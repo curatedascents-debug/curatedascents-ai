@@ -11,6 +11,12 @@ export default function Home() {
         <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg text-lg transition">
           Begin Your Journey
         </button>
+        <a 
+  href="/about" 
+  className="ml-4 bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 px-8 rounded-lg text-lg transition"
+>
+  Our Expertise
+</a>
       </section>
     </main>
   );
