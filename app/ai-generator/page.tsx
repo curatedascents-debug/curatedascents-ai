@@ -67,46 +67,57 @@ export default function AIGeneratorPage() {
   };
 
   // Generate AI itinerary
-  const generateItinerary = async () => {
-    setIsGenerating(true);
-    setError('');
-    setAiResponse(null);
+ const generateItinerary = async () => {
+  setIsGenerating(true);
+  setError('');
+  setAiResponse(null);
 
-    try {
-      // For now, we'll simulate the AI response
-      // In Phase 2, we'll replace this with actual DeepSeek API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock AI response based on preferences
-      const mockResponse: AIResponse = {
-        itinerary: `Based on your preferences for ${preferences.destination} (${preferences.duration} days, ${preferences.interests.join(', ')} interests), here's a curated itinerary:
+  try {
+    // Call our new API route
+    const response = await fetch('/api/ai-itinerary', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(preferences),
+    });
 
-Day 1-2: Kathmandu Valley immersion with private heritage tours
-Day 3-5: ${preferences.interests.includes('Trekking') ? 'Annapurna foothills trek with luxury lodges' : 'Pokhara lakeside luxury with helicopter scenic flights'}
-Day 6-${preferences.duration}: ${preferences.destination === 'Bhutan' ? 'Paro & Punakha cultural journey' : 'Chitwan wildlife safari with premium lodge stays'}
+    const data = await response.json();
 
-All experiences include private guides, premium accommodations, and exclusive access based on 25 years of local expertise.`,
-        
-        estimatedCost: `$${preferences.budget === 'premium' ? '4,500' : preferences.budget === 'luxury' ? '6,800' : '9,200'} per person`,
-        
-        bestSeason: preferences.destination === 'Bhutan' ? 'March-May & September-November' : 'October-November & February-April',
-        
-        proTips: [
-          'Book at least 90 days in advance for premium lodges',
-          'Consider adding a helicopter scenic flight for mountain views',
-          'Include a rest day for altitude acclimatization if trekking',
-          'Request private cultural experiences for deeper immersion'
-        ]
-      };
-
-      setAiResponse(mockResponse);
-    } catch (err) {
-      setError('Failed to generate itinerary. Please try again.');
-      console.error('Generation error:', err);
-    } finally {
-      setIsGenerating(false);
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to generate itinerary');
     }
-  };
+
+    // The AI response comes back as a text block
+    const aiText = data.itinerary;
+    
+    // Simple parsing to extract sections
+    const sections = aiText.split('\n\n');
+    const costMatch = aiText.match(/\$\d+(?:,\d+)*(?:\.\d+)?/g);
+    const seasonMatch = aiText.match(/[A-Z][a-z]+(?: to |-)[A-Z][a-z]+/g);
+    
+    const aiResponse: AIResponse = {
+      itinerary: sections[0] || aiText,
+      estimatedCost: costMatch ? costMatch[0] + ' per person' : 'Contact for detailed pricing',
+      bestSeason: seasonMatch ? seasonMatch[0] : 'October to April',
+      proTips: sections
+        .filter((s: string) => 
+          s.toLowerCase().includes('tip') || 
+          s.toLowerCase().includes('recommend') ||
+          s.toLowerCase().includes('advice')
+        )
+        .slice(0, 4)
+        .map((tip: string) => tip.replace(/^\d+\.\s*/, '').trim())
+    };
+
+    setAiResponse(aiResponse);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Failed to generate itinerary. Please try again.');
+    console.error('Generation error:', err);
+  } finally {
+    setIsGenerating(false);
+  }
+};
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
