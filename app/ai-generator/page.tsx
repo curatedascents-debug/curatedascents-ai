@@ -73,7 +73,9 @@ export default function AIGeneratorPage() {
   setAiResponse(null);
 
   try {
-    // Call our new API route
+    console.log('📤 Sending request to API with preferences:', preferences);
+    
+    // Call our API route
     const response = await fetch('/api/ai-itinerary', {
       method: 'POST',
       headers: {
@@ -82,38 +84,69 @@ export default function AIGeneratorPage() {
       body: JSON.stringify(preferences),
     });
 
+    console.log('📥 API response status:', response.status);
+    
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to generate itinerary');
+      throw new Error(data.error || `API error: ${response.status}`);
     }
 
+    console.log('✅ API call successful, received data:', data);
+    
     // The AI response comes back as a text block
     const aiText = data.itinerary;
     
-    // Simple parsing to extract sections
+    // Parse the response
     const sections = aiText.split('\n\n');
-    const costMatch = aiText.match(/\$\d+(?:,\d+)*(?:\.\d+)?/g);
-    const seasonMatch = aiText.match(/[A-Z][a-z]+(?: to |-)[A-Z][a-z]+/g);
     
+    // Extract cost estimate
+    let estimatedCost = 'Contact for detailed pricing';
+    const costMatch = aiText.match(/\$[\d,]+(?:\s*-\s*\$[\d,]+)?(?:\s*per\s+person)?/i);
+    if (costMatch) {
+      estimatedCost = costMatch[0];
+    }
+    
+    // Extract best season
+    let bestSeason = 'October to April';
+    const seasonMatch = aiText.match(/(?:best|optimal|ideal).*?(season|time|months)[:.\-\s]+([^.]+)/i);
+    if (seasonMatch && seasonMatch[2]) {
+      bestSeason = seasonMatch[2].trim();
+    }
+    
+    // Extract tips
+    const proTips: string[] = [];
+    const tipLines = aiText.split('\n').filter(line => 
+      line.toLowerCase().includes('tip') || 
+      line.match(/^\d+\./) ||
+      line.includes('💡') ||
+      line.includes('✨')
+    );
+    
+    if (tipLines.length > 0) {
+      proTips.push(...tipLines.slice(0, 4).map(tip => tip.replace(/^\d+\.\s*/, '').trim()));
+    } else {
+      // Fallback tips
+      proTips.push(
+        'Book at least 90 days in advance for premium accommodations',
+        'Consider travel insurance for high-altitude destinations',
+        'Pack layers for variable mountain weather',
+        'Allow extra days for potential flight delays in remote regions'
+      );
+    }
+
     const aiResponse: AIResponse = {
       itinerary: sections[0] || aiText,
-      estimatedCost: costMatch ? costMatch[0] + ' per person' : 'Contact for detailed pricing',
-      bestSeason: seasonMatch ? seasonMatch[0] : 'October to April',
-      proTips: sections
-        .filter((s: string) => 
-          s.toLowerCase().includes('tip') || 
-          s.toLowerCase().includes('recommend') ||
-          s.toLowerCase().includes('advice')
-        )
-        .slice(0, 4)
-        .map((tip: string) => tip.replace(/^\d+\.\s*/, '').trim())
+      estimatedCost,
+      bestSeason,
+      proTips,
     };
 
     setAiResponse(aiResponse);
   } catch (err) {
-    setError(err instanceof Error ? err.message : 'Failed to generate itinerary. Please try again.');
-    console.error('Generation error:', err);
+    console.error('❌ Generation error:', err);
+    const errorMsg = err instanceof Error ? err.message : 'Failed to generate itinerary. Please try again.';
+    setError(errorMsg);
   } finally {
     setIsGenerating(false);
   }
