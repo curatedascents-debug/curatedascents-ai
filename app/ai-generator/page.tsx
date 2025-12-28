@@ -306,31 +306,33 @@ export default function AIGeneratorPage() {
                     </div>
                   </div>
 
-                  {/* Quick Facts */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-blue-50 p-4 rounded-xl">
-                      <div className="text-sm text-gray-600 mb-1">Estimated Cost</div>
-                      <div className="text-lg font-bold text-gray-900">{aiResponse.estimatedCost}</div>
-                    </div>
-                    <div className="bg-purple-50 p-4 rounded-xl">
-                      <div className="text-sm text-gray-600 mb-1">Best Season</div>
-                      <div className="text-lg font-bold text-gray-900">{aiResponse.bestSeason}</div>
-                    </div>
-                  </div>
+                  {/* Only show these sections if they have content */}
+{aiResponse.estimatedCost && (
+  <div className="grid grid-cols-2 gap-4">
+    <div className="bg-blue-50 p-4 rounded-xl">
+      <div className="text-sm text-gray-600 mb-1">Estimated Cost</div>
+      <div className="text-lg font-bold text-gray-900">{aiResponse.estimatedCost}</div>
+    </div>
+    <div className="bg-purple-50 p-4 rounded-xl">
+      <div className="text-sm text-gray-600 mb-1">Best Season</div>
+      <div className="text-lg font-bold text-gray-900">{aiResponse.bestSeason}</div>
+    </div>
+  </div>
+)}
 
-                  {/* Pro Tips */}
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Expert Tips</h3>
-                    <ul className="space-y-3">
-                      {aiResponse.proTips.map((tip, index) => (
-                        <li key={index} className="flex items-start">
-                          <span className="text-blue-500 mr-3">•</span>
-                          <span className="text-gray-700">{tip}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
+{aiResponse.proTips.length > 0 && (
+  <div>
+    <h3 className="text-lg font-bold text-gray-900 mb-4">Expert Tips</h3>
+    <ul className="space-y-3">
+      {aiResponse.proTips.map((tip, index) => (
+        <li key={index} className="flex items-start">
+          <span className="text-blue-500 mr-3">•</span>
+          <span className="text-gray-700">{tip}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
                   {/* CTA */}
                   <div className="pt-6 border-t border-gray-200">
                     <p className="text-gray-700 mb-4">Ready to make this itinerary a reality?</p>
