@@ -1,4 +1,4 @@
-"use client"; // This marks the page as a Client Component for interactivity
+"use client";
 
 import { useState } from 'react';
 
@@ -12,6 +12,7 @@ export default function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
+  const [submitError, setSubmitError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,28 +21,52 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError('');
+    setSubmitMessage('');
     
-    // For now, we'll simulate form submission
-    // In the next step, we'll connect to a real email service
-    setTimeout(() => {
-      console.log('Form would submit:', formData);
-      setSubmitMessage(`Thank you ${formData.name}! Your inquiry for ${formData.destination} has been received. I'll personally respond within 24 hours.`);
-      setIsSubmitting(false);
-      
-      // Reset form after successful "submission"
-      setFormData({
-        name: '',
-        email: '',
-        destination: 'Nepal',
-        travelers: '1',
-        message: ''
+    // REPLACE THIS URL WITH YOUR ACTUAL FORMSPREE ENDPOINT
+    const FORMSPREE_ENDPOINT = "https://formspree.io/f/meeqkvpp";
+    
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          destination: formData.destination,
+          travelers: formData.travelers,
+          message: formData.message,
+          _subject: `New Inquiry: ${formData.destination} trip for ${formData.travelers} traveler(s)`,
+        }),
       });
-    }, 1500);
+      
+      if (response.ok) {
+        setSubmitMessage(`Thank you ${formData.name}! Your inquiry for ${formData.destination} has been received. I'll personally respond within 24 hours.`);
+        
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          destination: 'Nepal',
+          travelers: '1',
+          message: ''
+        });
+      } else {
+        throw new Error('Form submission failed');
+      }
+    } catch (error) {
+      setSubmitError('There was an error sending your message. Please email me directly or try again.');
+      console.error('Form submission error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      {/* Hero Section */}
       <section className="px-6 py-16 bg-gradient-to-r from-blue-600 to-purple-700 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -54,7 +79,6 @@ export default function ContactPage() {
       </section>
 
       <div className="max-w-6xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-12">
-        {/* Contact Form */}
         <div className="md:col-span-2">
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Personalized Inquiry</h2>
@@ -139,7 +163,7 @@ export default function ContactPage() {
                 disabled={isSubmitting}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg text-lg transition disabled:opacity-70"
               >
-                {isSubmitting ? 'Crafting Your Response...' : 'Submit Inquiry →'}
+                {isSubmitting ? 'Sending Your Inquiry...' : 'Submit Inquiry →'}
               </button>
 
               {submitMessage && (
@@ -147,11 +171,19 @@ export default function ContactPage() {
                   <p className="text-green-800 font-medium">✓ {submitMessage}</p>
                 </div>
               )}
+
+              {submitError && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-800 font-medium">⚠️ {submitError}</p>
+                  <p className="text-red-700 text-sm mt-1">
+                    You can also email me directly at: [YourEmail@curatedascents.com]
+                  </p>
+                </div>
+              )}
             </form>
           </div>
         </div>
 
-        {/* Contact Info Sidebar */}
         <div className="space-y-8">
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h3 className="text-xl font-bold text-gray-900 mb-6">Why Inquire Directly</h3>
@@ -168,28 +200,18 @@ export default function ContactPage() {
                 <span className="text-blue-600 mr-3">✓</span>
                 <span className="text-gray-700">No automated responses - <strong>direct expert consultation</strong></span>
               </li>
-              <li className="flex items-start">
-                <span className="text-blue-600 mr-3">✓</span>
-                <span className="text-gray-700">Priority access to <strong>exclusive experiences</strong></span>
-              </li>
             </ul>
           </div>
 
           <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg p-8">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">What Happens Next</h3>
-            <ol className="space-y-4 text-gray-700">
-              <li className="flex items-start">
-                <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">1</span>
-                <span>I'll review your inquiry and research availability</span>
-              </li>
-              <li className="flex items-start">
-                <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">2</span>
-                <span>Generate a preliminary AI-curated itinerary</span>
-              </li>
-              <li className="flex items-start">
-                <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">3</span>
-                <span>Schedule a personal consultation call</span>
-              </li>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Email Testing Note</h3>
+            <p className="text-gray-700 mb-3">
+              <strong>Form is now connected to Formspree.</strong> After submitting, check:
+            </p>
+            <ol className="space-y-2 text-gray-700 text-sm">
+              <li>1. Your Formspree dashboard for the submission</li>
+              <li>2. Your connected email inbox</li>
+              <li>3. The success message on this page</li>
             </ol>
           </div>
         </div>
