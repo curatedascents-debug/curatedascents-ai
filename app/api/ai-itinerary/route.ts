@@ -107,4 +107,4 @@ Format the response clearly for a luxury travel client. Focus on exclusive acces
       { status: 500 }
     );
   }
-}
+}// Redeploy trigger: Sun Dec 28 06:02:04 UTC 2025
