@@ -98,16 +98,11 @@ export default function AIGeneratorPage() {
     const aiText = data.itinerary;
 
     // Show the FULL AI response
-    const aiResponse: AIResponse = {
+        const aiResponse: AIResponse = {
       itinerary: aiText,
-      estimatedCost: 'Custom quote based on your preferences',
-      bestSeason: 'Optimized for your travel dates',
-      proTips: [
-        '✓ Real AI-generated itinerary using DeepSeek API',
-        '✓ Contact me to refine with 25 years of expertise',
-        '✓ All details customizable to your exact preferences',
-        '✓ Includes exclusive access and premium services'
-      ],
+      estimatedCost: '',
+      bestSeason: '',  
+      proTips: [],
     };
 
     setAiResponse(aiResponse);
