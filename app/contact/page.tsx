@@ -176,7 +176,7 @@ export default function ContactPage() {
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                   <p className="text-red-800 font-medium">⚠️ {submitError}</p>
                   <p className="text-red-700 text-sm mt-1">
-                    You can also email me directly at: [YourEmail@curatedascents.com]
+                    You can also email me directly at: curatedascents@gmail.com
                   </p>
                 </div>
               )}
