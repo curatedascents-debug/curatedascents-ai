@@ -83,4 +83,4 @@ Format the response clearly for a luxury travel client. Focus on exclusive acces
       { status: 500 }
     );
   }
-}
+}// AI API configured on Sun Dec 28 05:36:55 UTC 2025
