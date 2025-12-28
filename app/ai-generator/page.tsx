@@ -1,5 +1,5 @@
 "use client";
-
+import ReactMarkdown from 'react-markdown';
 import { useState } from 'react';
 
 // Type definitions for our form and AI response
@@ -298,13 +298,26 @@ export default function AIGeneratorPage() {
                 </div>
 
                 <div className="space-y-8">
-                  {/* Itinerary */}
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Your Personalized Itinerary</h3>
-                    <div className="bg-gray-50 p-6 rounded-xl whitespace-pre-line text-gray-700">
-                      {aiResponse.itinerary}
-                    </div>
-                  </div>
+                 {/* Itinerary with Markdown Rendering */}
+<div>
+  <h3 className="text-xl font-bold text-gray-900 mb-4">Your Personalized Itinerary</h3>
+  <div className="bg-gray-50 p-6 rounded-xl text-gray-700 prose prose-lg max-w-none">
+    <ReactMarkdown
+      components={{
+        h1: ({node, ...props}) => <h1 className="text-2xl font-bold mt-6 mb-4 text-blue-800" {...props} />,
+        h2: ({node, ...props}) => <h2 className="text-xl font-bold mt-5 mb-3 text-gray-900" {...props} />,
+        h3: ({node, ...props}) => <h3 className="text-lg font-bold mt-4 mb-2 text-gray-800" {...props} />,
+        p: ({node, ...props}) => <p className="mb-4 leading-relaxed" {...props} />,
+        ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
+        li: ({node, ...props}) => <li className="pl-2" {...props} />,
+        strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
+        em: ({node, ...props}) => <em className="italic text-gray-700" {...props} />,
+      }}
+    >
+      {aiResponse.itinerary}
+    </ReactMarkdown>
+  </div>
+</div>
 
                   {/* Only show these sections if they have content */}
 {aiResponse.estimatedCost && (
