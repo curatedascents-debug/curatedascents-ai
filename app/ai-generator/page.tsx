@@ -116,15 +116,15 @@ export default function AIGeneratorPage() {
     
     // Extract tips
     const proTips: string[] = [];
-    const tipLines = aiText.split('\n').filter(line => 
-      line.toLowerCase().includes('tip') || 
-      line.match(/^\d+\./) ||
-      line.includes('💡') ||
-      line.includes('✨')
-    );
+   const tipLines = aiText.split('\n').filter((line: string) => 
+  line.toLowerCase().includes('tip') || 
+  line.match(/^\d+\./) ||
+  line.includes('💡') ||
+  line.includes('✨')
+);
     
     if (tipLines.length > 0) {
-      proTips.push(...tipLines.slice(0, 4).map(tip => tip.replace(/^\d+\.\s*/, '').trim()));
+      proTips.push(...tipLines.slice(0, 4).map((tip: string) => tip.replace(/^\d+\.\s*/, '').trim()));
     } else {
       // Fallback tips
       proTips.push(
