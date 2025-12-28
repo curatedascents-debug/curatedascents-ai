@@ -94,52 +94,20 @@ export default function AIGeneratorPage() {
 
     console.log('✅ API call successful, received data:', data);
     
-    // The AI response comes back as a text block
+        // The AI response comes back as a text block
     const aiText = data.itinerary;
-    
-    // Parse the response
-    const sections = aiText.split('\n\n');
-    
-    // Extract cost estimate
-    let estimatedCost = 'Contact for detailed pricing';
-    const costMatch = aiText.match(/\$[\d,]+(?:\s*-\s*\$[\d,]+)?(?:\s*per\s+person)?/i);
-    if (costMatch) {
-      estimatedCost = costMatch[0];
-    }
-    
-    // Extract best season
-    let bestSeason = 'October to April';
-    const seasonMatch = aiText.match(/(?:best|optimal|ideal).*?(season|time|months)[:.\-\s]+([^.]+)/i);
-    if (seasonMatch && seasonMatch[2]) {
-      bestSeason = seasonMatch[2].trim();
-    }
-    
-    // Extract tips
-    const proTips: string[] = [];
-   const tipLines = aiText.split('\n').filter((line: string) => 
-  line.toLowerCase().includes('tip') || 
-  line.match(/^\d+\./) ||
-  line.includes('💡') ||
-  line.includes('✨')
-);
-    
-    if (tipLines.length > 0) {
-      proTips.push(...tipLines.slice(0, 4).map((tip: string) => tip.replace(/^\d+\.\s*/, '').trim()));
-    } else {
-      // Fallback tips
-      proTips.push(
-        'Book at least 90 days in advance for premium accommodations',
-        'Consider travel insurance for high-altitude destinations',
-        'Pack layers for variable mountain weather',
-        'Allow extra days for potential flight delays in remote regions'
-      );
-    }
 
+    // Show the FULL AI response
     const aiResponse: AIResponse = {
-      itinerary: sections[0] || aiText,
-      estimatedCost,
-      bestSeason,
-      proTips,
+      itinerary: aiText,
+      estimatedCost: 'Custom quote based on your preferences',
+      bestSeason: 'Optimized for your travel dates',
+      proTips: [
+        '✓ Real AI-generated itinerary using DeepSeek API',
+        '✓ Contact me to refine with 25 years of expertise',
+        '✓ All details customizable to your exact preferences',
+        '✓ Includes exclusive access and premium services'
+      ],
     };
 
     setAiResponse(aiResponse);
