@@ -17,6 +17,13 @@ export default function Home() {
 >
   Our Expertise
 </a>
+<a 
+  href="/contact" 
+  className="ml-4 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg text-lg transition"
+>
+  Start Planning
+</a>
+
       </section>
     </main>
   );
