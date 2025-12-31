@@ -1,30 +1,33 @@
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50">
-      <section className="px-6 py-24 text-center">
-        <h1 className="text-5xl font-bold text-gray-900 mb-6">
-          CuratedAscents <span className="text-blue-600">AI</span>
-        </h1>
-        <p className="text-xl text-gray-700 max-w-2xl mx-auto mb-10">
-          Where 25 Years of Himalayan Mastery Meets Artificial Intelligence.
+    <div className="py-8">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">Welcome to CuratedAscents AI</h1>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Your AI-powered luxury travel platform with 25+ years of Himalayan expertise.
         </p>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg text-lg transition">
-          Begin Your Journey
-        </button>
-        <a 
-  href="/about" 
-  className="ml-4 bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 px-8 rounded-lg text-lg transition"
->
-  Our Expertise
-</a>
-<a 
-  href="/contact" 
-  className="ml-4 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg text-lg transition"
->
-  Start Planning
-</a>
-
-      </section>
-    </main>
+      </div>
+      
+      <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="font-bold text-xl mb-3">AI Trip Generator</h3>
+          <p className="text-gray-600">Create personalized luxury itineraries instantly.</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="font-bold text-xl mb-3">Expert Curation</h3>
+          <p className="text-gray-600">25+ years of Himalayan travel expertise.</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="font-bold text-xl mb-3">Luxury Packages</h3>
+          <p className="text-gray-600">Exclusive experiences in Nepal, Tibet, Bhutan.</p>
+        </div>
+      </div>
+      
+      <div className="text-center mt-12">
+        <a href="/contact" className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 inline-block">
+          Start Your Journey
+        </a>
+      </div>
+    </div>
   );
 }
