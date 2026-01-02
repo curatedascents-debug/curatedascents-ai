@@ -8,12 +8,28 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   margin: 0;
   padding: 0;
 }
 
-/* Utility classes */
+/* Logo-specific styling - SAFE */
+img[src*="logo.png"] {
+  display: block;
+  object-fit: contain;
+}
+
+/* Header logo - 192×192 source displayed at 64-80px */
+header img[src="/logo.png"] {
+  border-radius: 8px;
+}
+
+/* Footer logo - 160×160 source displayed at 48px */
+footer img[src="/logo-footer.png"] {
+  border-radius: 6px;
+}
+
+/* Container for consistent layout */
 .container {
   width: 100%;
   max-width: 1280px;
@@ -21,4 +37,12 @@ body {
   margin-right: auto;
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  header img[src="/logo.png"] {
+    height: 64px;
+    width: 64px;
+  }
 }
