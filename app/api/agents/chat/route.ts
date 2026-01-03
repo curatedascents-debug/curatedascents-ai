@@ -1,53 +1,84 @@
-// app/api/agents/chat/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-
-// DeepSeek API configuration
-const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
+import { getAgentMemory, updateAgentMemory } from '@/lib/agents/memory';
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, context } = await request.json();
+    const { messages, agentMode, sessionId, travelPreferences } = await request.json();
     
-    // Validate API key
-    const apiKey = process.env.DEEPSEEK_API_KEY;
-    if (!apiKey) {
+    // Validate required fields
+    if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
-        { 
-          error: 'API configuration error',
-          fallback: "I'm currently optimizing my systems. Based on our conversation, I recommend considering private helicopter tours and luxury lodges in the Annapurna region for an exclusive experience."
-        },
-        { status: 500 }
+        { error: 'Messages array is required' },
+        { status: 400 }
       );
     }
 
-    const systemPrompt = `You are an elite luxury travel agent with 25+ years of Himalayan expertise.
-ROLE: ${context.agentMode || 'planner'} specialist.
-CAPABILITIES: ${JSON.stringify(context.capabilities || [])}
+    // Get context from memory
+    let memoryContext = {};
+    try {
+      memoryContext = await getAgentMemory(sessionId);
+    } catch (memoryError) {
+      console.log('Memory system not available, starting fresh');
+    }
 
-MEMORY CONTEXT: ${JSON.stringify(context.memoryContext?.map((m: any) => m.key) || [])}
-CONVERSATION HISTORY: ${context.recentMessages || 'No recent messages'}
+    // System prompt based on agent mode
+    const modePrompts = {
+      planner: 'Focus on itinerary design, weather optimization, VIP access scoring, and luxury accommodations.',
+      negotiator: 'Focus on multi-vendor rate comparison, premium upgrades, exclusive access negotiation, and value optimization.',
+      concierge: 'Focus on personalized surprises, real-time local coordination, unique experiences, and guest delight.'
+    };
 
-CRITICAL BUSINESS RULES:
-1. ALWAYS position as luxury expert (25+ years Himalayan experience)
-2. ULTRA-LUXURY = $25,000+, LUXURY = $10,000-$25,000, PREMIUM = $5,000-$10,000
-3. Always suggest helicopter tours for remote access
-4. Recommend private guides for personalized experiences
-5. Mention specific properties: Tiger Mountain Pokhara, Dwarika's Kathmandu
-6. Include exclusive experiences: Everest flightseeing, Annapurna helicopter trek
+    const systemPrompt = `You are CuratedAscents AI, a luxury Himalayan travel specialist with 25+ years of experience.
 
-CURRENT QUERY: ${message}
+Mode: ${agentMode || 'planner'}
+${modePrompts[agentMode as keyof typeof modePrompts] || modePrompts.planner}
 
-RESPONSE FORMAT (JSON ONLY):
-{
-  "answer": "Your detailed response here",
-  "reasoning": "Internal thinking process",
-  "suggestions": ["Suggestion 1", "Suggestion 2", "Suggestion 3"],
-  "actions": ["Action 1", "Action 2"],
-  "budget_estimate": "$XX,XXX"
-}`;
+Memory Context: ${JSON.stringify(memoryContext)}
+
+Travel Preferences: ${JSON.stringify(travelPreferences || {})}
+
+Always structure responses with:
+1. Brief acknowledgment
+2. Specific, actionable suggestions
+3. Luxury differentiators
+4. Budget tier alignment (Ultra-Luxury: $25k+, Luxury: $10k-25k, Premium: $5k-10k)
+5. Next step recommendation
+
+Incorporate Himalayan luxury keywords: private helicopter, butler service, mountain villa, monastery access, spa retreat, exclusive access, personal guide.`;
+
+    // Get DeepSeek API key
+    const apiKey = process.env.DEEPSEEK_API_KEY;
+    if (!apiKey) {
+      console.error('DEEPSEEK_API_KEY is not configured');
+      
+      // Return a fallback response
+      const fallbackResponses = {
+        planner: "I'm currently designing your bespoke Himalayan itinerary. For immediate details, our luxury travel specialists are available at contact@curatedascents.com",
+        negotiator: "I'm securing premium upgrades and exclusive rates for your journey. For real-time negotiation, contact our team at contact@curatedascents.com",
+        concierge: "I'm arranging personalized surprises for your Himalayan adventure. For immediate concierge service, reach us at contact@curatedascents.com"
+      };
+      
+      const fallbackMode = agentMode || 'planner';
+      const fallbackResponse = fallbackResponses[fallbackMode as keyof typeof fallbackResponses] || 
+        fallbackResponses.planner;
+      
+      return NextResponse.json({ 
+        message: fallbackResponse,
+        sessionId: sessionId || `session_${Date.now()}`,
+        mode: agentMode || 'planner',
+        budgetTier: travelPreferences?.budget || 'luxury',
+        suggestions: [
+          "Private helicopter tour of Everest",
+          "Luxury villa with butler service",
+          "Exclusive monastery access",
+          "Personalized spa retreat"
+        ],
+        followUpQuestion: "What specific Himalayan destination are you most drawn to?"
+      });
+    }
 
     // Call DeepSeek API
-    const response = await fetch(DEEPSEEK_API_URL, {
+    const deepseekResponse = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -57,60 +88,79 @@ RESPONSE FORMAT (JSON ONLY):
         model: 'deepseek-chat',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: message }
+          ...messages.slice(-10) // Last 10 messages for context
         ],
         temperature: 0.7,
-        max_tokens: 1000,
-        response_format: { type: 'json_object' }
+        max_tokens: 1500,
+        stream: false
       })
     });
 
-    if (!response.ok) {
-      throw new Error(`DeepSeek API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
-    
-    if (!content) {
-      throw new Error('No response from DeepSeek');
-    }
-
-    const parsedResponse = JSON.parse(content);
-    
-    return NextResponse.json({
-      response: parsedResponse.answer,
-      metadata: {
-        reasoning: parsedResponse.reasoning || "Analyzing luxury travel patterns for optimal experience",
-        suggestions: parsedResponse.suggestions || [
-          "Consider private helicopter transfers",
-          "Ask about exclusive mountain lodge availability",
-          "Inquire about cultural immersion experiences"
+    if (!deepseekResponse.ok) {
+      const errorText = await deepseekResponse.text();
+      console.error('DeepSeek API error:', deepseekResponse.status, errorText);
+      
+      // Return a fallback response
+      return NextResponse.json({
+        message: `I'm enhancing your luxury travel plan. For immediate details, our Himalayan specialists are available at contact@curatedascents.com`,
+        sessionId: sessionId || `session_${Date.now()}`,
+        mode: agentMode || 'planner',
+        budgetTier: travelPreferences?.budget || 'luxury',
+        suggestions: [
+          "Private helicopter tour of Everest",
+          "Luxury villa with butler service",
+          "Exclusive monastery access",
+          "Personalized spa retreat"
         ],
-        actions: parsedResponse.actions || ['Schedule consultation', 'Check availability'],
-        budgetEstimate: parsedResponse.budget_estimate,
-        model: 'deepseek-chat'
+        followUpQuestion: "What specific Himalayan destination are you most drawn to?"
+      });
+    }
+
+    const data = await deepseekResponse.json();
+    const aiMessage = data.choices[0]?.message?.content || 
+      "I appreciate your interest in luxury Himalayan travel. Based on 25+ years of expertise, I recommend our signature 'Himalayan Royal Retreat' with private helicopter transfers and exclusive monastery access.";
+
+    // Update memory with this interaction
+    if (sessionId) {
+      try {
+        await updateAgentMemory(sessionId, {
+          lastInteraction: new Date().toISOString(),
+          agentMode: agentMode || 'planner',
+          conversationSummary: `User interested in: ${messages[messages.length - 1]?.content?.substring(0, 100)}...`,
+          preferences: travelPreferences || {}
+        });
+      } catch (memoryError) {
+        console.log('Memory update failed:', memoryError);
       }
+    }
+
+    return NextResponse.json({ 
+      message: aiMessage,
+      sessionId: sessionId || `session_${Date.now()}`,
+      mode: agentMode || 'planner',
+      budgetTier: travelPreferences?.budget || 'luxury',
+      suggestions: [
+        "Private helicopter tour of Everest",
+        "Luxury villa with butler service",
+        "Exclusive monastery access",
+        "Personalized spa retreat"
+      ],
+      followUpQuestion: "What specific Himalayan destination are you most drawn to?"
     });
 
-  } catch (error: any) {
-    console.error('DeepSeek agent error:', error);
+  } catch (error) {
+    console.error('Agent API error:', error);
     
-    // Enhanced fallback responses
-    const fallbacks = {
-      planner: "I'd craft an itinerary starting with Kathmandu's heritage sites, then a helicopter to Pokhara for luxury lakefront relaxation. Annapurna Base Camp helicopter tours are exclusive this season.",
-      negotiator: "Based on current Himalayan rates, I can secure VIP treatment at luxury lodges. Private guides with Everest experience are available at premium rates for personalized journeys.",
-      concierge: "I'll arrange sunrise champagne service at Poon Hill, private Thakali cuisine experiences, and spa treatments using traditional Himalayan herbs and techniques."
-    };
-    
-    return NextResponse.json({
-      response: fallbacks[context?.agentMode || 'planner'] || 
-                "I'm enhancing your luxury travel plan. For immediate details, our Himalayan specialists are available at contact@curatedascents.com",
-      metadata: {
-        reasoning: "System optimizing: Providing curated recommendations from 25+ years of Himalayan luxury expertise",
-        suggestions: ["Contact for exact pricing", "Request specific dates", "Ask about monsoon-season alternatives"],
-        isFallback: true
-      }
-    }, { status: 500 });
+    return NextResponse.json({ 
+      message: "I apologize for the interruption. As your luxury travel AI, I'm here to design exceptional Himalayan experiences. Please try again or contact our team at contact@curatedascents.com for immediate assistance.",
+      sessionId: `error_session_${Date.now()}`,
+      mode: 'planner',
+      budgetTier: 'luxury',
+      suggestions: [
+        "Retry the conversation",
+        "Contact our luxury specialists",
+        "Browse our signature experiences"
+      ]
+    });
   }
 }
