@@ -1,114 +1,84 @@
 /**
- * Utility functions for cleaning and formatting AI responses
+ * Comprehensive text cleaner for removing ALL markdown formatting
  */
 
-/**
- * Cleans AI text by removing markdown formatting
- */
-export function cleanAIText(text: string): string {
-    if (!text) return text;
+export function cleanText(text: string): string {
+    if (!text || typeof text !== 'string') return '';
 
     let cleaned = text;
 
-    // Remove markdown headers
+    // 1. Remove ALL markdown headers (single # to ######)
     cleaned = cleaned.replace(/^#{1,6}\s+/gm, '');
 
-    // Remove bold markers
+    // 2. Remove bold/italic markdown (**text**, *text*)
     cleaned = cleaned.replace(/\*\*/g, '');
+    cleaned = cleaned.replace(/\*/g, '');
 
-    // Remove italic markers but keep text
-    cleaned = cleaned.replace(/\*([^*]+)\*/g, '$1');
-
-    // Remove inline code markers
-    cleaned = cleaned.replace(/`([^`]+)`/g, '$1');
-
-    // Convert markdown bullets to • (preserving indentation)
-    cleaned = cleaned.replace(/^(\s*)[-*+]\s+/gm, '$1• ');
-
-    // Convert numbered lists (keep numbers)
-    cleaned = cleaned.replace(/^(\s*)\d+\.\s+/gm, '$1$&');
-
-    // Remove code blocks
+    // 3. Remove inline code and code blocks
     cleaned = cleaned.replace(/```[\s\S]*?```/g, '');
+    cleaned = cleaned.replace(/`/g, '');
 
-    // Clean up multiple newlines (keep max 2)
+    // 4. Remove markdown lists (both * and -)
+    cleaned = cleaned.replace(/^\s*[\*\-]\s+/gm, '• ');
+
+    // 5. Remove numbered lists
+    cleaned = cleaned.replace(/^\s*\d+\.\s+/gm, '');
+
+    // 6. Remove horizontal rules
+    cleaned = cleaned.replace(/^\s*[-*_]{3,}\s*$/gm, '');
+
+    // 7. Remove blockquotes
+    cleaned = cleaned.replace(/^\s*>\s+/gm, '');
+
+    // 8. Remove markdown links [text](url)
+    cleaned = cleaned.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+
+    // 9. Remove any remaining HTML tags (just in case)
+    cleaned = cleaned.replace(/<[^>]*>/g, '');
+
+    // 10. Clean up extra whitespace
+    cleaned = cleaned.replace(/\n\s*\n\s*\n/g, '\n\n');
+    cleaned = cleaned.replace(/[ \t]+/g, ' ');
+
+    // 11. Trim and return
+    return cleaned.trim();
+}
+
+/**
+ * Ultra-aggressive cleaning for stubborn API responses
+ */
+export function aggressiveClean(text: string): string {
+    if (!text || typeof text !== 'string') return '';
+
+    let cleaned = text;
+
+    // Remove ALL special markdown characters
+    cleaned = cleaned.replace(/[#*`_\-~>\[\]\(\)]/g, '');
+
+    // Fix list formatting
+    cleaned = cleaned.replace(/^\s*[•\-]\s+/gm, '• ');
+
+    // Normalize line breaks
+    cleaned = cleaned.replace(/\r\n/g, '\n');
     cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
-
-    // Clean up multiple spaces
-    cleaned = cleaned.replace(/[ \t]{2,}/g, ' ');
 
     return cleaned.trim();
 }
 
 /**
- * Formats text for HTML display (safe for dangerouslySetInnerHTML)
+ * Check if text contains markdown
  */
-export function formatTextForHTML(text: string): string {
-    const cleaned = cleanAIText(text);
+export function hasMarkdown(text: string): boolean {
+    const markdownPatterns = [
+        /^#{1,6}\s+/m,
+        /\*\*/,
+        /\*/,
+        /```/,
+        /`/,
+        /^[\*\-]\s+/m,
+        /^\d+\.\s+/m,
+        /\[.*\]\(.*\)/
+    ];
 
-    // Convert to HTML with basic formatting
-    return cleaned
-        .split('\n')
-        .map(line => {
-            if (!line.trim()) return '<br>';
-
-            // Check if line looks like a header (short, no period, ends with colon)
-            if (line.length < 50 && !line.includes('.') && line.trim().endsWith(':')) {
-                return `<h3 class="text-lg font-bold mt-4 mb-2 text-gray-900">${line.replace(':', '')}</h3>`;
-            }
-
-            // Check if line is a bullet point
-            if (line.trim().startsWith('•')) {
-                return `<div class="flex items-start mt-1">
-                  <span class="mr-2 mt-1">•</span>
-                  <span>${line.replace('•', '').trim()}</span>
-                </div>`;
-            }
-
-            // Check if line is a numbered item
-            if (line.match(/^\s*\d+\./)) {
-                return `<div class="ml-4 my-1">${line}</div>`;
-            }
-
-            // Regular paragraph
-            return `<p class="my-2">${line}</p>`;
-        })
-        .join('');
-}
-
-/**
- * Simple clean for immediate display (no HTML)
- */
-export function simpleClean(text: string): string {
-    return text
-        .replace(/^#+\s*/gm, '')
-        .replace(/\*\*/g, '')
-        .replace(/\*(?!\s)([^*]+)(?<!\s)\*/g, '$1')
-        .replace(/^\s*[-*+]\s+/gm, '• ')
-        .replace(/`([^`]+)`/g, '$1')
-        .replace(/\s+/g, ' ')
-        .trim();
-}
-
-/**
- * Extract budget tier from AI response
- */
-export function extractBudgetTier(text: string): 'Ultra-Luxury' | 'Luxury' | 'Premium' | null {
-    const lowerText = text.toLowerCase();
-
-    if (lowerText.includes('ultra-luxury') || lowerText.includes('$25,000') || lowerText.includes('25000')) {
-        return 'Ultra-Luxury';
-    }
-
-    if (lowerText.includes('luxury') ||
-        (lowerText.includes('$10,000') && lowerText.includes('$25,000')) ||
-        (lowerText.includes('10000') && lowerText.includes('25000'))) {
-        return 'Luxury';
-    }
-
-    if (lowerText.includes('premium') || lowerText.includes('$5,000') || lowerText.includes('5000')) {
-        return 'Premium';
-    }
-
-    return null;
+    return markdownPatterns.some(pattern => pattern.test(text));
 }
