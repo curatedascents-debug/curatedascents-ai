@@ -1,166 +1,151 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAgentMemory, updateAgentMemory } from '@/lib/agents/memory';
+import { getMemory, updateMemory } from '@/lib/agents/memory';
+
+export const maxDuration = 30;
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, agentMode, sessionId, travelPreferences } = await request.json();
-    
-    // Validate required fields
-    if (!messages || !Array.isArray(messages)) {
+    const { message, sessionId, agentType } = await request.json();
+
+    if (!message || !sessionId) {
       return NextResponse.json(
-        { error: 'Messages array is required' },
+        { error: 'Message and sessionId are required' },
         { status: 400 }
       );
     }
 
-    // Get context from memory
-    let memoryContext = {};
-    try {
-      memoryContext = await getAgentMemory(sessionId);
-    } catch (memoryError) {
-      console.log('Memory system not available, starting fresh');
-    }
+    // Get conversation history from memory
+    const memory = await getMemory(sessionId);
+    const previousMessages = memory.messages.slice(-10); // Last 10 messages for context
 
-    // System prompt based on agent mode
-    const modePrompts = {
-      planner: 'Focus on itinerary design, weather optimization, VIP access scoring, and luxury accommodations.',
-      negotiator: 'Focus on multi-vendor rate comparison, premium upgrades, exclusive access negotiation, and value optimization.',
-      concierge: 'Focus on personalized surprises, real-time local coordination, unique experiences, and guest delight.'
-    };
+    // Enhanced system prompt with strict formatting rules
+    const systemPrompt = `You are CuratedAscents AI, a premier luxury travel concierge with 25+ years of Himalayan expertise.
 
-    const systemPrompt = `You are CuratedAscents AI, a luxury Himalayan travel specialist with 25+ years of experience.
+CRITICAL FORMATTING RULES - YOU MUST FOLLOW THESE:
+1. NEVER use markdown symbols: #, *, **, \`\`\`, \`
+2. NEVER create headers with # symbols
+3. Use ONLY plain text formatting
+4. For emphasis: Use CAPITALIZATION or descriptive language instead of asterisks
+5. For lists: Use bullet points with • symbol or numbered lists (1., 2., 3.)
+6. Section separation: Use double line breaks between sections
 
-Mode: ${agentMode || 'planner'}
-${modePrompts[agentMode as keyof typeof modePrompts] || modePrompts.planner}
+AGENT SPECIALIZATIONS:
+${agentType === 'planner' ? '• You are the PLANNER: Design exquisite itineraries, optimize for weather/season, secure VIP access' : ''}
+${agentType === 'negotiator' ? '• You are the NEGOTIATOR: Compare multi-vendor rates, secure premium upgrades, exclusive perks' : ''}
+${agentType === 'concierge' ? '• You are the CONCIERGE: Arrange personalized surprises, real-time coordination, special requests' : ''}
 
-Memory Context: ${JSON.stringify(memoryContext)}
+RESPONSE GUIDELINES:
+• Use elegant, conversational language fitting for luxury travel
+• Provide specific, actionable recommendations
+• Ask clarifying questions when needed
+• Maintain 25+ years expert tone
+• Format all responses in clean, readable plain text
+• Use • for bullet points, not * or -
 
-Travel Preferences: ${JSON.stringify(travelPreferences || {})}
+EXAMPLE OF GOOD FORMATTING:
+For your luxury Himalayan experience, I recommend:
 
-Always structure responses with:
-1. Brief acknowledgment
-2. Specific, actionable suggestions
-3. Luxury differentiators
-4. Budget tier alignment (Ultra-Luxury: $25k+, Luxury: $10k-25k, Premium: $5k-10k)
-5. Next step recommendation
+• Private helicopter tour to Everest Base Camp
+• Stay at the exclusive Yeti Mountain Home
+• Personal sherpa guide with 20+ years experience
 
-Incorporate Himalayan luxury keywords: private helicopter, butler service, mountain villa, monastery access, spa retreat, exclusive access, personal guide.`;
+The best time to visit is April-May for optimal weather conditions.`;
 
-    // Get DeepSeek API key
-    const apiKey = process.env.DEEPSEEK_API_KEY;
-    if (!apiKey) {
-      console.error('DEEPSEEK_API_KEY is not configured');
-      
-      // Return a fallback response
-      const fallbackResponses = {
-        planner: "I'm currently designing your bespoke Himalayan itinerary. For immediate details, our luxury travel specialists are available at contact@curatedascents.com",
-        negotiator: "I'm securing premium upgrades and exclusive rates for your journey. For real-time negotiation, contact our team at contact@curatedascents.com",
-        concierge: "I'm arranging personalized surprises for your Himalayan adventure. For immediate concierge service, reach us at contact@curatedascents.com"
-      };
-      
-      const fallbackMode = agentMode || 'planner';
-      const fallbackResponse = fallbackResponses[fallbackMode as keyof typeof fallbackResponses] || 
-        fallbackResponses.planner;
-      
-      return NextResponse.json({ 
-        message: fallbackResponse,
-        sessionId: sessionId || `session_${Date.now()}`,
-        mode: agentMode || 'planner',
-        budgetTier: travelPreferences?.budget || 'luxury',
-        suggestions: [
-          "Private helicopter tour of Everest",
-          "Luxury villa with butler service",
-          "Exclusive monastery access",
-          "Personalized spa retreat"
-        ],
-        followUpQuestion: "What specific Himalayan destination are you most drawn to?"
-      });
-    }
+    // Prepare messages for DeepSeek
+    const messages = [
+      {
+        role: 'system',
+        content: systemPrompt,
+      },
+      ...previousMessages.map(msg => ({
+        role: msg.isUser ? 'user' : 'assistant',
+        content: msg.content,
+      })),
+      {
+        role: 'user',
+        content: message,
+      },
+    ];
 
     // Call DeepSeek API
-    const deepseekResponse = await fetch('https://api.deepseek.com/v1/chat/completions', {
+    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
         model: 'deepseek-chat',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages.slice(-10) // Last 10 messages for context
-        ],
-        temperature: 0.7,
+        messages: messages,
         max_tokens: 1500,
-        stream: false
-      })
+        temperature: 0.7,
+        stream: false,
+      }),
     });
 
-    if (!deepseekResponse.ok) {
-      const errorText = await deepseekResponse.text();
-      console.error('DeepSeek API error:', deepseekResponse.status, errorText);
-      
-      // Return a fallback response
-      return NextResponse.json({
-        message: `I'm enhancing your luxury travel plan. For immediate details, our Himalayan specialists are available at contact@curatedascents.com`,
-        sessionId: sessionId || `session_${Date.now()}`,
-        mode: agentMode || 'planner',
-        budgetTier: travelPreferences?.budget || 'luxury',
-        suggestions: [
-          "Private helicopter tour of Everest",
-          "Luxury villa with butler service",
-          "Exclusive monastery access",
-          "Personalized spa retreat"
-        ],
-        followUpQuestion: "What specific Himalayan destination are you most drawn to?"
-      });
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('DeepSeek API error:', errorData);
+      throw new Error(`DeepSeek API error: ${response.status}`);
     }
 
-    const data = await deepseekResponse.json();
-    const aiMessage = data.choices[0]?.message?.content || 
-      "I appreciate your interest in luxury Himalayan travel. Based on 25+ years of expertise, I recommend our signature 'Himalayan Royal Retreat' with private helicopter transfers and exclusive monastery access.";
+    const data = await response.json();
+    const aiResponse = data.choices[0]?.message?.content || '';
 
-    // Update memory with this interaction
-    if (sessionId) {
-      try {
-        await updateAgentMemory(sessionId, {
-          lastInteraction: new Date().toISOString(),
-          agentMode: agentMode || 'planner',
-          conversationSummary: `User interested in: ${messages[messages.length - 1]?.content?.substring(0, 100)}...`,
-          preferences: travelPreferences || {}
-        });
-      } catch (memoryError) {
-        console.log('Memory update failed:', memoryError);
-      }
-    }
+    // Clean the response (extra safety measure)
+    const cleanedResponse = cleanAIText(aiResponse);
 
-    return NextResponse.json({ 
-      message: aiMessage,
-      sessionId: sessionId || `session_${Date.now()}`,
-      mode: agentMode || 'planner',
-      budgetTier: travelPreferences?.budget || 'luxury',
-      suggestions: [
-        "Private helicopter tour of Everest",
-        "Luxury villa with butler service",
-        "Exclusive monastery access",
-        "Personalized spa retreat"
-      ],
-      followUpQuestion: "What specific Himalayan destination are you most drawn to?"
+    // Update memory with new conversation
+    const updatedMemory = await updateMemory(sessionId, [
+      ...memory.messages,
+      { content: message, isUser: true, timestamp: new Date().toISOString() },
+      { content: cleanedResponse, isUser: false, timestamp: new Date().toISOString() },
+    ]);
+
+    return NextResponse.json({
+      response: cleanedResponse,
+      sessionId,
+      memory: updatedMemory,
     });
 
   } catch (error) {
-    console.error('Agent API error:', error);
-    
-    return NextResponse.json({ 
-      message: "I apologize for the interruption. As your luxury travel AI, I'm here to design exceptional Himalayan experiences. Please try again or contact our team at contact@curatedascents.com for immediate assistance.",
-      sessionId: `error_session_${Date.now()}`,
-      mode: 'planner',
-      budgetTier: 'luxury',
-      suggestions: [
-        "Retry the conversation",
-        "Contact our luxury specialists",
-        "Browse our signature experiences"
-      ]
-    });
+    console.error('Error in agent chat:', error);
+
+    // Fallback responses if API fails
+    const fallbackResponses = {
+      planner: "I apologize for the technical issue. As your luxury travel planner, I'd recommend considering a private Everest Base Camp helicopter tour with a stay at Yeti Mountain Home for an exclusive Himalayan experience.",
+      negotiator: "I'm experiencing a temporary connection issue. For premium upgrades and exclusive rates, I typically secure 20-30% off luxury lodges and private transport in Nepal.",
+      concierge: "Please pardon the interruption. For personalized surprises, I often arrange private dining at mountain viewpoints or spa treatments with Himalayan herbal therapies."
+    };
+
+    return NextResponse.json({
+      response: fallbackResponses[agentType as keyof typeof fallbackResponses] || "Thank you for your message. Our luxury travel concierge will assist you shortly with personalized recommendations for the Himalayas.",
+      sessionId: (await request.json()).sessionId,
+      memory: null,
+    }, { status: 200 });
   }
+}
+
+// Utility function to clean AI text
+function cleanAIText(text: string): string {
+  if (!text) return text;
+
+  return text
+    // Remove markdown headers
+    .replace(/^#{1,6}\s+/gm, '')
+    // Remove bold markers
+    .replace(/\*\*/g, '')
+    // Remove italic markers but preserve text
+    .replace(/\*([^*]+)\*/g, '$1')
+    // Remove inline code markers
+    .replace(/`([^`]+)`/g, '$1')
+    // Convert markdown bullets to •
+    .replace(/^\s*[-*+]\s+/gm, '• ')
+    // Remove code blocks
+    .replace(/```[\s\S]*?```/g, '')
+    // Clean up multiple spaces
+    .replace(/\s+/g, ' ')
+    // Trim whitespace
+    .trim();
 }
