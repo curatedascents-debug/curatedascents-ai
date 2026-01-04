@@ -45,6 +45,26 @@ export function cleanText(text: string): string {
 }
 
 /**
+ * Check if text contains markdown
+ */
+export function hasMarkdown(text: string): boolean {
+    if (!text) return false;
+
+    const markdownPatterns = [
+        /^#{1,6}\s+/m,
+        /\*\*/,
+        /\*/,
+        /```/,
+        /`/,
+        /^[\*\-]\s+/m,
+        /^\d+\.\s+/m,
+        /\[.*\]\(.*\)/
+    ];
+
+    return markdownPatterns.some(pattern => pattern.test(text));
+}
+
+/**
  * Ultra-aggressive cleaning for stubborn API responses
  */
 export function aggressiveClean(text: string): string {
@@ -63,22 +83,4 @@ export function aggressiveClean(text: string): string {
     cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
 
     return cleaned.trim();
-}
-
-/**
- * Check if text contains markdown
- */
-export function hasMarkdown(text: string): boolean {
-    const markdownPatterns = [
-        /^#{1,6}\s+/m,
-        /\*\*/,
-        /\*/,
-        /```/,
-        /`/,
-        /^[\*\-]\s+/m,
-        /^\d+\.\s+/m,
-        /\[.*\]\(.*\)/
-    ];
-
-    return markdownPatterns.some(pattern => pattern.test(text));
 }
