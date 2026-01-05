@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, User, Bot, Trash2, Loader2 } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -16,86 +15,15 @@ interface AgentChatProps {
   agentDescription: string;
 }
 
-// Text cleaner utility functions
+// Simple text cleaner
 const cleanText = (text: string): string => {
   if (!text) return '';
-
-  let cleaned = text
+  return text
     .replace(/[#*`_~\[\]()>|]/g, '')
     .replace(/```[\s\S]*?```/g, '')
     .replace(/`[^`]*`/g, '')
-    .replace(/<[^>]*>/g, '')
-    .trim();
-
-  // Fix spacing issues
-  cleaned = cleaned
-    .replace(/([\u4e00-\u9fff])([A-Za-z])/g, '$1 $2')
-    .replace(/([A-Za-z])([\u4e00-\u9fff])/g, '$1 $2')
-    .replace(/([\u4e00-\u9fff])(\d)/g, '$1 $2')
-    .replace(/(\d)([\u4e00-\u9fff])/g, '$1 $2');
-
-  // Fix compound words
-  cleaned = cleaned
-    .replace(/\b(\d+)(minute|min|hour|hr|day|month|year|star)\b/gi, '$1-$2')
-    .replace(/\b(last|low|high)(minute|effort|reward)\b/gi, '$1-$2')
     .replace(/\s+/g, ' ')
-    .replace(/\n\s*\n/g, '\n\n')
     .trim();
-
-  return cleaned;
-};
-
-const formatForDisplay = (text: string): string => {
-  let cleaned = cleanText(text);
-
-  // Add spacing after periods
-  cleaned = cleaned.replace(/\.([A-Z])/g, '. $1');
-
-  // Format day sections
-  cleaned = cleaned.replace(/(Day \d+|Days \d+-\d+):/gi, '\n\n**$1:**\n');
-
-  return cleaned.trim();
-};
-
-const textToHtml = (text: string): string => {
-  const cleaned = formatForDisplay(text);
-
-  const paragraphs = cleaned.split('\n\n');
-  let html = '';
-
-  for (let i = 0; i < paragraphs.length; i++) {
-    const trimmed = paragraphs[i].trim();
-    if (!trimmed) continue;
-
-    // Day sections become headers
-    if (trimmed.match(/^\*\*Day \d+:\*\*|\*\*Days \d+-\d+:\*\*/i)) {
-      const dayText = trimmed.replace(/\*\*/g, '');
-      html += `<div class="day-section"><strong>${dayText}</strong></div>`;
-      continue;
-    }
-
-    // Check for bullet points
-    if (trimmed.includes('•')) {
-      const lines = trimmed.split('\n').filter(line => line.trim());
-      let listHtml = '<ul class="bulleted-list">';
-
-      for (const line of lines) {
-        const item = line.replace('•', '').trim();
-        if (item) {
-          listHtml += `<li>${item}</li>`;
-        }
-      }
-
-      listHtml += '</ul>';
-      html += listHtml;
-      continue;
-    }
-
-    // Regular paragraphs
-    html += `<p class="message-paragraph">${trimmed}</p>`;
-  }
-
-  return html;
 };
 
 const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) => {
@@ -111,35 +39,6 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Quick prompts based on agent type
-  const quickPrompts = {
-    'trip-planner': [
-      'Plan a 7-day luxury trip to Japan',
-      'Family vacation to Europe this summer',
-      'Romantic getaway to Maldives',
-      'Adventure trip to New Zealand',
-    ],
-    'deal-negotiator': [
-      'Find best deals for flights to Paris',
-      'Hotel discounts in Tokyo',
-      'All-inclusive resort promotions',
-      'Last-minute cruise deals',
-    ],
-    'vip-concierge': [
-      'Arrange private jet service',
-      'Book Michelin star restaurant',
-      'VIP event access in London',
-      'Personal shopper in Milan',
-    ],
-  };
-
-  // Format message text with proper cleaning and HTML
-  const formatMessageText = (text: string): string => {
-    if (!text) return '';
-    return textToHtml(text);
-  };
-
-  // Handle sending a message
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -196,35 +95,16 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
     }
   };
 
-  // Handle quick prompt click
-  const handleQuickPrompt = (prompt: string) => {
-    setInput(prompt);
-  };
-
-  // Clear chat history
-  const handleClearChat = () => {
-    setMessages([
-      {
-        id: '1',
-        content: `Hello! I'm your ${agentName}. ${agentDescription}`,
-        role: 'assistant',
-        timestamp: new Date(),
-      },
-    ]);
-  };
-
-  // Scroll to bottom of messages
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  // Handle Enter key press
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
   };
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-xl overflow-hidden">
@@ -236,12 +116,15 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
             <p className="text-blue-100 mt-1">{agentDescription}</p>
           </div>
           <button
-            onClick={handleClearChat}
+            onClick={() => setMessages([{
+              id: '1',
+              content: `Hello! I'm your ${agentName}. ${agentDescription}`,
+              role: 'assistant',
+              timestamp: new Date(),
+            }])}
             className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors"
-            title="Clear chat history"
           >
-            <Trash2 size={18} />
-            <span className="hidden sm:inline">Clear Chat</span>
+            Clear Chat
           </button>
         </div>
       </div>
@@ -255,17 +138,13 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
           >
             <div
               className={`max-w-[85%] lg:max-w-[75%] rounded-2xl p-5 ${message.role === 'user'
-                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-br-none'
-                : 'bg-white border border-gray-200 shadow-sm rounded-bl-none'
+                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-br-none'
+                  : 'bg-white border border-gray-200 shadow-sm rounded-bl-none'
                 }`}
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className={`p-2 rounded-full ${message.role === 'user' ? 'bg-blue-400' : 'bg-indigo-100'}`}>
-                  {message.role === 'user' ? (
-                    <User size={18} className={message.role === 'user' ? 'text-white' : 'text-indigo-600'} />
-                  ) : (
-                    <Bot size={18} className={message.role === 'user' ? 'text-white' : 'text-indigo-600'} />
-                  )}
+                  {message.role === 'user' ? '👤' : '🤖'}
                 </div>
                 <div>
                   <span className="font-semibold">
@@ -277,29 +156,21 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
                 </div>
               </div>
 
-              {/* Message Content with Proper Formatting */}
-              <div
-                className={`message-content ${message.role === 'user' ? 'text-white' : 'text-gray-800'}`}
-                dangerouslySetInnerHTML={{
-                  __html: message.role === 'assistant'
-                    ? formatMessageText(message.content)
-                    : `<p>${cleanText(message.content)}</p>`
-                }}
-              />
+              <div className="whitespace-pre-wrap">
+                {message.content}
+              </div>
             </div>
           </div>
         ))}
 
-        {/* Loading Indicator */}
         {isLoading && (
           <div className="flex justify-start">
             <div className="max-w-[85%] lg:max-w-[75%] rounded-2xl p-5 bg-white border border-gray-200 shadow-sm rounded-bl-none">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-full bg-indigo-100">
-                  <Bot size={18} className="text-indigo-600" />
+                  🤖
                 </div>
                 <div className="flex items-center gap-2">
-                  <Loader2 size={20} className="animate-spin text-indigo-600" />
                   <span className="text-gray-600">{agentName} is thinking...</span>
                 </div>
               </div>
@@ -308,24 +179,6 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
         )}
 
         <div ref={messagesEndRef} />
-      </div>
-
-      {/* Quick Prompts */}
-      <div className="border-t border-gray-200 p-4 bg-gray-50">
-        <div className="mb-3">
-          <p className="text-sm font-medium text-gray-600 mb-2">Quick Prompts:</p>
-          <div className="flex flex-wrap gap-2">
-            {quickPrompts[agentType].map((prompt, index) => (
-              <button
-                key={index}
-                onClick={() => handleQuickPrompt(prompt)}
-                className="text-sm bg-white hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-full border border-gray-300 transition-colors"
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Input Area */}
@@ -346,11 +199,7 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
               disabled={!input.trim() || isLoading}
               className="absolute right-4 bottom-4 p-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-full hover:from-blue-700 hover:to-indigo-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all"
             >
-              {isLoading ? (
-                <Loader2 size={20} className="animate-spin" />
-              ) : (
-                <Send size={20} />
-              )}
+              {isLoading ? '...' : '→'}
             </button>
           </div>
         </div>
@@ -358,64 +207,6 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
           Press Enter to send • Shift+Enter for new line
         </p>
       </div>
-
-      {/* Inline CSS for formatted content */}
-      <style>{`
-        .message-content .day-section {
-          background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-          padding: 1rem 1.5rem;
-          border-radius: 0.75rem;
-          border-left: 4px solid #3b82f6;
-          margin: 1rem 0;
-          font-weight: 600;
-          color: #1e40af;
-          font-size: 1.1rem;
-        }
-        
-        .message-content .bulleted-list {
-          list-style-type: none;
-          padding-left: 0;
-          margin: 1rem 0;
-        }
-        
-        .message-content .bulleted-list li {
-          padding: 0.5rem 0;
-          padding-left: 2rem;
-          position: relative;
-          color: inherit;
-        }
-        
-        .message-content .bulleted-list li:before {
-          content: '•';
-          position: absolute;
-          left: 0.75rem;
-          color: #3b82f6;
-          font-size: 1.5rem;
-          line-height: 1;
-        }
-        
-        .message-content .message-paragraph {
-          margin: 0.75rem 0;
-          line-height: 1.6;
-          color: inherit;
-        }
-        
-        /* Fix Chinese-English spacing */
-        .message-content {
-          letter-spacing: 0.01em;
-          word-spacing: 0.05em;
-        }
-        
-        /* User message specific styles */
-        .bg-gradient-to-r.from-blue-500.to-indigo-600 .message-content .day-section {
-          background: rgba(255, 255, 255, 0.2);
-          color: #dbeafe;
-        }
-        
-        .bg-gradient-to-r.from-blue-500.to-indigo-600 .message-content .bulleted-list li:before {
-          color: #93c5fd;
-        }
-      `}</style>
     </div>
   );
 };
