@@ -16,7 +16,7 @@ interface AgentChatProps {
   agentDescription: string;
 }
 
-// Text cleaner utility functions (inlined to avoid import issues)
+// Text cleaner utility functions
 const cleanText = (text: string): string => {
   if (!text) return '';
 
@@ -60,42 +60,42 @@ const formatForDisplay = (text: string): string => {
 const textToHtml = (text: string): string => {
   const cleaned = formatForDisplay(text);
 
-  return cleaned
-    .split('\n\n')
-    .map(paragraph => {
-      const trimmed = paragraph.trim();
-      if (!trimmed) return '';
+  const paragraphs = cleaned.split('\n\n');
+  let html = '';
 
-      // Day sections become headers
-      if (trimmed.match(/^\*\*Day \d+:\*\*|\*\*Days \d+-\d+:\*\*/i)) {
-        const dayText = trimmed.replace(/\*\*/g, '');
-        return `<div class="day-section"><strong>${dayText}</strong></div>`;
+  for (let i = 0; i < paragraphs.length; i++) {
+    const trimmed = paragraphs[i].trim();
+    if (!trimmed) continue;
+
+    // Day sections become headers
+    if (trimmed.match(/^\*\*Day \d+:\*\*|\*\*Days \d+-\d+:\*\*/i)) {
+      const dayText = trimmed.replace(/\*\*/g, '');
+      html += `<div class="day-section"><strong>${dayText}</strong></div>`;
+      continue;
+    }
+
+    // Check for bullet points
+    if (trimmed.includes('•')) {
+      const lines = trimmed.split('\n').filter(line => line.trim());
+      let listHtml = '<ul class="bulleted-list">';
+
+      for (const line of lines) {
+        const item = line.replace('•', '').trim();
+        if (item) {
+          listHtml += `<li>${item}</li>`;
+        }
       }
 
-      // Check for bullet points
-      if (trimmed.includes('•')) {
-        const items = trimmed.split('\n')
-          .filter(line => line.trim())
-          .map(line => {
-            const item = line.replace('•', '').trim();
-            return `<li>${item}</li>`;
-          })
-          .join('');
-        return `<ul class="bulleted-list">${items}</ul>`;
-      }
+      listHtml += '</ul>';
+      html += listHtml;
+      continue;
+    }
 
-      // Check if it looks like a bullet point list
-      if (trimmed.match(/^[•\-\*]\s/)) {
-        const items = trimmed.split(/(?<=\.)\s+[•\-\*]\s/)
-          .map(item => `<li>${item.replace(/^[•\-\*]\s/, '').trim()}</li>`)
-          .join('');
-        return `<ul class="bulleted-list">${items}</ul>`;
-      }
+    // Regular paragraphs
+    html += `<p class="message-paragraph">${trimmed}</p>`;
+  }
 
-      // Regular paragraphs
-      return `<p>${trimmed}</p>`;
-    })
-    .join('');
+  return html;
 };
 
 const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) => {
@@ -360,8 +360,8 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
       </div>
 
       {/* Inline CSS for formatted content */}
-      <style jsx>{`
-        .message-content :global(.day-section) {
+      <style>{`
+        .message-content .day-section {
           background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
           padding: 1rem 1.5rem;
           border-radius: 0.75rem;
@@ -372,20 +372,20 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
           font-size: 1.1rem;
         }
         
-        .message-content :global(.bulleted-list) {
+        .message-content .bulleted-list {
           list-style-type: none;
           padding-left: 0;
           margin: 1rem 0;
         }
         
-        .message-content :global(.bulleted-list li) {
+        .message-content .bulleted-list li {
           padding: 0.5rem 0;
           padding-left: 2rem;
           position: relative;
           color: inherit;
         }
         
-        .message-content :global(.bulleted-list li:before) {
+        .message-content .bulleted-list li:before {
           content: '•';
           position: absolute;
           left: 0.75rem;
@@ -394,21 +394,26 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
           line-height: 1;
         }
         
-        .message-content :global(p) {
+        .message-content .message-paragraph {
           margin: 0.75rem 0;
           line-height: 1.6;
           color: inherit;
         }
         
-        .message-content :global(strong) {
-          font-weight: 700;
-          color: inherit;
-        }
-        
         /* Fix Chinese-English spacing */
-        .message-content :global(*) {
+        .message-content {
           letter-spacing: 0.01em;
           word-spacing: 0.05em;
+        }
+        
+        /* User message specific styles */
+        .bg-gradient-to-r.from-blue-500.to-indigo-600 .message-content .day-section {
+          background: rgba(255, 255, 255, 0.2);
+          color: #dbeafe;
+        }
+        
+        .bg-gradient-to-r.from-blue-500.to-indigo-600 .message-content .bulleted-list li:before {
+          color: #93c5fd;
         }
       `}</style>
     </div>
