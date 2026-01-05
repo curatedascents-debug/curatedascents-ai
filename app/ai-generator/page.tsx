@@ -1,43 +1,57 @@
 // app/ai-generator/page.tsx
 import type { Metadata } from 'next';
-import AgentChat from '@/components/agents/AgentChat';
+import { AgentChat } from '@/components/agents/AgentChat'; // FIXED: Use named import
 
 export const metadata: Metadata = {
   title: 'AI Luxury Travel Concierge | CuratedAscents',
-  description: 'Your personal AI luxury travel specialist for Himalayan adventures',
+  description: 'Your personal AI travel assistant for luxury experiences worldwide',
 };
 
 export default function AIGeneratorPage() {
+  const agents = [
+    { id: 'planner', name: 'Trip Planner', description: 'Plan your perfect itinerary' },
+    { id: 'negotiator', name: 'Deal Negotiator', description: 'Get the best travel deals' },
+    { id: 'concierge', name: 'VIP Concierge', description: 'Luxury experiences & services' },
+  ];
+
   return (
-    // In the return statement of /app/ai-generator/page.tsx
-    // Replace the AgentChat section with:
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            AI Luxury Travel Concierge
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Your personal AI assistant for planning, negotiating, and experiencing luxury travel worldwide.
+          </p>
+        </div>
 
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Planner Agent */}
-      <div className="lg:col-span-1">
-        <AgentChat
-          agentType="planner"
-          agentDescription="Designs exquisite itineraries with VIP access"
-          initialMessage="Hello! I'm your Luxury Travel Planner. I'll design your perfect Himalayan itinerary with VIP access and optimal weather planning. Where shall we begin?"
-        />
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {agents.map((agent) => (
+            <div
+              key={agent.id}
+              className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow"
+            >
+              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                {agent.name}
+              </h2>
+              <p className="text-gray-600 mb-4">{agent.description}</p>
+              <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800">
+                Ready to assist
+              </div>
+            </div>
+          ))}
+        </div>
 
-      {/* Negotiator Agent */}
-      <div className="lg:col-span-1">
-        <AgentChat
-          agentType="negotiator"
-          agentDescription="Secures premium rates and exclusive upgrades"
-          initialMessage="Greetings! I'm your Luxury Negotiator. I'll secure the best rates, premium upgrades, and exclusive perks for your Himalayan journey. What experiences are you seeking?"
-        />
-      </div>
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+          <div className="h-[600px]">
+            <AgentChat agent="planner" />
+          </div>
+        </div>
 
-      {/* Concierge Agent */}
-      <div className="lg:col-span-1">
-        <AgentChat
-          agentType="concierge"
-          agentDescription="Arranges personalized surprises and coordination"
-          initialMessage="Welcome! I'm your Personal Concierge. I'll arrange special surprises, coordinate all details, and ensure your Himalayan experience is truly extraordinary. How may I assist?"
-        />
+        <div className="mt-8 text-center text-gray-500 text-sm">
+          <p>Powered by DeepSeek AI • Responses are cleaned for optimal readability</p>
+        </div>
       </div>
     </div>
   );
