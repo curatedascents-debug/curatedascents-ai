@@ -55,11 +55,11 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
   // Format message text with proper cleaning and HTML
   const formatMessageText = (text: string): string => {
     if (!text) return '';
-
+    
     // Clean and format the text
     const cleaned = cleanText(text);
     const formatted = formatForDisplay(cleaned);
-
+    
     // Convert to HTML with proper structure
     return textToHtml(formatted);
   };
@@ -96,7 +96,7 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
       }
 
       const data = await response.json();
-
+      
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: data.response || data.message || 'No response received',
@@ -107,7 +107,7 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error:', error);
-
+      
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: 'Sorry, I encountered an error. Please try again.',
@@ -179,10 +179,11 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[85%] lg:max-w-[75%] rounded-2xl p-5 ${message.role === 'user'
+              className={`max-w-[85%] lg:max-w-[75%] rounded-2xl p-5 ${
+                message.role === 'user'
                   ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-br-none'
                   : 'bg-white border border-gray-200 shadow-sm rounded-bl-none'
-                }`}
+              }`}
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className={`p-2 rounded-full ${message.role === 'user' ? 'bg-blue-400' : 'bg-indigo-100'}`}>
@@ -201,12 +202,12 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
                   </span>
                 </div>
               </div>
-
+              
               {/* Message Content with Proper Formatting */}
-              <div
+              <div 
                 className={`message-content ${message.role === 'user' ? 'text-white' : 'text-gray-800'}`}
-                dangerouslySetInnerHTML={{
-                  __html: message.role === 'assistant'
+                dangerouslySetInnerHTML={{ 
+                  __html: message.role === 'assistant' 
                     ? formatMessageText(message.content)
                     : `<p>${cleanText(message.content)}</p>`
                 }}
@@ -214,7 +215,7 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
             </div>
           </div>
         ))}
-
+        
         {/* Loading Indicator */}
         {isLoading && (
           <div className="flex justify-start">
@@ -231,7 +232,7 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
             </div>
           </div>
         )}
-
+        
         <div ref={messagesEndRef} />
       </div>
 
@@ -283,57 +284,6 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
           Press Enter to send • Shift+Enter for new line
         </p>
       </div>
-
-      {/* Custom CSS for formatted content */}
-      <style jsx>{`
-        .message-content :global(.day-section) {
-          background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-          padding: 1rem 1.5rem;
-          border-radius: 0.75rem;
-          border-left: 4px solid #3b82f6;
-          margin: 1rem 0;
-          font-weight: 600;
-          color: #1e40af;
-        }
-        
-        .message-content :global(.bulleted-list) {
-          list-style-type: none;
-          padding-left: 0;
-          margin: 1rem 0;
-        }
-        
-        .message-content :global(.bulleted-list li) {
-          padding: 0.5rem 0;
-          padding-left: 2rem;
-          position: relative;
-          color: #374151;
-        }
-        
-        .message-content :global(.bulleted-list li:before) {
-          content: '•';
-          position: absolute;
-          left: 0.75rem;
-          color: #3b82f6;
-          font-size: 1.5rem;
-          line-height: 1;
-        }
-        
-        .message-content :global(p) {
-          margin: 0.75rem 0;
-          line-height: 1.6;
-          color: inherit;
-        }
-        
-        .message-content :global(strong) {
-          font-weight: 700;
-          color: inherit;
-        }
-        
-        /* Fix Chinese-English spacing in rendered content */
-        .message-content :global(*) {
-          letter-spacing: 0.01em;
-        }
-      `}</style>
     </div>
   );
 };

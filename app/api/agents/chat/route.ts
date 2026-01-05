@@ -116,12 +116,12 @@ export async function POST(request: NextRequest) {
 
     // Apply multi-layer cleaning
     let cleanedResponse = cleanText(aiResponse);
-
+    
     // Check if markdown still exists after cleaning
     if (/[#*`_~\[\]()>|]/.test(cleanedResponse)) {
       cleanedResponse = aggressiveClean(cleanedResponse);
     }
-
+    
     // Final pass for common issues
     cleanedResponse = cleanedResponse
       .replace(/\b(\d+)(minute|min|hour|hr|day|month|year)\b/gi, '$1-$2')
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Chat API error:', error);
     return NextResponse.json(
-      {
+      { 
         error: 'Failed to process request',
         message: error instanceof Error ? error.message : 'Unknown error'
       },
