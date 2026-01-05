@@ -6,26 +6,25 @@ import { cleanText, aggressiveClean } from '@/lib/utils/textCleaner';
 // Format message text with safety checks
 function formatMessageText(text: string): string {
   if (!text) return '';
-
+  
   // Apply cleaning
   let cleaned = cleanText(text);
-
+  
   // Check if still has markdown
   if (cleaned.includes('#') || cleaned.includes('*') || cleaned.includes('`')) {
     cleaned = aggressiveClean(cleaned);
   }
-
+  
   // Final safety - replace any remaining markdown
   cleaned = cleaned
     .replace(/[#*`_]/g, '')
-    .replace(/^\s*[-•]\s+/gm, '• ')
+    .replace(/^\s*[•\-]\s+/gm, '• ')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
-
+  
   // Convert to HTML-safe with line breaks
   return cleaned
-    .replace(/\n/g, '<br>')
-    .replace(/•/g, '•');
+    .replace(/\n/g, '<br>');
 }
 
 export function AgentChat({ agent }: { agent: string }) {
@@ -47,7 +46,7 @@ export function AgentChat({ agent }: { agent: string }) {
 
     const userMessage = input.trim();
     setInput('');
-
+    
     // Add user message
     const newMessages = [...messages, { role: 'user', content: userMessage }];
     setMessages(newMessages);
@@ -70,22 +69,22 @@ export function AgentChat({ agent }: { agent: string }) {
       }
 
       const data = await response.json();
-
+      
       // Apply final safety cleaning
       let aiResponse = data.response || '';
       if (aiResponse.includes('#') || aiResponse.includes('*') || aiResponse.includes('`')) {
         aiResponse = aggressiveClean(aiResponse);
       }
-
+      
       // Add AI response
       setMessages([...newMessages, { role: 'assistant', content: aiResponse }]);
     } catch (error) {
       console.error('Error sending message:', error);
       setMessages([
         ...newMessages,
-        {
-          role: 'assistant',
-          content: 'Sorry, I encountered an error. Please try again.'
+        { 
+          role: 'assistant', 
+          content: 'Sorry, I encountered an error. Please try again.' 
         }
       ]);
     } finally {
@@ -103,16 +102,17 @@ export function AgentChat({ agent }: { agent: string }) {
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[80%] rounded-2xl px-4 py-3 ${message.role === 'user'
-                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                : 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border border-gray-200'
-                }`}
+              className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                message.role === 'user'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
+                  : 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border border-gray-200'
+              }`}
             >
               {message.role === 'assistant' ? (
-                <div
+                <div 
                   className="prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{
-                    __html: formatMessageText(message.content)
+                  dangerouslySetInnerHTML={{ 
+                    __html: formatMessageText(message.content) 
                   }}
                 />
               ) : (
