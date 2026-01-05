@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Send, User, Bot, Trash2, Loader2 } from 'lucide-react';
-import { cleanText, formatForDisplay, textToHtml } from '@/lib/utils/textCleaner';
 
 interface Message {
   id: string;
@@ -16,6 +15,88 @@ interface AgentChatProps {
   agentName: string;
   agentDescription: string;
 }
+
+// Text cleaner utility functions (inlined to avoid import issues)
+const cleanText = (text: string): string => {
+  if (!text) return '';
+
+  let cleaned = text
+    .replace(/[#*`_~\[\]()>|]/g, '')
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`[^`]*`/g, '')
+    .replace(/<[^>]*>/g, '')
+    .trim();
+
+  // Fix spacing issues
+  cleaned = cleaned
+    .replace(/([\u4e00-\u9fff])([A-Za-z])/g, '$1 $2')
+    .replace(/([A-Za-z])([\u4e00-\u9fff])/g, '$1 $2')
+    .replace(/([\u4e00-\u9fff])(\d)/g, '$1 $2')
+    .replace(/(\d)([\u4e00-\u9fff])/g, '$1 $2');
+
+  // Fix compound words
+  cleaned = cleaned
+    .replace(/\b(\d+)(minute|min|hour|hr|day|month|year|star)\b/gi, '$1-$2')
+    .replace(/\b(last|low|high)(minute|effort|reward)\b/gi, '$1-$2')
+    .replace(/\s+/g, ' ')
+    .replace(/\n\s*\n/g, '\n\n')
+    .trim();
+
+  return cleaned;
+};
+
+const formatForDisplay = (text: string): string => {
+  let cleaned = cleanText(text);
+
+  // Add spacing after periods
+  cleaned = cleaned.replace(/\.([A-Z])/g, '. $1');
+
+  // Format day sections
+  cleaned = cleaned.replace(/(Day \d+|Days \d+-\d+):/gi, '\n\n**$1:**\n');
+
+  return cleaned.trim();
+};
+
+const textToHtml = (text: string): string => {
+  const cleaned = formatForDisplay(text);
+
+  return cleaned
+    .split('\n\n')
+    .map(paragraph => {
+      const trimmed = paragraph.trim();
+      if (!trimmed) return '';
+
+      // Day sections become headers
+      if (trimmed.match(/^\*\*Day \d+:\*\*|\*\*Days \d+-\d+:\*\*/i)) {
+        const dayText = trimmed.replace(/\*\*/g, '');
+        return `<div class="day-section"><strong>${dayText}</strong></div>`;
+      }
+
+      // Check for bullet points
+      if (trimmed.includes('•')) {
+        const items = trimmed.split('\n')
+          .filter(line => line.trim())
+          .map(line => {
+            const item = line.replace('•', '').trim();
+            return `<li>${item}</li>`;
+          })
+          .join('');
+        return `<ul class="bulleted-list">${items}</ul>`;
+      }
+
+      // Check if it looks like a bullet point list
+      if (trimmed.match(/^[•\-\*]\s/)) {
+        const items = trimmed.split(/(?<=\.)\s+[•\-\*]\s/)
+          .map(item => `<li>${item.replace(/^[•\-\*]\s/, '').trim()}</li>`)
+          .join('');
+        return `<ul class="bulleted-list">${items}</ul>`;
+      }
+
+      // Regular paragraphs
+      return `<p>${trimmed}</p>`;
+    })
+    .join('');
+};
 
 const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) => {
   const [messages, setMessages] = useState<Message[]>([
@@ -55,13 +136,7 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
   // Format message text with proper cleaning and HTML
   const formatMessageText = (text: string): string => {
     if (!text) return '';
-    
-    // Clean and format the text
-    const cleaned = cleanText(text);
-    const formatted = formatForDisplay(cleaned);
-    
-    // Convert to HTML with proper structure
-    return textToHtml(formatted);
+    return textToHtml(text);
   };
 
   // Handle sending a message
@@ -96,7 +171,7 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
       }
 
       const data = await response.json();
-      
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: data.response || data.message || 'No response received',
@@ -107,7 +182,7 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error:', error);
-      
+
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: 'Sorry, I encountered an error. Please try again.',
@@ -179,11 +254,10 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[85%] lg:max-w-[75%] rounded-2xl p-5 ${
-                message.role === 'user'
-                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-br-none'
-                  : 'bg-white border border-gray-200 shadow-sm rounded-bl-none'
-              }`}
+              className={`max-w-[85%] lg:max-w-[75%] rounded-2xl p-5 ${message.role === 'user'
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-br-none'
+                : 'bg-white border border-gray-200 shadow-sm rounded-bl-none'
+                }`}
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className={`p-2 rounded-full ${message.role === 'user' ? 'bg-blue-400' : 'bg-indigo-100'}`}>
@@ -202,12 +276,12 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
                   </span>
                 </div>
               </div>
-              
+
               {/* Message Content with Proper Formatting */}
-              <div 
+              <div
                 className={`message-content ${message.role === 'user' ? 'text-white' : 'text-gray-800'}`}
-                dangerouslySetInnerHTML={{ 
-                  __html: message.role === 'assistant' 
+                dangerouslySetInnerHTML={{
+                  __html: message.role === 'assistant'
                     ? formatMessageText(message.content)
                     : `<p>${cleanText(message.content)}</p>`
                 }}
@@ -215,7 +289,7 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
             </div>
           </div>
         ))}
-        
+
         {/* Loading Indicator */}
         {isLoading && (
           <div className="flex justify-start">
@@ -232,7 +306,7 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -284,6 +358,59 @@ const AgentChat = ({ agentType, agentName, agentDescription }: AgentChatProps) =
           Press Enter to send • Shift+Enter for new line
         </p>
       </div>
+
+      {/* Inline CSS for formatted content */}
+      <style jsx>{`
+        .message-content :global(.day-section) {
+          background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+          padding: 1rem 1.5rem;
+          border-radius: 0.75rem;
+          border-left: 4px solid #3b82f6;
+          margin: 1rem 0;
+          font-weight: 600;
+          color: #1e40af;
+          font-size: 1.1rem;
+        }
+        
+        .message-content :global(.bulleted-list) {
+          list-style-type: none;
+          padding-left: 0;
+          margin: 1rem 0;
+        }
+        
+        .message-content :global(.bulleted-list li) {
+          padding: 0.5rem 0;
+          padding-left: 2rem;
+          position: relative;
+          color: inherit;
+        }
+        
+        .message-content :global(.bulleted-list li:before) {
+          content: '•';
+          position: absolute;
+          left: 0.75rem;
+          color: #3b82f6;
+          font-size: 1.5rem;
+          line-height: 1;
+        }
+        
+        .message-content :global(p) {
+          margin: 0.75rem 0;
+          line-height: 1.6;
+          color: inherit;
+        }
+        
+        .message-content :global(strong) {
+          font-weight: 700;
+          color: inherit;
+        }
+        
+        /* Fix Chinese-English spacing */
+        .message-content :global(*) {
+          letter-spacing: 0.01em;
+          word-spacing: 0.05em;
+        }
+      `}</style>
     </div>
   );
 };
