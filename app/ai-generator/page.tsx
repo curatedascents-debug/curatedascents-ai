@@ -1,56 +1,58 @@
-// app/ai-generator/page.tsx
-import type { Metadata } from 'next';
-import { AgentChat } from '@/components/agents/AgentChat'; // FIXED: Use named import
+'use client';
 
-export const metadata: Metadata = {
-  title: 'AI Luxury Travel Concierge | CuratedAscents',
-  description: 'Your personal AI travel assistant for luxury experiences worldwide',
-};
+import { AgentChat } from '@/components/agents/AgentChat';
+import { useState } from 'react';
+
+const agents = [
+  { id: 'planner', name: 'Trip Planner', description: 'Plan your perfect itinerary', color: 'from-blue-500 to-cyan-500' },
+  { id: 'negotiator', name: 'Deal Negotiator', description: 'Get the best travel deals', color: 'from-green-500 to-emerald-500' },
+  { id: 'concierge', name: 'VIP Concierge', description: 'Luxury experiences & services', color: 'from-purple-500 to-pink-500' },
+];
 
 export default function AIGeneratorPage() {
-  const agents = [
-    { id: 'planner', name: 'Trip Planner', description: 'Plan your perfect itinerary' },
-    { id: 'negotiator', name: 'Deal Negotiator', description: 'Get the best travel deals' },
-    { id: 'concierge', name: 'VIP Concierge', description: 'Luxury experiences & services' },
-  ];
+  const [activeAgent, setActiveAgent] = useState('planner');
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            AI Luxury Travel Concierge
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Your personal AI assistant for planning, negotiating, and experiencing luxury travel worldwide.
-          </p>
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">AI Luxury Travel Concierge</h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">Your personal AI assistant for luxury travel worldwide</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {agents.map((agent) => (
-            <div
-              key={agent.id}
-              className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow"
-            >
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                {agent.name}
-              </h2>
-              <p className="text-gray-600 mb-4">{agent.description}</p>
-              <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800">
-                Ready to assist
-              </div>
-            </div>
+            <button key={agent.id} onClick={() => setActiveAgent(agent.id)}
+              className={`p-5 rounded-2xl border-2 transition-all ${activeAgent === agent.id ? 
+                `bg-gradient-to-r ${agent.color} text-white border-transparent` : 
+                'bg-white border-gray-200 hover:border-gray-300'}`}>
+              <h2 className="text-xl font-semibold mb-2">{agent.name}</h2>
+              <p className={activeAgent === agent.id ? 'text-white/90' : 'text-gray-600'}>{agent.description}</p>
+            </button>
           ))}
+        </div>
+
+        <div className="mb-4 p-4 bg-gray-50 rounded-xl">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-gray-900 capitalize">{agents.find(a => a.id === activeAgent)?.name}</h3>
+              <p className="text-gray-600">Currently active - Ask me anything!</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-sm text-green-700 font-medium">Ready</span>
+            </div>
+          </div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
           <div className="h-[600px]">
-            <AgentChat agent="planner" />
+            <AgentChat agent={activeAgent} />
           </div>
         </div>
 
-        <div className="mt-8 text-center text-gray-500 text-sm">
-          <p>Powered by DeepSeek AI • Responses are cleaned for optimal readability</p>
+        <div className="mt-6 text-center text-gray-500 text-sm">
+          <p>Powered by DeepSeek AI • All responses cleaned for readability</p>
         </div>
       </div>
     </div>
