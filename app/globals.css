@@ -46,3 +46,61 @@ footer img[src="/logo-footer.png"] {
     width: 64px;
   }
 }
+
+/* Add these styles to your global CSS file */
+
+/* Chat message formatting */
+.day-section {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  padding: 1rem 1.5rem;
+  border-radius: 0.75rem;
+  border-left: 4px solid #3b82f6;
+  margin: 1rem 0;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.bulleted-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 1rem 0;
+}
+
+.bulleted-list li {
+  padding: 0.5rem 0;
+  padding-left: 2rem;
+  position: relative;
+  color: #374151;
+}
+
+.bulleted-list li:before {
+  content: '•';
+  position: absolute;
+  left: 0.75rem;
+  color: #3b82f6;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* Fix for Chinese-English text spacing */
+.text-content {
+  letter-spacing: 0.01em;
+  word-spacing: 0.05em;
+}
+
+/* Ensure proper spacing in chat messages */
+.message-content p {
+  margin: 0.75rem 0;
+  line-height: 1.6;
+}
+
+.message-content strong {
+  font-weight: 700;
+}
+
+/* Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .message-content {
+    -webkit-font-smoothing: antialiased;
+  }
+}
