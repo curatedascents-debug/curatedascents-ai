@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function EnhancedContactPage() {
+// Create a separate component for the search params logic
+function ContactFormContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const packageParam = searchParams.get('package');
-  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -31,8 +30,9 @@ export default function EnhancedContactPage() {
   const [interests, setInterests] = useState<string[]>(['Culture', 'Luxury']);
   const [formProgress, setFormProgress] = useState(0);
   const [estimatedValue, setEstimatedValue] = useState('');
+  const [packageParam, setPackageParam] = useState<string | null>(null);
 
-  // Check for AI itinerary and preferences
+  // Check for AI itinerary and preferences when page loads
   useEffect(() => {
     const savedItinerary = localStorage.getItem('ai-itinerary');
     const aiPreferences = localStorage.getItem('ai-preferences');
@@ -72,12 +72,17 @@ export default function EnhancedContactPage() {
       }
     }
     
-    // Set package if in URL
-    if (packageParam) {
-      setFormData(prev => ({
-        ...prev,
-        message: `I'm interested in the ${packageParam.replace('-', ' ')} package. ${prev.message}`
-      }));
+    // Check URL for package parameter (client-side only)
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const packageFromUrl = urlParams.get('package');
+      if (packageFromUrl) {
+        setPackageParam(packageFromUrl);
+        setFormData(prev => ({
+          ...prev,
+          message: `I'm interested in the ${packageFromUrl.replace('-', ' ')} package. ${prev.message}`
+        }));
+      }
     }
     
     calculateFormProgress();
@@ -122,7 +127,7 @@ export default function EnhancedContactPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [e.target.name]: value });
   };
 
   const toggleInterest = (interest: string) => {
@@ -312,7 +317,7 @@ export default function EnhancedContactPage() {
       )}
       
       {/* Hero Section */}
-      <section className="relative px-6 py-20 luxury-gradient text-white overflow-hidden">
+      <section className="relative px-6 py-20 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 text-white overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
@@ -364,399 +369,411 @@ export default function EnhancedContactPage() {
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Left: Kiran's Promise */}
           <div className="lg:col-span-1">
-            <div className="luxury-card sticky top-6">
-              <div className="p-8">
-                <h3 className="text-xl font-bold mb-8 text-gray-900">Kiran's Personal Promise</h3>
-                
-                <div className="space-y-8">
-                  <div>
-                    <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
-                        <span className="text-blue-600 text-xl">👨‍💼</span>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900">Direct Founder Access</h4>
-                        <p className="text-sm text-gray-600">Kiran reviews every luxury inquiry</p>
-                      </div>
+            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 sticky top-6">
+              <h3 className="text-xl font-bold mb-8 text-gray-900">Kiran's Personal Promise</h3>
+              
+              <div className="space-y-8">
+                <div>
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
+                      <span className="text-blue-600 text-xl">👨‍💼</span>
                     </div>
-                  </div>
-                  
-                  <div>
-                    <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4">
-                        <span className="text-green-600 text-xl">🤖</span>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900">AI-Enhanced Planning</h4>
-                        <p className="text-sm text-gray-600">Enterprise technology + 28 years expertise</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
-                        <span className="text-purple-600 text-xl">🏔️</span>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900">Nepal-Based Execution</h4>
-                        <p className="text-sm text-gray-600">Full operations team in Kathmandu</p>
-                      </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Direct Founder Access</h4>
+                      <p className="text-sm text-gray-600">Kiran reviews every luxury inquiry</p>
                     </div>
                   </div>
                 </div>
                 
-                {/* Contact Info */}
-                <div className="mt-12 pt-8 border-t border-gray-200">
-                  <h4 className="font-semibold text-gray-900 mb-4">Direct Contact</h4>
-                  <p className="text-sm text-gray-600 mb-4">
-                    For urgent luxury inquiries or corporate partnerships:
-                  </p>
-                  <a 
-                    href="mailto:kiran@curatedascents.com" 
-                    className="text-blue-600 font-semibold hover:text-blue-800 transition"
-                  >
-                    kiran@curatedascents.com
-                  </a>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Carmel, IN • Kathmandu, NP
-                  </p>
+                <div>
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4">
+                      <span className="text-green-600 text-xl">🤖</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900">AI-Enhanced Planning</h4>
+                      <p className="text-sm text-gray-600">Enterprise technology + 28 years expertise</p>
+                    </div>
+                  </div>
                 </div>
                 
-                {/* Response Time */}
-                <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl">
-                  <h4 className="font-semibold text-gray-900 mb-2">Response Time</h4>
-                  <ul className="space-y-2 text-sm text-gray-700">
-                    <li className="flex items-center">
-                      <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-                      <span>Standard: Within 24 hours</span>
-                    </li>
-                    <li className="flex items-center">
-                      <span className="w-2 h-2 bg-amber-500 rounded-full mr-3"></span>
-                      <span>Urgent: Within 12 hours</span>
-                    </li>
-                    <li className="flex items-center">
-                      <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
-                      <span>Weekends: Within 36 hours</span>
-                    </li>
-                  </ul>
+                <div>
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
+                      <span className="text-purple-600 text-xl">🏔️</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Nepal-Based Execution</h4>
+                      <p className="text-sm text-gray-600">Full operations team in Kathmandu</p>
+                    </div>
+                  </div>
                 </div>
+              </div>
+              
+              {/* Contact Info */}
+              <div className="mt-12 pt-8 border-t border-gray-200">
+                <h4 className="font-semibold text-gray-900 mb-4">Direct Contact</h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  For urgent luxury inquiries or corporate partnerships:
+                </p>
+                <a 
+                  href="mailto:kiran@curatedascents.com" 
+                  className="text-blue-600 font-semibold hover:text-blue-800 transition"
+                >
+                  kiran@curatedascents.com
+                </a>
+                <p className="text-xs text-gray-500 mt-2">
+                  Carmel, IN • Kathmandu, NP
+                </p>
+              </div>
+              
+              {/* Response Time */}
+              <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl">
+                <h4 className="font-semibold text-gray-900 mb-2">Response Time</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                    <span>Standard: Within 24 hours</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-amber-500 rounded-full mr-3"></span>
+                    <span>Urgent: Within 12 hours</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                    <span>Weekends: Within 36 hours</span>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
           
           {/* Right: Enhanced Form */}
           <div className="lg:col-span-2">
-            <div className="luxury-card">
-              <div className="p-8 md:p-10">
-                <div className="flex items-center justify-between mb-10">
-                  <div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Personalized Luxury Inquiry</h2>
-                    <p className="text-gray-600 mt-2">All inquiries receive Kiran's direct attention and expert consultation.</p>
-                  </div>
-                  {hasAiItinerary && (
-                    <span className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
-                      ✨ AI Itinerary Attached
-                    </span>
-                  )}
+            <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
+              <div className="flex items-center justify-between mb-10">
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Personalized Luxury Inquiry</h2>
+                  <p className="text-gray-600 mt-2">All inquiries receive Kiran's direct attention and expert consultation.</p>
                 </div>
-                
-                {/* AI Itinerary Preview */}
-                {hasAiItinerary && aiItineraryPreview && (
-                  <div className="mb-10 p-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl border border-blue-200">
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="font-semibold text-gray-900 flex items-center">
-                        <span className="mr-3">📋</span>
-                        AI-Generated Itinerary Preview
-                      </h3>
-                      <button
-                        onClick={() => {
-                          const fullItinerary = localStorage.getItem('ai-itinerary');
-                          if (fullItinerary) {
-                            navigator.clipboard.writeText(fullItinerary);
-                            toast.success('Itinerary copied for your consultation');
-                          }
-                        }}
-                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        Copy Full Itinerary
-                      </button>
-                    </div>
-                    <div className="text-gray-700 text-sm bg-white/70 p-4 rounded-lg max-h-40 overflow-y-auto">
-                      {aiItineraryPreview}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-3">
-                      This itinerary will be personally reviewed by Kiran's team
-                    </p>
-                  </div>
+                {hasAiItinerary && (
+                  <span className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                    ✨ AI Itinerary Attached
+                  </span>
                 )}
-                
-                {/* Progress Indicator */}
-                <div className="bg-gray-50 p-6 rounded-2xl mb-10">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-sm font-medium text-gray-700">Inquiry Progress</span>
-                    <span className="text-sm font-bold text-blue-600">{formProgress}%</span>
+              </div>
+              
+              {/* AI Itinerary Preview */}
+              {hasAiItinerary && aiItineraryPreview && (
+                <div className="mb-10 p-6 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl border border-blue-200">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="font-semibold text-gray-900 flex items-center">
+                      <span className="mr-3">📋</span>
+                      AI-Generated Itinerary Preview
+                    </h3>
+                    <button
+                      onClick={() => {
+                        const fullItinerary = localStorage.getItem('ai-itinerary');
+                        if (fullItinerary) {
+                          navigator.clipboard.writeText(fullItinerary);
+                          toast.success('Itinerary copied for your consultation');
+                        }
+                      }}
+                      className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      Copy Full Itinerary
+                    </button>
                   </div>
-                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-blue-500 to-teal-500 transition-all duration-700"
-                      style={{ width: `${formProgress}%` }}
-                    />
+                  <div className="text-gray-700 text-sm bg-white/70 p-4 rounded-lg max-h-40 overflow-y-auto">
+                    {aiItineraryPreview}
                   </div>
                   <p className="text-xs text-gray-500 mt-3">
-                    Complete more fields for a more accurate luxury consultation
+                    This itinerary will be personally reviewed by Kiran's team
                   </p>
                 </div>
-                
-                <form onSubmit={handleSubmit} className="space-y-12">
-                  {/* Section 1: Basic Information */}
-                  <div className="space-y-8">
-                    <div className="border-b border-gray-200 pb-6">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-6">Basic Information</h3>
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium mb-3">Full Name *</label>
-                          <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            placeholder="Your name"
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                          />
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium mb-3">Email Address *</label>
-                          <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            placeholder="your@email.com"
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                          />
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium mb-3">Phone Number</label>
-                          <input
-                            type="tel"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            placeholder="+1 (555) 123-4567"
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                          />
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium mb-3">Traveler Type</label>
-                          <select
-                            name="travelerType"
-                            value={formData.travelerType}
-                            onChange={handleChange}
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                          >
-                            {travelerTypeOptions.map((option) => (
-                              <option key={option.value} value={option.value}>
-                                {option.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+              )}
+              
+              {/* Progress Indicator */}
+              <div className="bg-gray-50 p-6 rounded-2xl mb-10">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-sm font-medium text-gray-700">Inquiry Progress</span>
+                  <span className="text-sm font-bold text-blue-600">{formProgress}%</span>
+                </div>
+                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-blue-500 to-teal-500 transition-all duration-700"
+                    style={{ width: `${formProgress}%` }}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  Complete more fields for a more accurate luxury consultation
+                </p>
+              </div>
+              
+              <form onSubmit={handleSubmit} className="space-y-12">
+                {/* Section 1: Basic Information */}
+                <div className="space-y-8">
+                  <div className="border-b border-gray-200 pb-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-6">Basic Information</h3>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium mb-3">Full Name *</label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          required
+                          placeholder="Your name"
+                          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        />
                       </div>
-                    </div>
-
-                    {/* Section 2: Trip Details */}
-                    <div className="border-b border-gray-200 pb-6">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-6">Trip Details</h3>
                       
-                      <div className="mb-8">
-                        <label className="block text-sm font-medium mb-4">Destination</label>
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                          {popularDestinations.map((dest) => (
-                            <button
-                              key={dest.value}
-                              type="button"
-                              onClick={() => setFormData({...formData, destination: dest.value})}
-                              className={`p-4 rounded-xl border transition flex flex-col items-center ${
-                                formData.destination === dest.value
-                                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                  : 'border-gray-200 hover:border-gray-300'
-                              }`}
-                            >
-                              <span className="text-2xl mb-2">{dest.icon}</span>
-                              <span className="text-sm">{dest.value}</span>
-                            </button>
+                      <div>
+                        <label className="block text-sm font-medium mb-3">Email Address *</label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          required
+                          placeholder="your@email.com"
+                          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-3">Phone Number</label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          placeholder="+1 (555) 123-4567"
+                          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-3">Traveler Type</label>
+                        <select
+                          name="travelerType"
+                          value={formData.travelerType}
+                          onChange={handleChange}
+                          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        >
+                          {travelerTypeOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
                           ))}
-                        </div>
+                        </select>
                       </div>
-                      
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium mb-3">Number of Travelers</label>
-                          <select
-                            name="travelers"
-                            value={formData.travelers}
-                            onChange={handleChange}
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                          >
-                            <option value="1">1 (Solo)</option>
-                            <option value="2">2 (Couple)</option>
-                            <option value="3">3</option>
-                            <option value="4">4 (Family/Group)</option>
-                            <option value="5">5</option>
-                            <option value="6">6+</option>
-                          </select>
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium mb-3">Travel Dates / Season</label>
-                          <input
-                            type="text"
-                            name="travelDates"
-                            value={formData.travelDates}
-                            onChange={handleChange}
-                            placeholder="e.g., March 2026, Flexible, Specific dates"
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Section 3: Preferences */}
-                    <div className="border-b border-gray-200 pb-6">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-6">Preferences & Budget</h3>
-                      
-                      <div className="mb-8">
-                        <label className="block text-sm font-medium mb-4">Interests (Select all that apply)</label>
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                          {interestOptions.map((interest) => (
-                            <button
-                              key={interest.value}
-                              type="button"
-                              onClick={() => toggleInterest(interest.value)}
-                              className={`p-4 rounded-xl border transition flex flex-col items-center ${
-                                interests.includes(interest.value)
-                                  ? 'border-purple-500 bg-purple-50'
-                                  : 'border-gray-200 hover:border-gray-300'
-                              }`}
-                            >
-                              <span className="text-2xl mb-2">{interest.icon}</span>
-                              <span className="text-sm">{interest.value}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="mb-8">
-                        <label className="block text-sm font-medium mb-4">Budget Level</label>
-                        <div className="space-y-3">
-                          {budgetOptions.map((budget) => (
-                            <button
-                              key={budget.value}
-                              type="button"
-                              onClick={() => setFormData({...formData, budget: budget.value})}
-                              className={`w-full p-4 rounded-xl border transition text-left ${
-                                formData.budget === budget.value
-                                  ? 'border-amber-500 bg-amber-50 text-amber-700'
-                                  : 'border-gray-200 hover:border-gray-300'
-                              }`}
-                            >
-                              <div className="font-bold">{budget.label}</div>
-                              <div className="text-sm text-gray-600">{budget.desc}</div>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium mb-3">Planning Stage</label>
-                          <select
-                            name="planningStage"
-                            value={formData.planningStage}
-                            onChange={handleChange}
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                          >
-                            {planningStageOptions.map((option) => (
-                              <option key={option.value} value={option.value}>
-                                {option.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium mb-3">Response Urgency</label>
-                          <select
-                            name="urgency"
-                            value={formData.urgency}
-                            onChange={handleChange}
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                          >
-                            {urgencyOptions.map((option) => (
-                              <option key={option.value} value={option.value}>
-                                {option.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Section 4: Message */}
-                    <div>
-                      <label className="block text-xl font-semibold text-gray-900 mb-6">
-                        Tell Us About Your Vision
-                      </label>
-                      <textarea
-                        name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        rows={6}
-                        placeholder="Describe your dream Himalayan journey. What experiences are most important to you? Any special occasions, celebrations, or specific requirements?"
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                      />
-                      <p className="text-sm text-gray-500 mt-3">
-                        The more details you provide, the better Kiran's team can personalize your luxury experience.
-                      </p>
                     </div>
                   </div>
-                  
-                  {/* Submit Button */}
-                  <div className="pt-8 border-t border-gray-200">
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="luxury-button w-full py-5 text-lg flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <span className="animate-spin">⟳</span>
-                          <span>Submitting to Kiran's Team...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>✨</span>
-                          <span>Submit Luxury Inquiry</span>
-                          <span>→</span>
-                        </>
-                      )}
-                    </button>
-                    <p className="text-center text-sm text-gray-500 mt-4">
-                      Kiran or a senior team member will respond within {formData.urgency === 'urgent' ? '12 hours' : '24 hours'}
+
+                  {/* Section 2: Trip Details */}
+                  <div className="border-b border-gray-200 pb-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-6">Trip Details</h3>
+                    
+                    <div className="mb-8">
+                      <label className="block text-sm font-medium mb-4">Destination</label>
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        {popularDestinations.map((dest) => (
+                          <button
+                            key={dest.value}
+                            type="button"
+                            onClick={() => setFormData({...formData, destination: dest.value})}
+                            className={`p-4 rounded-xl border transition flex flex-col items-center ${
+                              formData.destination === dest.value
+                                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <span className="text-2xl mb-2">{dest.icon}</span>
+                            <span className="text-sm">{dest.value}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium mb-3">Number of Travelers</label>
+                        <select
+                          name="travelers"
+                          value={formData.travelers}
+                          onChange={handleChange}
+                          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        >
+                          <option value="1">1 (Solo)</option>
+                          <option value="2">2 (Couple)</option>
+                          <option value="3">3</option>
+                          <option value="4">4 (Family/Group)</option>
+                          <option value="5">5</option>
+                          <option value="6">6+</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-3">Travel Dates / Season</label>
+                        <input
+                          type="text"
+                          name="travelDates"
+                          value={formData.travelDates}
+                          onChange={handleChange}
+                          placeholder="e.g., March 2026, Flexible, Specific dates"
+                          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 3: Preferences */}
+                  <div className="border-b border-gray-200 pb-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-6">Preferences & Budget</h3>
+                    
+                    <div className="mb-8">
+                      <label className="block text-sm font-medium mb-4">Interests (Select all that apply)</label>
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        {interestOptions.map((interest) => (
+                          <button
+                            key={interest.value}
+                            type="button"
+                            onClick={() => toggleInterest(interest.value)}
+                            className={`p-4 rounded-xl border transition flex flex-col items-center ${
+                              interests.includes(interest.value)
+                                ? 'border-purple-500 bg-purple-50'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <span className="text-2xl mb-2">{interest.icon}</span>
+                            <span className="text-sm">{interest.value}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="mb-8">
+                      <label className="block text-sm font-medium mb-4">Budget Level</label>
+                      <div className="space-y-3">
+                        {budgetOptions.map((budget) => (
+                          <button
+                            key={budget.value}
+                            type="button"
+                            onClick={() => setFormData({...formData, budget: budget.value})}
+                            className={`w-full p-4 rounded-xl border transition text-left ${
+                              formData.budget === budget.value
+                                ? 'border-amber-500 bg-amber-50 text-amber-700'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="font-bold">{budget.label}</div>
+                            <div className="text-sm text-gray-600">{budget.desc}</div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium mb-3">Planning Stage</label>
+                        <select
+                          name="planningStage"
+                          value={formData.planningStage}
+                          onChange={handleChange}
+                          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        >
+                          {planningStageOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-3">Response Urgency</label>
+                        <select
+                          name="urgency"
+                          value={formData.urgency}
+                          onChange={handleChange}
+                          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        >
+                          {urgencyOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 4: Message */}
+                  <div>
+                    <label className="block text-xl font-semibold text-gray-900 mb-6">
+                      Tell Us About Your Vision
+                    </label>
+                    <textarea
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      rows={6}
+                      placeholder="Describe your dream Himalayan journey. What experiences are most important to you? Any special occasions, celebrations, or specific requirements?"
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                    />
+                    <p className="text-sm text-gray-500 mt-3">
+                      The more details you provide, the better Kiran's team can personalize your luxury experience.
                     </p>
                   </div>
-                </form>
-              </div>
+                </div>
+                
+                {/* Submit Button */}
+                <div className="pt-8 border-t border-gray-200">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-gradient-to-r from-blue-600 to-teal-600 text-white font-semibold py-5 px-8 rounded-xl text-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl w-full flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <span className="animate-spin">⟳</span>
+                        <span>Submitting to Kiran's Team...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>✨</span>
+                        <span>Submit Luxury Inquiry</span>
+                        <span>→</span>
+                      </>
+                    )}
+                  </button>
+                  <p className="text-center text-sm text-gray-500 mt-4">
+                    Kiran or a senior team member will respond within {formData.urgency === 'urgent' ? '12 hours' : '24 hours'}
+                  </p>
+                </div>
+              </form>
             </div>
           </div>
         </div>
       </div>
     </main>
+  );
+}
+
+// Main component with Suspense boundary
+export default function ContactPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading contact form...</p>
+        </div>
+      </div>
+    }>
+      <ContactFormContent />
+    </Suspense>
   );
 }
