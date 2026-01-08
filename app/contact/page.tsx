@@ -33,23 +33,32 @@ function ContactFormContent() {
   const [packageParam, setPackageParam] = useState<string | null>(null);
 
   // Check for AI itinerary and preferences when page loads
-  useEffect(() => {
-    const savedItinerary = localStorage.getItem('ai-itinerary');
-    const aiPreferences = localStorage.getItem('ai-preferences');
+ useEffect(() => {
+  const savedItinerary = localStorage.getItem('ai-itinerary');
+  const aiPreferences = localStorage.getItem('ai-preferences');
+  
+  if (savedItinerary) {
+    setHasAiItinerary(true);
     
-    if (savedItinerary) {
-      setHasAiItinerary(true);
-      const preview = savedItinerary.length > 200 
-        ? savedItinerary.substring(0, 200) + '...' 
-        : savedItinerary;
-      setAiItineraryPreview(preview);
-      
-      toast.success('✨ AI itinerary detected! It will be included in your inquiry.', {
-        duration: 5000,
-        icon: '🤖',
-      });
-    }
+    // Clean markdown characters from preview
+    const cleanItinerary = savedItinerary
+      .replace(/#{1,6}\s*/g, '') // Remove markdown headers (#, ##, etc.)
+      .replace(/\*\*/g, '')      // Remove bold (**)
+      .replace(/\*/g, '')        // Remove asterisks
+      .replace(/`/g, '')         // Remove code backticks
+      .replace(/\[(.*?)\]\(.*?\)/g, '$1'); // Replace markdown links with just text
     
+    const preview = cleanItinerary.length > 200 
+      ? cleanItinerary.substring(0, 200) + '...' 
+      : cleanItinerary;
+    setAiItineraryPreview(preview);
+    
+    toast.success('✨ AI itinerary detected! It will be included in your inquiry.', {
+      duration: 5000,
+      icon: '🤖',
+    });
+  }
+     
     if (aiPreferences) {
       try {
         const prefs = JSON.parse(aiPreferences);

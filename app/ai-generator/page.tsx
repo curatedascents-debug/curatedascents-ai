@@ -522,19 +522,19 @@ export default function EnhancedAIGeneratorPage() {
 
               {/* Form Sections */}
               <div className="space-y-10">
-                {/* Destination & Duration */}
+                {/* Destination & Duration - FIXED SECTION */}
                 <div>
                   <h3 className="text-lg font-semibold mb-4 text-gray-900">Destination & Duration</h3>
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="md:grid md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium mb-3">Destination</label>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="flex flex-wrap gap-3">
                         {destinations.map((dest) => (
                           <button
                             key={dest.value}
                             type="button"
                             onClick={() => handleInputChange('destination', dest.value)}
-                            className={`p-4 rounded-xl border transition ${
+                            className={`flex flex-col items-center justify-center p-4 rounded-xl border transition min-w-[140px] flex-grow ${
                               preferences.destination === dest.value
                                 ? 'border-blue-500 bg-blue-50 text-blue-700'
                                 : 'border-gray-200 hover:border-blue-300'
@@ -542,7 +542,7 @@ export default function EnhancedAIGeneratorPage() {
                           >
                             <div className="text-2xl mb-2">{dest.icon}</div>
                             <div className="font-medium text-sm">{dest.value}</div>
-                            <div className="text-xs text-gray-500 mt-1">{dest.description}</div>
+                            <div className="text-xs text-gray-500 mt-1 text-center">{dest.description}</div>
                           </button>
                         ))}
                       </div>
@@ -550,20 +550,20 @@ export default function EnhancedAIGeneratorPage() {
                     
                     <div>
                       <label className="block text-sm font-medium mb-3">Duration</label>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                      <div className="flex flex-wrap gap-3">
                         {durations.map((dur) => (
                           <button
                             key={dur.days}
                             type="button"
                             onClick={() => handleInputChange('duration', dur.days)}
-                            className={`p-3 rounded-lg border transition ${
+                            className={`flex flex-col items-center justify-center p-3 rounded-lg border transition min-w-[120px] flex-grow ${
                               preferences.duration === dur.days
                                 ? 'border-blue-500 bg-blue-50 text-blue-700'
                                 : 'border-gray-200 hover:border-gray-300'
                             }`}
                           >
                             <div className="font-bold">{dur.label}</div>
-                            <div className="text-xs text-gray-500">{dur.description}</div>
+                            <div className="text-xs text-gray-500 text-center">{dur.description}</div>
                           </button>
                         ))}
                       </div>
