@@ -33,32 +33,32 @@ function ContactFormContent() {
   const [packageParam, setPackageParam] = useState<string | null>(null);
 
   // Check for AI itinerary and preferences when page loads
- useEffect(() => {
-  const savedItinerary = localStorage.getItem('ai-itinerary');
-  const aiPreferences = localStorage.getItem('ai-preferences');
-  
-  if (savedItinerary) {
-    setHasAiItinerary(true);
+  useEffect(() => {
+    const savedItinerary = localStorage.getItem('ai-itinerary');
+    const aiPreferences = localStorage.getItem('ai-preferences');
     
-    // Clean markdown characters from preview
-    const cleanItinerary = savedItinerary
-      .replace(/#{1,6}\s*/g, '') // Remove markdown headers (#, ##, etc.)
-      .replace(/\*\*/g, '')      // Remove bold (**)
-      .replace(/\*/g, '')        // Remove asterisks
-      .replace(/`/g, '')         // Remove code backticks
-      .replace(/\[(.*?)\]\(.*?\)/g, '$1'); // Replace markdown links with just text
-    
-    const preview = cleanItinerary.length > 200 
-      ? cleanItinerary.substring(0, 200) + '...' 
-      : cleanItinerary;
-    setAiItineraryPreview(preview);
-    
-    toast.success('✨ AI itinerary detected! It will be included in your inquiry.', {
-      duration: 5000,
-      icon: '🤖',
-    });
-  }
-     
+    if (savedItinerary) {
+      setHasAiItinerary(true);
+      
+      // Clean markdown characters from preview
+      const cleanItinerary = savedItinerary
+        .replace(/#{1,6}\s*/g, '') // Remove markdown headers (#, ##, etc.)
+        .replace(/\*\*/g, '')      // Remove bold (**)
+        .replace(/\*/g, '')        // Remove asterisks
+        .replace(/`/g, '')         // Remove code backticks
+        .replace(/\[(.*?)\]\(.*?\)/g, '$1'); // Replace markdown links with just text
+      
+      const preview = cleanItinerary.length > 200 
+        ? cleanItinerary.substring(0, 200) + '...' 
+        : cleanItinerary;
+      setAiItineraryPreview(preview);
+      
+      toast.success('✨ AI itinerary detected! It will be included in your inquiry.', {
+        duration: 5000,
+        icon: '🤖',
+      });
+    }
+       
     if (aiPreferences) {
       try {
         const prefs = JSON.parse(aiPreferences);
@@ -147,6 +147,7 @@ function ContactFormContent() {
     setFormData(prev => ({ ...prev, interests: newInterests }));
   };
 
+  // ✅ FIXED FORMSPREE SUBMISSION FUNCTION
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -155,7 +156,8 @@ function ContactFormContent() {
     const aiItinerary = localStorage.getItem('ai-itinerary') || '';
     const aiPreferences = localStorage.getItem('ai-preferences') || '';
     
-    const FORMSPREE_ENDPOINT = "https://formspree.io/f/meeqkvpp";
+    // ✅ CORRECT FORMSPREE ENDPOINT
+    const FORMSPREE_ENDPOINT = "https://formspree.io/f/meeqkvpp"; // Your form ID
     
     try {
       // Get budget label
@@ -173,45 +175,45 @@ function ContactFormContent() {
         'corporate-retreat': 'Corporate Retreat'
       };
       
+      // ✅ Create FormData object (required for Formspree)
+      const formDataObj = new FormData();
+      
+      // ✅ Required fields
+      formDataObj.append('name', formData.name);
+      formDataObj.append('email', formData.email);
+      formDataObj.append('_replyto', formData.email); // For reply-to email
+      formDataObj.append('_subject', `[${formData.urgency === 'urgent' ? 'URGENT' : 'LUXURY INQUIRY'}] ${formData.name} - ${formData.destination}`);
+      
+      // ✅ Additional fields
+      formDataObj.append('phone', formData.phone || 'Not provided');
+      formDataObj.append('destination', formData.destination);
+      formDataObj.append('travelers', formData.travelers);
+      formDataObj.append('travelDates', formData.travelDates || 'Flexible');
+      formDataObj.append('budget', budgetLabels[formData.budget] || formData.budget);
+      formDataObj.append('interests', interests.join(', ') || 'Not specified');
+      formDataObj.append('travelerType', travelerTypes[formData.travelerType] || 'Luxury Traveler');
+      formDataObj.append('planningStage', formData.planningStage);
+      formDataObj.append('heardAboutUs', formData.heardAboutUs);
+      formDataObj.append('message', formData.message);
+      formDataObj.append('urgency', formData.urgency);
+      formDataObj.append('aiItinerary', aiItinerary ? 'Yes' : 'No');
+      formDataObj.append('estimatedValue', estimatedValue);
+      
+      // ✅ Add AI itinerary content if available
+      if (aiItinerary) {
+        // Send a preview (first 1000 chars)
+        const itineraryPreview = aiItinerary.length > 1000 
+          ? aiItinerary.substring(0, 1000) + '... [Full itinerary available]' 
+          : aiItinerary;
+        formDataObj.append('aiItineraryContent', itineraryPreview);
+      }
+      
       const response = await fetch(FORMSPREE_ENDPOINT, {
         method: 'POST',
+        body: formDataObj,
         headers: {
-          'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: JSON.stringify({
-          // Contact Info
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone || 'Not provided',
-          
-          // Trip Details
-          destination: formData.destination,
-          travelers: formData.travelers,
-          travelDates: formData.travelDates || 'Flexible',
-          budget: budgetLabels[formData.budget] || formData.budget,
-          interests: interests.join(', ') || 'Not specified',
-          travelerType: travelerTypes[formData.travelerType] || 'Luxury Traveler',
-          planningStage: formData.planningStage,
-          heardAboutUs: formData.heardAboutUs,
-          
-          // Message
-          message: formData.message,
-          urgency: formData.urgency,
-          
-          // AI Integration
-          aiItinerary: aiItinerary ? 'Yes' : 'No',
-          aiPreferences: aiPreferences ? 'Yes' : 'No',
-          source: aiItinerary ? 'AI Generator' : 'Direct Contact',
-          
-          // Estimated Value
-          estimatedValue: estimatedValue,
-          
-          // Email Settings
-          _subject: `[${formData.urgency === 'urgent' ? 'URGENT' : 'LUXURY INQUIRY'}] ${formData.name} - ${formData.destination} - ${budgetLabels[formData.budget] || 'Luxury'}`,
-          _replyto: formData.email,
-          _template: 'luxury-inquiry',
-        }),
       });
       
       if (response.ok) {
@@ -228,10 +230,10 @@ function ContactFormContent() {
           name: '',
           email: '',
           phone: '',
-          destination: formData.destination,
+          destination: 'Nepal',
           travelers: '2',
           travelDates: '',
-          budget: formData.budget,
+          budget: 'luxury',
           interests: [],
           message: '',
           urgency: 'standard',
@@ -253,13 +255,15 @@ function ContactFormContent() {
         }, 3000);
         
       } else {
-        throw new Error('Form submission failed');
+        const errorData = await response.json();
+        console.error('Formspree error:', errorData);
+        throw new Error(errorData.error || 'Form submission failed');
       }
     } catch (error) {
+      console.error('Form submission error:', error);
       toast.error('There was an error sending your message. Please email kiran@curatedascents.com directly.', {
         duration: 5000,
       });
-      console.error('Form submission error:', error);
     } finally {
       setIsSubmitting(false);
     }
