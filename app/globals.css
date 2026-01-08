@@ -2,34 +2,80 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0f172a;
+  --luxury-gold: #d4af37;
+  --luxury-navy: #0f172a;
+  --luxury-cream: #f8f5f0;
+  --luxury-teal: #0d9488;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: system-ui, -apple-system, 'Inter', sans-serif;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
-/* Logo-specific styling - SAFE */
-img[src*="logo.png"] {
-  display: block;
-  object-fit: contain;
+/* Luxury Gradient Effects */
+.luxury-gradient {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
 }
 
-/* Header logo - 192×192 source displayed at 64-80px */
-header img[src="/logo.png"] {
-  border-radius: 8px;
+.luxury-gradient-light {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
-/* Footer logo - 160×160 source displayed at 48px */
-footer img[src="/logo-footer.png"] {
-  border-radius: 6px;
+.luxury-gradient-gold {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
 }
 
-/* Container for consistent layout */
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #0d9488, #1e293b);
+  border-radius: 4px;
+}
+
+/* Typography Enhancements */
+h1, h2, h3, h4 {
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+/* Luxury Card Styles */
+.luxury-card {
+  @apply bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-blue-100;
+}
+
+/* Button Styles */
+.luxury-button {
+  @apply bg-gradient-to-r from-blue-600 to-teal-600 text-white font-semibold py-4 px-8 rounded-xl hover:from-blue-700 hover:to-teal-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl;
+}
+
+.luxury-button-outline {
+  @apply border-2 border-blue-600 text-blue-600 font-semibold py-4 px-8 rounded-xl hover:bg-blue-50 transition;
+}
+
+/* Container */
 .container {
   width: 100%;
   max-width: 1280px;
@@ -39,10 +85,9 @@ footer img[src="/logo-footer.png"] {
   padding-right: 1rem;
 }
 
-/* Responsive improvements */
 @media (max-width: 768px) {
-  header img[src="/logo.png"] {
-    height: 64px;
-    width: 64px;
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
 }

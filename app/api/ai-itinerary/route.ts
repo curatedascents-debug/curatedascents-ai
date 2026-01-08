@@ -1,57 +1,93 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  console.log('🔧 API route called at:', new Date().toISOString());
+  console.log('🔧 Enhanced AI Itinerary API called:', new Date().toISOString());
   
   try {
     const body = await request.json();
-    const { destination, duration, travelers, interests, budget, specialRequests } = body;
+    const { 
+      destination, 
+      duration, 
+      travelers, 
+      interests, 
+      budget, 
+      specialRequests,
+      travelerType,
+      pace,
+      accommodationStyle 
+    } = body;
     
-    console.log('📋 Received preferences:', { 
+    console.log('📋 Received enhanced preferences:', { 
       destination, 
       duration, 
       travelers, 
       interests: interests?.length || 0,
-      budget 
+      budget,
+      travelerType,
+      pace,
+      accommodationStyle
     });
 
-    // Debug: Check environment variables
-    console.log('🔑 Checking for DEEPSEEK_API_KEY in environment...');
+    // Check environment variables
     const apiKey = process.env.DEEPSEEK_API_KEY;
-    console.log('✅ API key exists:', !!apiKey);
-    console.log('📏 API key length:', apiKey ? `${apiKey.length} characters` : '0');
-    console.log('🔍 API key starts with:', apiKey ? apiKey.substring(0, 5) + '...' : 'none');
     
     if (!apiKey) {
-      console.error('❌ DeepSeek API key is missing from environment variables');
-      console.log('📋 Available env vars:', Object.keys(process.env).filter(k => k.includes('DEEPSEEK') || k.includes('API')));
+      console.error('❌ DeepSeek API key is missing');
       return NextResponse.json(
         { error: 'AI service is not configured. Please contact support.' },
         { status: 500 }
       );
     }
 
-    console.log('🚀 Proceeding with API call to DeepSeek...');
+    console.log('🚀 Proceeding with enhanced API call to DeepSeek...');
 
-    // Construct the prompt using your 25 years of expertise
-    const prompt = `As a Himalayan travel expert with 25 years of experience operating luxury tours in Nepal, Tibet, and Bhutan, create a detailed itinerary with these parameters:
+    // Enhanced prompt with Kiran's expertise
+    const prompt = `You are Kiran Pokhrel's AI assistant, with access to 28 years of Himalayan luxury travel expertise. 
+    Create a detailed luxury itinerary using Kiran's knowledge and operational experience.
 
-Destination: ${destination}
-Duration: ${duration} days
-Travelers: ${travelers} ${travelers === '1' ? 'person' : 'people'}
-Interests: ${interests.join(', ')}
-Budget Level: ${budget}
-Special Requests: ${specialRequests || 'None'}
+CLIENT PROFILE:
+- Destination: ${destination}
+- Duration: ${duration} days
+- Travelers: ${travelers} ${travelers === '1' ? 'person' : 'people'}
+- Traveler Type: ${travelerType || 'luxury traveler'}
+- Pace Preference: ${pace || 'moderate'}
+- Accommodation Style: ${accommodationStyle || 'luxury'}
+- Interests: ${interests.join(', ')}
+- Budget Level: ${budget}
+- Special Requests: ${specialRequests || 'None'}
 
-Please provide:
-1. A day-by-day itinerary with unique, insider experiences only a local expert would know
-2. Estimated cost range in USD (be realistic for luxury travel)
-3. Best season to visit with specific month recommendations
-4. 3-4 professional tips based on actual operational experience
+KIRAN'S EXPERTISE TO APPLY:
+1. Altitude considerations: Include proper acclimatization for luxury comfort
+2. Seasonality: Recommend best months based on 28 years of operations
+3. Luxury properties: Suggest specific high-end hotels/lodges Kiran has relationships with
+4. Exclusive access: Include experiences not available to standard tours
+5. Safety protocols: Built-in safety from insurance industry experience
+6. Cultural authenticity: Genuine local experiences with proper protocols
 
-Format the response clearly for a luxury travel client. Focus on exclusive access, safety considerations, and authentic cultural immersion.`;
+ITINERARY REQUIREMENTS:
+1. Start with an engaging title that reflects luxury and destination
+2. Include a "Why This Journey Is Unique" section highlighting Kiran's expertise
+3. Day-by-day breakdown with:
+   - Morning, afternoon, evening activities
+   - Specific luxury accommodation recommendations
+   - Dining suggestions (private dining where appropriate)
+   - Transportation details (private vehicles, helicopters if budget allows)
+4. Estimated cost range in USD (be realistic for luxury travel)
+5. Best season to visit with specific month recommendations
+6. Packing tips specific to this itinerary
+7. 4-5 professional tips from Kiran's operational experience
 
-    console.log('📤 Making request to DeepSeek API...');
+FORMAT REQUIREMENTS:
+- Use clear markdown formatting
+- Include emojis for visual appeal
+- Bold important luxury features
+- Keep it professional but engaging
+- End with how to proceed with Kiran's team
+
+Remember: This is for high-net-worth clients who value exclusivity, comfort, and authentic experiences. 
+Every recommendation should reflect 28 years of hands-on Himalayan luxury travel operations.`;
+
+    console.log('📤 Making enhanced request to DeepSeek API...');
     
     // Call DeepSeek API
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
@@ -65,15 +101,29 @@ Format the response clearly for a luxury travel client. Focus on exclusive acces
         messages: [
           {
             role: 'system',
-            content: 'You are a Himalayan travel expert with 25 years of experience operating luxury tours. Provide detailed, practical, and exclusive travel advice. Be specific about locations, timing, and unique experiences.'
+            content: `You are Kiran Pokhrel's AI travel concierge. You have access to 28 years of Himalayan luxury travel expertise including:
+            
+1. Operational knowledge of Nepal, Tibet, and Bhutan luxury travel
+2. Network of 500+ vetted luxury suppliers
+3. Altitude and safety protocols from decades of experience
+4. Exclusive access to properties and experiences not available publicly
+5. Cultural protocols and authentic local connections
+6. Enterprise technology background from Travelport, American Airlines, Amex GBT
+
+You create detailed, practical, and exclusive travel itineraries that reflect real operational knowledge. 
+Be specific about locations, timing, unique experiences, and luxury considerations. 
+Always include Kiran's professional tips based on actual experience.
+
+Format responses in elegant markdown with clear sections and emoji enhancement for readability.`
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        max_tokens: 1500,
-        temperature: 0.7,
+        max_tokens: 2500,
+        temperature: 0.8,
+        stream: false,
       }),
     });
 
@@ -89,22 +139,38 @@ Format the response clearly for a luxury travel client. Focus on exclusive acces
     }
 
     const data = await response.json();
-    console.log('✅ DeepSeek API call successful');
+    console.log('✅ Enhanced DeepSeek API call successful');
     console.log('📄 Response token usage:', data.usage?.total_tokens || 'unknown');
 
     const aiResponse = data.choices[0].message.content;
 
-    // Parse the AI response into structured format
+    // Add Kiran's signature note
+    const enhancedResponse = `${aiResponse}
+
+---
+*This itinerary was generated by CuratedAscents AI, powered by Kiran Pokhrel's 28+ years of Himalayan luxury travel expertise and enterprise technology background.*
+
+**Next Steps with Kiran's Team:**
+1. Review this itinerary with our Nepal-based experts
+2. Customize based on your specific preferences
+3. Secure bookings through Kiran's luxury network
+4. Receive white-glove service throughout your journey
+
+*Contact Kiran's team at kiran@curatedascents.com to begin the refinement process.*`;
+
     return NextResponse.json({
       success: true,
-      itinerary: aiResponse,
+      itinerary: enhancedResponse,
+      expertiseApplied: true,
+      generatedAt: new Date().toISOString(),
+      expertiseYears: 28
     });
 
   } catch (error) {
-    console.error('💥 API route error:', error);
+    console.error('💥 Enhanced API route error:', error);
     return NextResponse.json(
       { error: 'An unexpected error occurred. Please try again later.' },
       { status: 500 }
     );
   }
-}// Redeploy trigger: Sun Dec 28 06:02:04 UTC 2025
+}

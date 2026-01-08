@@ -11,6 +11,9 @@ type TripPreferences = {
   interests: string[];
   budget: string;
   specialRequests: string;
+  travelerType: string;
+  pace: string;
+  accommodationStyle: string;
 };
 
 type AIResponse = {
@@ -22,55 +25,70 @@ type AIResponse = {
   highlights?: string[];
 };
 
-// Sample prompts for inspiration
-const SAMPLE_PROMPTS = [
+// Enhanced sample prompts with Kiran's expertise
+const ENHANCED_SAMPLE_PROMPTS = [
   {
     title: "Luxury Nepal Culture & Wellness",
-    description: "7-day luxury cultural tour with spa retreat",
+    description: "7-day luxury cultural tour with spa retreat & private access",
+    expertiseNote: "Includes Kiran's private contacts at heritage properties",
     preferences: {
       destination: "Nepal",
       duration: "7",
       travelers: "2",
-      interests: ["Culture", "Wellness", "Luxury"],
+      interests: ["Culture", "Wellness", "Luxury", "Photography"],
       budget: "luxury",
-      specialRequests: "Private guided tours, luxury spa experiences, heritage hotels"
+      specialRequests: "Private guided tours, luxury spa experiences, heritage hotel access, photography sessions",
+      travelerType: "luxury-couple",
+      pace: "moderate",
+      accommodationStyle: "boutique-heritage"
     }
   },
   {
     title: "Bhutan Spiritual Journey",
-    description: "10-day spiritual and photography tour",
+    description: "10-day spiritual & photography tour with monastery access",
+    expertiseNote: "Based on 28 years of Bhutan operations",
     preferences: {
       destination: "Bhutan",
       duration: "10",
       travelers: "4",
-      interests: ["Spiritual", "Photography", "Culture"],
-      budget: "premium",
-      specialRequests: "Monastery visits, meditation sessions, local family experiences"
+      interests: ["Spiritual", "Photography", "Culture", "Wellness"],
+      budget: "ultra-luxury",
+      specialRequests: "Private monastery visits, meditation with masters, local family experiences, photography guidance",
+      travelerType: "spiritual-group",
+      pace: "leisurely",
+      accommodationStyle: "luxury-lodge"
     }
   },
   {
-    title: "Tibet Trekking Adventure",
-    description: "14-day luxury trek with wildlife viewing",
+    title: "Everest Luxury Trek",
+    description: "14-day luxury trek with helicopter access & gourmet dining",
+    expertiseNote: "Kiran's altitude expertise applied",
     preferences: {
-      destination: "Tibet",
+      destination: "Nepal",
       duration: "14",
-      travelers: "6",
-      interests: ["Trekking", "Wildlife", "Luxury"],
+      travelers: "2",
+      interests: ["Trekking", "Luxury", "Adventure", "Photography"],
       budget: "ultra-luxury",
-      specialRequests: "Private chef, luxury camps, wildlife expert guide"
+      specialRequests: "Private chef, luxury lodges, helicopter transfers, altitude expert guide",
+      travelerType: "adventure-luxury",
+      pace: "active",
+      accommodationStyle: "luxury-lodge"
     }
   }
 ];
 
-export default function AIGeneratorPage() {
-  // Form state
+export default function EnhancedAIGeneratorPage() {
+  // Enhanced form state
   const [preferences, setPreferences] = useState<TripPreferences>({
     destination: 'Nepal',
     duration: '7',
     travelers: '2',
-    interests: ['Culture'],
+    interests: ['Culture', 'Luxury'],
     budget: 'luxury',
-    specialRequests: ''
+    specialRequests: '',
+    travelerType: 'luxury-couple',
+    pace: 'moderate',
+    accommodationStyle: 'luxury-lodge'
   });
 
   // AI response state
@@ -81,44 +99,83 @@ export default function AIGeneratorPage() {
   const [showSamplePrompts, setShowSamplePrompts] = useState(true);
   const [responseTime, setResponseTime] = useState<number | null>(null);
 
-  // Available options
+  // Enhanced options
   const destinations = [
-    { value: 'Nepal', icon: '🇳🇵' },
-    { value: 'Bhutan', icon: '🇧🇹' },
-    { value: 'Tibet', icon: '🇨🇳' },
-    { value: 'Multiple', icon: '🌏' }
+    { value: 'Nepal', icon: '🇳🇵', description: 'Everest, Annapurna, Culture' },
+    { value: 'Bhutan', icon: '🇧🇹', description: 'Dragon Kingdom, Monasteries' },
+    { value: 'Tibet', icon: '🇨🇳', description: 'Lhasa, Mount Kailash' },
+    { value: 'Multiple', icon: '🌏', description: 'Combined Himalayan Journey' }
   ];
   
   const durations = [
-    { days: '5', label: '5 days' },
-    { days: '7', label: '7 days' },
-    { days: '10', label: '10 days' },
-    { days: '14', label: '2 weeks' },
-    { days: '21', label: '3 weeks' }
+    { days: '5', label: '5 days', description: 'Short luxury getaway' },
+    { days: '7', label: '7 days', description: 'Week-long immersion' },
+    { days: '10', label: '10 days', description: 'In-depth exploration' },
+    { days: '14', label: '2 weeks', description: 'Comprehensive journey' },
+    { days: '21', label: '3 weeks', description: 'Ultimate Himalayan experience' }
   ];
   
   const travelerOptions = [
-    { value: '1', label: 'Solo' },
-    { value: '2', label: 'Couple' },
-    { value: '4', label: 'Family (4)' },
-    { value: '6', label: 'Group (6)' },
-    { value: '8+', label: 'Large Group' }
+    { value: '1', label: 'Solo', description: 'Personal journey' },
+    { value: '2', label: 'Couple', description: 'Romantic getaway' },
+    { value: '4', label: 'Family (4)', description: 'Family adventure' },
+    { value: '6', label: 'Group (6)', description: 'Friends circle' },
+    { value: '8+', label: 'Large Group', description: 'Corporate or special' }
+  ];
+  
+  const travelerTypes = [
+    { value: 'luxury-couple', label: 'Luxury Couple', icon: '💑' },
+    { value: 'family-luxury', label: 'Luxury Family', icon: '👨‍👩‍👧‍👦' },
+    { value: 'adventure-luxury', label: 'Adventure Luxury', icon: '🧗' },
+    { value: 'spiritual-group', label: 'Spiritual Group', icon: '🕉️' },
+    { value: 'corporate-retreat', label: 'Corporate Retreat', icon: '🏢' }
+  ];
+  
+  const paceOptions = [
+    { value: 'leisurely', label: 'Leisurely', description: 'Relaxed pace, luxury focus' },
+    { value: 'moderate', label: 'Moderate', description: 'Balanced activities' },
+    { value: 'active', label: 'Active', description: 'Adventure-focused' }
+  ];
+  
+  const accommodationStyles = [
+    { value: '5-star', label: '5-Star Hotels', icon: '⭐' },
+    { value: 'boutique-heritage', label: 'Boutique Heritage', icon: '🏯' },
+    { value: 'luxury-lodge', label: 'Luxury Lodges', icon: '🏔️' },
+    { value: 'private-villa', label: 'Private Villas', icon: '🏡' },
+    { value: 'luxury-tented', label: 'Luxury Tented', icon: '⛺' }
   ];
   
   const interestOptions = [
-    { value: 'Culture', icon: '🏛️', color: 'purple' },
-    { value: 'Trekking', icon: '🥾', color: 'green' },
-    { value: 'Luxury', icon: '⭐', color: 'yellow' },
-    { value: 'Wellness', icon: '🧘', color: 'teal' },
-    { value: 'Wildlife', icon: '🦌', color: 'orange' },
-    { value: 'Photography', icon: '📸', color: 'blue' },
-    { value: 'Spiritual', icon: '🙏', color: 'indigo' }
+    { value: 'Culture', icon: '🏛️', color: 'purple', description: 'Heritage & traditions' },
+    { value: 'Trekking', icon: '🥾', color: 'green', description: 'Mountain adventures' },
+    { value: 'Luxury', icon: '✨', color: 'yellow', description: 'Premium experiences' },
+    { value: 'Wellness', icon: '🧘', color: 'teal', description: 'Spa & relaxation' },
+    { value: 'Wildlife', icon: '🦌', color: 'orange', description: 'Nature & animals' },
+    { value: 'Photography', icon: '📸', color: 'blue', description: 'Photo opportunities' },
+    { value: 'Spiritual', icon: '🙏', color: 'indigo', description: 'Religious sites' },
+    { value: 'Food', icon: '🍲', color: 'red', description: 'Culinary experiences' },
+    { value: 'Adventure', icon: '🧗', color: 'amber', description: 'Thrilling activities' }
   ];
   
   const budgetOptions = [
-    { value: 'premium', label: 'Premium ($300-500/day)', color: 'blue' },
-    { value: 'luxury', label: 'Luxury ($500-800/day)', color: 'purple' },
-    { value: 'ultra-luxury', label: 'Ultra-Luxury ($800+/day)', color: 'amber' }
+    { 
+      value: 'premium', 
+      label: 'Premium ($300-500/day)', 
+      color: 'blue',
+      description: 'Boutique hotels & guided experiences'
+    },
+    { 
+      value: 'luxury', 
+      label: 'Luxury ($500-800/day)', 
+      color: 'purple',
+      description: '5-star properties & exclusive access'
+    },
+    { 
+      value: 'ultra-luxury', 
+      label: 'Ultra-Luxury ($800+/day)', 
+      color: 'amber',
+      description: 'Private charters & bespoke services'
+    }
   ];
 
   // Handle form changes
@@ -142,13 +199,15 @@ export default function AIGeneratorPage() {
   };
 
   // Load sample prompt
-  const loadSamplePrompt = (sample: typeof SAMPLE_PROMPTS[0]) => {
+  const loadSamplePrompt = (sample: typeof ENHANCED_SAMPLE_PROMPTS[0]) => {
     setPreferences(sample.preferences);
     setShowSamplePrompts(false);
-    toast.success('Sample preferences loaded! Adjust as needed.');
+    toast.success(`Loaded "${sample.title}" with Kiran's ${sample.expertiseNote}`, {
+      icon: '✨',
+    });
   };
 
-  // Generate AI itinerary
+  // Generate AI itinerary with enhanced prompt
   const generateItinerary = async () => {
     const startTime = Date.now();
     setIsGenerating(true);
@@ -175,13 +234,20 @@ export default function AIGeneratorPage() {
       const endTime = Date.now();
       setResponseTime(endTime - startTime);
 
-      // Parse the AI response to extract structured data
+      // Parse the AI response
       const parsedResponse = parseAIResponse(data.itinerary);
       setAiResponse(parsedResponse);
 
-      toast.success('Itinerary generated successfully!');
+      // Save to localStorage for contact form
+      localStorage.setItem('ai-itinerary', data.itinerary);
+      localStorage.setItem('ai-preferences', JSON.stringify(preferences));
+
+      toast.success('Itinerary generated with Kiran\'s expertise!', {
+        icon: '🏔️',
+        duration: 4000,
+      });
     } catch (err) {
-      console.error('❌ Generation error:', err);
+      console.error('Generation error:', err);
       const errorMsg = err instanceof Error ? err.message : 'Failed to generate itinerary. Please try again.';
       setError(errorMsg);
       toast.error(errorMsg);
@@ -190,18 +256,18 @@ export default function AIGeneratorPage() {
     }
   };
 
-  // Parse AI response to extract structured data
+  // Parse AI response with enhanced formatting
   const parseAIResponse = (text: string): AIResponse => {
-    // Try to extract sections from markdown
+    // Enhanced parsing logic
     const sections = text.split('\n## ');
     
-    // Extract title from first line
+    // Extract title
     const firstLine = text.split('\n')[0];
     const title = firstLine.replace('# ', '').replace('**', '').replace('**', '');
     
-    // Try to find highlights (bullet points after "Highlights" or "Key Features")
+    // Extract highlights
     let highlights: string[] = [];
-    const highlightsMatch = text.match(/Highlights?:?\s*\n([\s\S]*?)(?=\n## |\n\n## |$)/);
+    const highlightsMatch = text.match(/Highlights?:?\s*\n([\s\S]*?)(?=\n## |\n\n## |$)/i);
     if (highlightsMatch) {
       highlights = highlightsMatch[1]
         .split('\n')
@@ -210,11 +276,19 @@ export default function AIGeneratorPage() {
         .filter(line => line.length > 0);
     }
 
-    // Extract estimated cost if present
+    // Extract estimated cost
     let estimatedCost = '';
     const costMatch = text.match(/Estimated Cost:?\s*\$\s*([0-9,]+(?:\s*-\s*[0-9,]+)?)/i);
     if (costMatch) {
       estimatedCost = `$${costMatch[1]}`;
+    } else {
+      // Default based on budget
+      const defaults = {
+        'premium': '$4,000 - $6,000',
+        'luxury': '$7,000 - $12,000',
+        'ultra-luxury': '$12,000+'
+      };
+      estimatedCost = defaults[preferences.budget as keyof typeof defaults] || 'Contact for personalized quote';
     }
 
     // Extract best season
@@ -222,9 +296,11 @@ export default function AIGeneratorPage() {
     const seasonMatch = text.match(/Best Season:?\s*([^\.\n]+)/i);
     if (seasonMatch) {
       bestSeason = seasonMatch[1].trim();
+    } else {
+      bestSeason = 'Year-round with seasonal variations (Kiran will advise)';
     }
 
-    // Extract pro tips (look for section with "Tips" or "Pro Tips")
+    // Extract pro tips
     let proTips: string[] = [];
     const tipsMatch = text.match(/(?:Pro )?Tips?:?\s*\n([\s\S]*?)(?=\n## |\n\n## |$)/i);
     if (tipsMatch) {
@@ -235,16 +311,22 @@ export default function AIGeneratorPage() {
         .filter(line => line.length > 0);
     }
 
+    // Add Kiran's expertise tips if none found
+    if (proTips.length === 0) {
+      proTips = [
+        'Based on 28 years experience: Book luxury properties 6+ months in advance',
+        'Altitude advice: Include proper acclimatization days for comfort',
+        'Travel insurance is essential for high-altitude luxury travel',
+        'Private guides make all the difference for exclusive access'
+      ];
+    }
+
     return {
       itinerary: text,
-      estimatedCost: estimatedCost || 'Contact for personalized quote',
-      bestSeason: bestSeason || 'Year-round with seasonal variations',
-      proTips: proTips.length > 0 ? proTips : [
-        'Book 3-6 months in advance for luxury accommodations',
-        'Consider travel insurance for high-altitude destinations',
-        'Pack layers for variable mountain weather'
-      ],
-      title,
+      estimatedCost,
+      bestSeason,
+      proTips,
+      title: title || `AI-Generated ${preferences.destination} Luxury Journey`,
       highlights: highlights.length > 0 ? highlights : undefined
     };
   };
@@ -253,12 +335,14 @@ export default function AIGeneratorPage() {
   const copyToClipboard = async () => {
     if (!aiResponse) return;
     
-    const textToCopy = `${aiResponse.title || 'AI Generated Itinerary'}\n\n${aiResponse.itinerary}`;
+    const textToCopy = `${aiResponse.title}\n\nGenerated by CuratedAscents AI\nPowered by Kiran Pokhrel's 28+ Years Expertise\n\n${aiResponse.itinerary}`;
     
     try {
       await navigator.clipboard.writeText(textToCopy);
       setIsCopied(true);
-      toast.success('Itinerary copied to clipboard!');
+      toast.success('Itinerary copied! Ready to share with Kiran\'s team.', {
+        icon: '📋',
+      });
       
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
@@ -270,44 +354,45 @@ export default function AIGeneratorPage() {
   const downloadAsText = () => {
     if (!aiResponse) return;
     
-    const text = `${aiResponse.title || 'AI Generated Itinerary'}\n\n${aiResponse.itinerary}\n\nGenerated by Curated Ascents AI\n${window.location.origin}`;
+    const text = `${aiResponse.title}\n\nGenerated by CuratedAscents AI\nPowered by Kiran Pokhrel's 28+ Years Himalayan Expertise\n\n${aiResponse.itinerary}\n\nContact: kiran@curatedascents.com\nWebsite: ${window.location.origin}`;
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `itinerary-${preferences.destination.toLowerCase()}-${preferences.duration}days.txt`;
+    a.download = `curatedascents-${preferences.destination.toLowerCase()}-luxury-itinerary.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    toast.success('Itinerary downloaded!');
+    toast.success('Itinerary downloaded! Ready for your consultation.', {
+      icon: '💾',
+    });
   };
 
   // Share itinerary
   const shareItinerary = () => {
     if (!aiResponse) return;
     
-    const text = `Check out this AI-generated itinerary for ${preferences.destination} by Curated Ascents!`;
+    const text = `Check out my AI-generated luxury itinerary for ${preferences.destination} by CuratedAscents AI! Powered by Kiran Pokhrel's 28+ years of Himalayan expertise.`;
     const url = window.location.href;
     
     if (navigator.share) {
       navigator.share({
-        title: aiResponse.title || 'AI Generated Itinerary',
+        title: aiResponse.title || 'AI Generated Luxury Itinerary',
         text: text,
         url: url,
       }).catch(() => {
-        // Fallback to clipboard
         navigator.clipboard.writeText(url);
-        toast.success('Link copied to clipboard!');
+        toast.success('Link copied! Share with travel companions.');
       });
     } else {
       navigator.clipboard.writeText(url);
-      toast.success('Link copied to clipboard!');
+      toast.success('Link copied! Share with travel companions.');
     }
   };
 
-  // Validate form before generation
+  // Validate form
   const validateForm = (): boolean => {
     if (preferences.interests.length === 0) {
       toast.error('Please select at least one interest');
@@ -331,554 +416,521 @@ export default function AIGeneratorPage() {
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Toaster position="top-right" />
       
-      {/* Hero Section */}
-      <section className="px-6 py-16 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 text-white">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-pulse">
+      {/* Enhanced Hero Section */}
+      <section className="relative px-6 py-20 luxury-gradient text-white overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6">
             <span className="mr-2">✨</span> AI-Powered Luxury Travel Planning
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">
-            AI Trip Idea Generator
-          </h1>
-          <p className="text-xl opacity-90 max-w-3xl mx-auto mb-8">
-            Experience the future of travel planning. Our AI—trained on 25 years of Himalayan expertise—will craft your perfect luxury itinerary.
-          </p>
-          <div className="flex items-center justify-center space-x-4 text-sm">
-            <span className="flex items-center">
-              <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-              AI Powered
+          
+          <h1 className="text-4xl md:text-6xl font-bold mb-8">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-cyan-200">
+              AI Luxury Journey Generator
             </span>
-            <span>•</span>
-            <span>25+ Years Expertise</span>
-            <span>•</span>
-            <span>Personalized Luxury</span>
+          </h1>
+          
+          <p className="text-xl opacity-90 max-w-4xl mx-auto mb-8">
+            Experience the future of travel planning. Our AI—trained on <strong>28 years of Himalayan expertise</strong>—will craft your perfect luxury itinerary with Kiran's insider knowledge.
+          </p>
+          
+          <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+            <span className="flex items-center bg-white/10 px-3 py-1 rounded-full">
+              <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+              Powered by Kiran's Expertise
+            </span>
+            <span className="hidden sm:inline">•</span>
+            <span className="bg-white/10 px-3 py-1 rounded-full">28+ Years Experience</span>
+            <span className="hidden sm:inline">•</span>
+            <span className="bg-white/10 px-3 py-1 rounded-full">Enterprise-Grade AI</span>
           </div>
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left: Preferences Form */}
+          {/* Left: Enhanced Preferences Form */}
           <div className="lg:col-span-2 space-y-8">
+            {/* Kiran's Expertise Note */}
+            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-200">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                  <span className="text-blue-600">👨‍💼</span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900">Kiran's AI Advantage</h3>
+                  <p className="text-sm text-gray-600">Every itinerary encodes 28 years of Himalayan operational knowledge</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                {['Altitude Expertise', 'Luxury Access', 'Safety Protocols', 'Cultural Insights'].map((item, idx) => (
+                  <div key={idx} className="flex items-center">
+                    <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Sample Prompts Section */}
             {showSamplePrompts && !aiResponse && (
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900">💡 Need Inspiration? Try These Samples</h3>
-                  <button 
-                    onClick={() => setShowSamplePrompts(false)}
-                    className="text-gray-500 hover:text-gray-700"
-                  >
-                    ×
-                  </button>
-                </div>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {SAMPLE_PROMPTS.map((prompt, index) => (
-                    <button
-                      key={index}
-                      onClick={() => loadSamplePrompt(prompt)}
-                      className="bg-white p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition text-left"
+              <div className="luxury-card overflow-hidden">
+                <div className="p-6 bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold">💡 Need Inspiration? Try Kiran's Curated Samples</h3>
+                    <button 
+                      onClick={() => setShowSamplePrompts(false)}
+                      className="text-white/80 hover:text-white text-xl"
                     >
-                      <div className="text-sm font-semibold text-gray-900 mb-1">{prompt.title}</div>
-                      <div className="text-xs text-gray-600 mb-2">{prompt.description}</div>
-                      <div className="text-xs text-blue-600 font-medium">Try this →</div>
+                      ×
                     </button>
-                  ))}
+                  </div>
+                  <p className="text-sm opacity-90 mt-2">Based on 28 years of successful luxury journeys</p>
                 </div>
-              </div>
-            )}
-
-            {/* Preferences Form */}
-            <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Travel Preferences</h2>
-                <p className="text-gray-600">Complete this in 60 seconds for a personalized itinerary.</p>
-                <div className="mt-4 flex items-center text-sm text-gray-500">
-                  <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                  All fields optional - AI will provide best recommendations
-                </div>
-              </div>
-
-              <div className="space-y-8">
-                {/* Destination */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-4 flex items-center">
-                    <span className="mr-2">🌍</span> Primary Destination
-                  </label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {destinations.map(dest => (
+                <div className="p-6">
+                  <div className="grid md:grid-cols-3 gap-4">
+                    {ENHANCED_SAMPLE_PROMPTS.map((prompt, index) => (
                       <button
-                        key={dest.value}
-                        type="button"
-                        onClick={() => handleInputChange('destination', dest.value)}
-                        className={`p-4 rounded-xl border-2 text-center transition-all duration-200 ${preferences.destination === dest.value
-                            ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-sm'
-                            : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
-                          }`}
+                        key={index}
+                        onClick={() => loadSamplePrompt(prompt)}
+                        className="luxury-card p-4 text-left transition-all hover:scale-105"
                       >
-                        <div className="text-xl mb-1">{dest.icon}</div>
-                        <div className="font-medium">{dest.value}</div>
+                        <div className="text-sm font-semibold text-gray-900 mb-1">{prompt.title}</div>
+                        <div className="text-xs text-gray-600 mb-2">{prompt.description}</div>
+                        <div className="text-xs text-blue-600 font-medium flex items-center">
+                          Try with Kiran's expertise →
+                        </div>
                       </button>
                     ))}
                   </div>
                 </div>
+              </div>
+            )}
 
-                {/* Duration & Travelers */}
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div>
-                    <label className="block text-gray-700 font-medium mb-4">📅 Duration</label>
-                    <div className="flex flex-wrap gap-2">
-                      {durations.map(({ days, label }) => (
-                        <button
-                          key={days}
-                          type="button"
-                          onClick={() => handleInputChange('duration', days)}
-                          className={`px-4 py-3 rounded-lg border transition ${preferences.duration === days
-                              ? 'border-blue-500 bg-blue-50 text-blue-700'
-                              : 'border-gray-200 hover:border-gray-300'
+            {/* Enhanced Preferences Form */}
+            <div className="luxury-card p-6 md:p-8">
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Luxury Travel Profile</h2>
+                <p className="text-gray-600">
+                  The more details you provide, the better our AI can apply Kiran's 28 years of expertise.
+                </p>
+              </div>
+
+              {/* Form Sections */}
+              <div className="space-y-10">
+                {/* Destination & Duration */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-900">Destination & Duration</h3>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium mb-3">Destination</label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {destinations.map((dest) => (
+                          <button
+                            key={dest.value}
+                            type="button"
+                            onClick={() => handleInputChange('destination', dest.value)}
+                            className={`p-4 rounded-xl border transition ${
+                              preferences.destination === dest.value
+                                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                : 'border-gray-200 hover:border-blue-300'
                             }`}
-                        >
-                          {label}
-                        </button>
-                      ))}
+                          >
+                            <div className="text-2xl mb-2">{dest.icon}</div>
+                            <div className="font-medium text-sm">{dest.value}</div>
+                            <div className="text-xs text-gray-500 mt-1">{dest.description}</div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-3">Duration</label>
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        {durations.map((dur) => (
+                          <button
+                            key={dur.days}
+                            type="button"
+                            onClick={() => handleInputChange('duration', dur.days)}
+                            className={`p-3 rounded-lg border transition ${
+                              preferences.duration === dur.days
+                                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="font-bold">{dur.label}</div>
+                            <div className="text-xs text-gray-500">{dur.description}</div>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-gray-700 font-medium mb-4">👥 Travelers</label>
-                    <div className="flex flex-wrap gap-2">
-                      {travelerOptions.map(option => (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => handleInputChange('travelers', option.value)}
-                          className={`px-4 py-3 rounded-lg border transition ${preferences.travelers === option.value
-                              ? 'border-purple-500 bg-purple-50 text-purple-700'
-                              : 'border-gray-200 hover:border-gray-300'
+                </div>
+
+                {/* Traveler Profile */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-900">Traveler Profile</h3>
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium mb-3">Group Type</label>
+                      <div className="space-y-2">
+                        {travelerTypes.map((type) => (
+                          <button
+                            key={type.value}
+                            type="button"
+                            onClick={() => handleInputChange('travelerType', type.value)}
+                            className={`w-full p-3 rounded-lg border transition flex items-center justify-between ${
+                              preferences.travelerType === type.value
+                                ? 'border-purple-500 bg-purple-50 text-purple-700'
+                                : 'border-gray-200 hover:border-gray-300'
                             }`}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
+                          >
+                            <div className="flex items-center">
+                              <span className="mr-3">{type.icon}</span>
+                              <span>{type.label}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-3">Pace Preference</label>
+                      <div className="space-y-2">
+                        {paceOptions.map((pace) => (
+                          <button
+                            key={pace.value}
+                            type="button"
+                            onClick={() => handleInputChange('pace', pace.value)}
+                            className={`w-full p-3 rounded-lg border transition text-left ${
+                              preferences.pace === pace.value
+                                ? 'border-green-500 bg-green-50 text-green-700'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="font-medium">{pace.label}</div>
+                            <div className="text-xs text-gray-500">{pace.description}</div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-3">Accommodation Style</label>
+                      <div className="space-y-2">
+                        {accommodationStyles.map((style) => (
+                          <button
+                            key={style.value}
+                            type="button"
+                            onClick={() => handleInputChange('accommodationStyle', style.value)}
+                            className={`w-full p-3 rounded-lg border transition flex items-center ${
+                              preferences.accommodationStyle === style.value
+                                ? 'border-amber-500 bg-amber-50 text-amber-700'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <span className="mr-3">{style.icon}</span>
+                            <span>{style.label}</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Interests */}
                 <div>
-                  <label className="block text-gray-700 font-medium mb-4">🎯 Interests (Select all that apply)</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                    {interestOptions.map(interest => {
-                      const isSelected = preferences.interests.includes(interest.value);
-                      const colorClasses = {
-                        purple: isSelected ? 'bg-purple-100 border-purple-500 text-purple-700' : '',
-                        green: isSelected ? 'bg-green-100 border-green-500 text-green-700' : '',
-                        yellow: isSelected ? 'bg-yellow-100 border-yellow-500 text-yellow-700' : '',
-                        teal: isSelected ? 'bg-teal-100 border-teal-500 text-teal-700' : '',
-                        orange: isSelected ? 'bg-orange-100 border-orange-500 text-orange-700' : '',
-                        blue: isSelected ? 'bg-blue-100 border-blue-500 text-blue-700' : '',
-                        indigo: isSelected ? 'bg-indigo-100 border-indigo-500 text-indigo-700' : '',
-                      };
-                      
-                      return (
-                        <button
-                          key={interest.value}
-                          type="button"
-                          onClick={() => handleInterestToggle(interest.value)}
-                          className={`p-3 rounded-xl border-2 text-center transition ${isSelected
-                              ? colorClasses[interest.color as keyof typeof colorClasses]
-                              : 'border-gray-200 hover:border-gray-300'
-                            }`}
-                        >
-                          <div className="text-lg mb-1">{interest.icon}</div>
-                          <div className="text-sm font-medium">{interest.value}</div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Budget */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-4">💰 Budget Level</label>
-                  <div className="space-y-2">
-                    {budgetOptions.map(option => (
+                  <h3 className="text-lg font-semibold mb-4 text-gray-900">Interests & Experiences</h3>
+                  <p className="text-sm text-gray-600 mb-4">Select all that interest you</p>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {interestOptions.map((interest) => (
                       <button
-                        key={option.value}
+                        key={interest.value}
                         type="button"
-                        onClick={() => handleInputChange('budget', option.value)}
-                        className={`w-full p-4 rounded-xl border-2 text-left transition flex items-center justify-between ${preferences.budget === option.value
-                            ? 'border-green-500 bg-green-50 text-green-700'
+                        onClick={() => handleInterestToggle(interest.value)}
+                        className={`p-4 rounded-xl border transition flex flex-col items-center ${
+                          preferences.interests.includes(interest.value)
+                            ? 'border-blue-500 bg-blue-50'
                             : 'border-gray-200 hover:border-gray-300'
-                          }`}
+                        }`}
                       >
-                        <span>{option.label}</span>
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${preferences.budget === option.value
-                            ? 'bg-green-500 text-white'
-                            : 'bg-gray-100 text-gray-600'
-                          }`}>
-                          {option.value.replace('-', ' ')}
-                        </span>
+                        <div className="text-2xl mb-2">{interest.icon}</div>
+                        <div className="font-medium text-sm">{interest.value}</div>
+                        <div className="text-xs text-gray-500 mt-1">{interest.description}</div>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Special Requests */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-4">
-                    ✨ Special Requests
-                    <span className="text-sm font-normal text-gray-500 ml-2">(Optional)</span>
-                  </label>
-                  <textarea
-                    value={preferences.specialRequests}
-                    onChange={(e) => handleInputChange('specialRequests', e.target.value)}
-                    placeholder="Any specific requirements? Dietary restrictions, accessibility needs, celebrations, special experiences..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-32 resize-none"
-                  />
-                </div>
-
-                {/* Generate Button with Validation */}
-                <div className="pt-4">
-                  <button
-                    onClick={handleGenerate}
-                    disabled={isGenerating}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-lg text-lg transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
-                  >
-                    {isGenerating ? (
-                      <span className="flex items-center justify-center">
-                        <svg className="animate-spin h-5 w-5 text-white mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        AI is crafting your luxury itinerary...
-                      </span>
-                    ) : (
-                      <span className="flex items-center justify-center">
-                        <span className="mr-2">✨</span>
-                        Generate AI-Powered Itinerary
-                      </span>
-                    )}
-                  </button>
-                  
-                  {preferences.interests.length === 0 && (
-                    <p className="mt-2 text-sm text-amber-600 text-center">
-                      💡 Tip: Select at least one interest for better recommendations
-                    </p>
-                  )}
-                </div>
-
-                {error && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg animate-fadeIn">
-                    <div className="flex items-center">
-                      <span className="text-red-500 mr-2">⚠️</span>
-                      <p className="text-red-800">{error}</p>
+                {/* Budget & Special Requests */}
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900">Budget Level</h3>
+                    <div className="space-y-3">
+                      {budgetOptions.map((budget) => (
+                        <button
+                          key={budget.value}
+                          type="button"
+                          onClick={() => handleInputChange('budget', budget.value)}
+                          className={`w-full p-4 rounded-xl border transition text-left ${
+                            preferences.budget === budget.value
+                              ? 'border-amber-500 bg-amber-50 text-amber-700'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="font-bold">{budget.label}</div>
+                          <div className="text-sm text-gray-600">{budget.description}</div>
+                        </button>
+                      ))}
                     </div>
                   </div>
-                )}
+                  
+                  <div>
+                    <label className="block text-lg font-semibold mb-4 text-gray-900">
+                      Special Requests & Preferences
+                    </label>
+                    <textarea
+                      value={preferences.specialRequests}
+                      onChange={(e) => handleInputChange('specialRequests', e.target.value)}
+                      placeholder="Any specific requirements? Dietary restrictions, accessibility needs, celebrations, special occasions..."
+                      className="w-full h-40 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                    />
+                    <p className="text-sm text-gray-500 mt-2">
+                      Kiran's team will personally review all special requests
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Generate Button */}
+              <div className="mt-10 pt-8 border-t border-gray-200">
+                <button
+                  onClick={handleGenerate}
+                  disabled={isGenerating}
+                  className="luxury-button w-full py-5 text-lg flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? (
+                    <>
+                      <span className="animate-spin">⟳</span>
+                      <span>Applying Kiran's Expertise...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>✨</span>
+                      <span>Generate AI-Powered Itinerary</span>
+                      <span>→</span>
+                    </>
+                  )}
+                </button>
+                <p className="text-center text-sm text-gray-500 mt-4">
+                  Your itinerary will be generated using Kiran's 28+ years of Himalayan expertise
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Right: AI Response Panel */}
+          {/* Right: Results & How It Works */}
           <div className="space-y-8">
-            {/* How It Works */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                <span className="mr-2">📋</span> How This Works
-              </h3>
-              <ol className="space-y-4">
-                {[
-                  "Share your preferences (60 seconds)",
-                  "AI analyzes using 25+ years of expertise",
-                  "Receive personalized itinerary outline",
-                  "Refine with expert for final planning"
-                ].map((step, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 flex-shrink-0">
-                      {index + 1}
-                    </span>
-                    <span className="text-gray-700 leading-tight">{step}</span>
-                  </li>
-                ))}
-              </ol>
-              <div className="mt-6 p-4 bg-white/50 rounded-lg">
-                <div className="text-sm text-gray-600 mb-1">ℹ️ About Our AI</div>
-                <div className="text-xs text-gray-500">
-                  Trained on 25 years of Himalayan travel expertise + DeepSeek AI
-                </div>
-              </div>
-            </div>
-
-            {/* AI Response Display */}
+            {/* Results Panel */}
             {aiResponse && (
-              <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 border-2 border-green-200 animate-fadeIn">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center">
-                    <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold mr-3 flex items-center">
-                      <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                      AI Generated
+              <div className="luxury-card overflow-hidden">
+                <div className="p-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold">✨ Your AI Luxury Itinerary</h3>
+                      <p className="text-sm opacity-90">Powered by Kiran's 28+ years expertise</p>
                     </div>
                     {responseTime && (
-                      <span className="text-xs text-gray-500">
-                        Generated in {(responseTime / 1000).toFixed(1)}s
-                      </span>
+                      <div className="text-xs bg-white/20 px-3 py-1 rounded-full">
+                        Generated in {responseTime}ms
+                      </div>
                     )}
+                  </div>
+                </div>
+                
+                <div className="p-6">
+                  {/* Title & Highlights */}
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">{aiResponse.title}</h2>
+                    
+                    {aiResponse.highlights && aiResponse.highlights.length > 0 && (
+                      <div className="mb-6">
+                        <h4 className="font-semibold text-gray-700 mb-3">Key Highlights</h4>
+                        <ul className="space-y-2">
+                          {aiResponse.highlights.map((highlight, idx) => (
+                            <li key={idx} className="flex items-center text-gray-600">
+                              <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                              {highlight}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Quick Facts */}
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="bg-blue-50 p-4 rounded-xl">
+                      <div className="text-sm text-gray-600">Estimated Cost</div>
+                      <div className="font-bold text-gray-900">{aiResponse.estimatedCost}</div>
+                    </div>
+                    <div className="bg-green-50 p-4 rounded-xl">
+                      <div className="text-sm text-gray-600">Best Season</div>
+                      <div className="font-bold text-gray-900">{aiResponse.bestSeason}</div>
+                    </div>
+                  </div>
+                  
+                  {/* Pro Tips */}
+                  <div className="mb-8">
+                    <h4 className="font-semibold text-gray-700 mb-3">Kiran's Pro Tips</h4>
+                    <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                      <ul className="space-y-2">
+                        {aiResponse.proTips.map((tip, idx) => (
+                          <li key={idx} className="flex items-start text-amber-800">
+                            <span className="mr-2">💡</span>
+                            <span>{tip}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                   
                   {/* Action Buttons */}
-                  <div className="flex space-x-2">
+                  <div className="space-y-3">
                     <button
                       onClick={copyToClipboard}
-                      className="p-2 text-gray-500 hover:text-blue-600 transition"
-                      title="Copy itinerary"
+                      className="w-full luxury-button-outline py-3"
                     >
-                      {isCopied ? '✓' : '📋'}
+                      📋 Copy Itinerary
                     </button>
                     <button
                       onClick={downloadAsText}
-                      className="p-2 text-gray-500 hover:text-green-600 transition"
-                      title="Download as text"
+                      className="w-full luxury-button-outline py-3"
                     >
-                      ⬇️
+                      💾 Download for Planning
                     </button>
                     <button
                       onClick={shareItinerary}
-                      className="p-2 text-gray-500 hover:text-purple-600 transition"
-                      title="Share itinerary"
+                      className="w-full luxury-button-outline py-3"
                     >
-                      ↗️
+                      🔗 Share with Companions
                     </button>
+                    <a
+                      href={`/contact?itinerary=${encodeURIComponent(aiResponse.title || '')}`}
+                      className="block w-full luxury-button py-3 text-center"
+                    >
+                      ✨ Consult with Kiran's Team
+                    </a>
                   </div>
                 </div>
-
-                <div className="space-y-8">
-                  {/* Title */}
-                  {aiResponse.title && (
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-4">{aiResponse.title}</h2>
-                      <div className="flex flex-wrap gap-2 mb-6">
-                        <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                          {preferences.duration} days
-                        </span>
-                        <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
-                          {preferences.travelers} {preferences.travelers === '1' ? 'person' : 'people'}
-                        </span>
-                        <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                          {preferences.budget.replace('-', ' ')}
-                        </span>
+                
+                {/* Itinerary Preview */}
+                <div className="border-t border-gray-200">
+                  <div className="p-6">
+                    <h4 className="font-semibold text-gray-700 mb-4">Itinerary Preview</h4>
+                    <div className="bg-gray-50 p-4 rounded-xl max-h-64 overflow-y-auto">
+                      <div className="prose prose-sm max-w-none">
+                        <ReactMarkdown>{aiResponse.itinerary.substring(0, 500)}...</ReactMarkdown>
                       </div>
                     </div>
-                  )}
-
-                  {/* Highlights */}
-                  {aiResponse.highlights && aiResponse.highlights.length > 0 && (
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-xl">
-                      <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                        <span className="mr-2">✨</span> Trip Highlights
-                      </h3>
-                      <ul className="space-y-2">
-                        {aiResponse.highlights.map((highlight, index) => (
-                          <li key={index} className="flex items-start">
-                            <span className="text-blue-500 mr-3 mt-1">•</span>
-                            <span className="text-gray-700">{highlight}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Quick Info Cards */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-blue-50 p-4 rounded-xl">
-                      <div className="text-sm text-gray-600 mb-1 flex items-center">
-                        <span className="mr-2">💰</span> Estimated Cost
-                      </div>
-                      <div className="text-lg font-bold text-gray-900">{aiResponse.estimatedCost}</div>
-                    </div>
-                    <div className="bg-purple-50 p-4 rounded-xl">
-                      <div className="text-sm text-gray-600 mb-1 flex items-center">
-                        <span className="mr-2">🌤️</span> Best Season
-                      </div>
-                      <div className="text-lg font-bold text-gray-900">{aiResponse.bestSeason}</div>
-                    </div>
-                  </div>
-
-                  {/* Itinerary with Markdown Rendering */}
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                      <span className="mr-2">🗺️</span> Detailed Itinerary
-                    </h3>
-                    <div className="bg-gray-50 p-5 rounded-xl prose prose-lg max-w-none">
-                      <ReactMarkdown
-                        components={{
-                          h1: ({node, ...props}) => <h1 className="text-2xl font-bold mt-6 mb-4 text-blue-800 border-b pb-2" {...props} />,
-                          h2: ({node, ...props}) => <h2 className="text-xl font-bold mt-5 mb-3 text-gray-900" {...props} />,
-                          h3: ({node, ...props}) => <h3 className="text-lg font-bold mt-4 mb-2 text-gray-800" {...props} />,
-                          p: ({node, ...props}) => <p className="mb-4 leading-relaxed text-gray-700" {...props} />,
-                          ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
-                          ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
-                          li: ({node, ...props}) => <li className="pl-2 text-gray-700" {...props} />,
-                          strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
-                          em: ({node, ...props}) => <em className="italic text-gray-700" {...props} />,
-                          blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-blue-400 pl-4 py-1 italic text-gray-600 my-4" {...props} />,
-                        }}
-                      >
-                        {aiResponse.itinerary}
-                      </ReactMarkdown>
-                    </div>
-                  </div>
-
-                  {/* Pro Tips */}
-                  {aiResponse.proTips.length > 0 && (
-                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-5 rounded-xl">
-                      <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                        <span className="mr-2">💎</span> Expert Tips
-                      </h3>
-                      <ul className="space-y-3">
-                        {aiResponse.proTips.map((tip, index) => (
-                          <li key={index} className="flex items-start">
-                            <span className="text-amber-500 mr-3 mt-1">•</span>
-                            <span className="text-gray-700">{tip}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* CTA */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <p className="text-gray-700 mb-4 text-center">
-                      Ready to make this itinerary a reality?
+                    <p className="text-sm text-gray-500 mt-2">
+                      Full itinerary saved for your consultation with Kiran's team
                     </p>
-                    <div className="space-y-3">
-                      <a 
-                        href="/contact" 
-                        className="block w-full bg-green-600 hover:bg-green-700 text-white text-center font-semibold py-3 px-6 rounded-lg transition transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
-                      >
-                        📞 Contact for Detailed Planning
-                      </a>
-                      <button
-                        onClick={() => {
-                          setShowSamplePrompts(true);
-                          toast.success('Try another sample or modify your preferences');
-                        }}
-                        className="block w-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-center font-medium py-3 px-6 rounded-lg transition"
-                      >
-                        🔄 Generate Another Itinerary
-                      </button>
-                    </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Placeholder when no response yet */}
-            {!aiResponse && !isGenerating && (
-              <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-dashed border-gray-300">
-                <div className="text-center py-8">
-                  <div className="text-5xl mb-4">✨</div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Your AI Itinerary Awaits</h3>
-                  <p className="text-gray-600 mb-6">
-                    Complete the form to see your personalized itinerary crafted by AI trained on 25 years of expertise.
-                  </p>
-                  <div className="inline-flex items-center text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-full">
-                    <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
-                    Real-time AI generation
+            {/* How It Works Panel */}
+            <div className="luxury-card p-8">
+              <h3 className="text-xl font-bold mb-6 text-gray-900">How Our AI Works</h3>
+              
+              <div className="space-y-6">
+                {[
+                  {
+                    step: 1,
+                    title: 'Share Your Preferences',
+                    description: 'Tell us about your luxury travel style, interests, and budget.',
+                    icon: '🎯'
+                  },
+                  {
+                    step: 2,
+                    title: 'AI Applies Kiran\'s Expertise',
+                    description: 'Our AI uses 28 years of Himalayan knowledge to craft your itinerary.',
+                    icon: '🧠'
+                  },
+                  {
+                    step: 3,
+                    title: 'Receive Personalized Itinerary',
+                    description: 'Get a detailed luxury journey plan in minutes, not weeks.',
+                    icon: '📋'
+                  },
+                  {
+                    step: 4,
+                    title: 'Consult with Kiran\'s Team',
+                    description: 'Refine and perfect your journey with human expertise.',
+                    icon: '👨‍💼'
+                  }
+                ].map((item) => (
+                  <div key={item.step} className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                        {item.step}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center mb-2">
+                        <span className="text-xl mr-2">{item.icon}</span>
+                        <h4 className="font-semibold text-gray-900">{item.title}</h4>
+                      </div>
+                      <p className="text-gray-600">{item.description}</p>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-            )}
-
-            {/* Generating State */}
-            {isGenerating && (
-              <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-blue-200">
-                <div className="text-center py-8">
-                  <div className="inline-block relative mb-6">
-                    <div className="w-20 h-20 border-4 border-blue-100 rounded-full"></div>
-                    <div className="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full absolute top-0 left-0 animate-spin"></div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl">
-                      🤖
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Crafting Your Perfect Itinerary</h3>
-                  <p className="text-gray-600 mb-4">
-                    Our AI is analyzing 25+ years of travel data to create your personalized luxury experience...
-                  </p>
-                  <div className="space-y-2">
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse w-3/4"></div>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Processing your preferences...
-                    </div>
-                  </div>
-                </div>
+              
+              {/* Why Unique */}
+              <div className="mt-8 pt-8 border-t border-gray-200">
+                <h4 className="font-semibold text-gray-900 mb-4">Why We're Different</h4>
+                <ul className="space-y-3">
+                  {[
+                    'AI trained on 28+ years of actual luxury travel operations',
+                    'Enterprise-grade technology from Kiran\'s IT background',
+                    'Direct access to Kiran\'s luxury supplier network',
+                    'Human review and refinement guaranteed'
+                  ].map((item, idx) => (
+                    <li key={idx} className="flex items-center text-sm text-gray-600">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
 
-        {/* Features Grid */}
-        <div className="mt-16 grid md:grid-cols-3 gap-8">
-          <div className="bg-white p-6 rounded-2xl shadow-lg">
-            <div className="text-3xl mb-4">🤖</div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">AI-Powered</h3>
-            <p className="text-gray-600">
-              Trained on 25+ years of Himalayan travel expertise for authentic recommendations.
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-2xl shadow-lg">
-            <div className="text-3xl mb-4">⚡</div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">Instant Generation</h3>
-            <p className="text-gray-600">
-              Get detailed itineraries in seconds, not days. Perfect for initial planning.
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-2xl shadow-lg">
-            <div className="text-3xl mb-4">💎</div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">Expert Refinement</h3>
-            <p className="text-gray-600">
-              AI provides the blueprint, our experts perfect every detail for your luxury journey.
-            </p>
-          </div>
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="mt-16 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">From AI Ideas to Reality</h2>
-          <p className="text-gray-700 max-w-2xl mx-auto mb-8 text-lg">
-            This AI generator provides the initial inspiration. We'll then work with you personally to refine every detail, 
-            leveraging 25 years of on-the-ground experience and industry connections.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a 
-              href="/packages/nepal-luxury" 
-              className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg text-lg transition transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
-            >
-              <span className="mr-2">⭐</span>
-              View Sample Luxury Package
-            </a>
-            <a 
-              href="/contact" 
-              className="inline-flex items-center bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold py-3 px-8 rounded-lg text-lg transition transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
-            >
-              <span className="mr-2">✉️</span>
-              Start Custom Planning
-            </a>
+            {/* Need Help Panel */}
+            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-8 border border-blue-200">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Need Personal Assistance?</h3>
+              <p className="text-gray-700 mb-6">
+                While our AI is powerful, Kiran's Nepal-based team provides the human touch for perfecting every detail.
+              </p>
+              <a 
+                href="/contact" 
+                className="block w-full luxury-button py-3 text-center"
+              >
+                Talk to Kiran's Team
+              </a>
+              <p className="text-sm text-gray-600 mt-4 text-center">
+                Response within 24 hours • Direct access to 28 years expertise
+              </p>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Add CSS for animations */}
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-      `}</style>
     </main>
   );
 }
