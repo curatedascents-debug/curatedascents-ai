@@ -417,7 +417,7 @@ export default function EnhancedAIGeneratorPage() {
       <Toaster position="top-right" />
       
       {/* Enhanced Hero Section */}
-      <section className="relative px-6 py-20 luxury-gradient text-white overflow-hidden">
+      <section className="relative px-6 py-20 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 text-white overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
@@ -429,7 +429,7 @@ export default function EnhancedAIGeneratorPage() {
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold mb-8">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-cyan-200">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">
               AI Luxury Journey Generator
             </span>
           </h1>
@@ -478,7 +478,7 @@ export default function EnhancedAIGeneratorPage() {
 
             {/* Sample Prompts Section */}
             {showSamplePrompts && !aiResponse && (
-              <div className="luxury-card overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                 <div className="p-6 bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold">💡 Need Inspiration? Try Kiran's Curated Samples</h3>
@@ -497,7 +497,7 @@ export default function EnhancedAIGeneratorPage() {
                       <button
                         key={index}
                         onClick={() => loadSamplePrompt(prompt)}
-                        className="luxury-card p-4 text-left transition-all hover:scale-105"
+                        className="bg-white p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition text-left"
                       >
                         <div className="text-sm font-semibold text-gray-900 mb-1">{prompt.title}</div>
                         <div className="text-xs text-gray-600 mb-2">{prompt.description}</div>
@@ -512,7 +512,7 @@ export default function EnhancedAIGeneratorPage() {
             )}
 
             {/* Enhanced Preferences Form */}
-            <div className="luxury-card p-6 md:p-8">
+            <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
               <div className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Luxury Travel Profile</h2>
                 <p className="text-gray-600">
@@ -711,7 +711,7 @@ export default function EnhancedAIGeneratorPage() {
                 <button
                   onClick={handleGenerate}
                   disabled={isGenerating}
-                  className="luxury-button w-full py-5 text-lg flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-gradient-to-r from-blue-600 to-teal-600 text-white font-semibold py-5 px-8 rounded-xl text-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-xl w-full flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isGenerating ? (
                     <>
@@ -737,7 +737,7 @@ export default function EnhancedAIGeneratorPage() {
           <div className="space-y-8">
             {/* Results Panel */}
             {aiResponse && (
-              <div className="luxury-card overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                 <div className="p-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white">
                   <div className="flex items-center justify-between">
                     <div>
@@ -803,25 +803,25 @@ export default function EnhancedAIGeneratorPage() {
                   <div className="space-y-3">
                     <button
                       onClick={copyToClipboard}
-                      className="w-full luxury-button-outline py-3"
+                      className="w-full border-2 border-blue-600 text-blue-600 font-semibold py-3 px-8 rounded-xl hover:bg-blue-50 transition"
                     >
                       📋 Copy Itinerary
                     </button>
                     <button
                       onClick={downloadAsText}
-                      className="w-full luxury-button-outline py-3"
+                      className="w-full border-2 border-blue-600 text-blue-600 font-semibold py-3 px-8 rounded-xl hover:bg-blue-50 transition"
                     >
                       💾 Download for Planning
                     </button>
                     <button
                       onClick={shareItinerary}
-                      className="w-full luxury-button-outline py-3"
+                      className="w-full border-2 border-blue-600 text-blue-600 font-semibold py-3 px-8 rounded-xl hover:bg-blue-50 transition"
                     >
                       🔗 Share with Companions
                     </button>
                     <a
                       href={`/contact?itinerary=${encodeURIComponent(aiResponse.title || '')}`}
-                      className="block w-full luxury-button py-3 text-center"
+                      className="block w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white font-semibold py-3 px-8 rounded-xl hover:from-blue-700 hover:to-teal-700 transition-all text-center"
                     >
                       ✨ Consult with Kiran's Team
                     </a>
@@ -834,7 +834,9 @@ export default function EnhancedAIGeneratorPage() {
                     <h4 className="font-semibold text-gray-700 mb-4">Itinerary Preview</h4>
                     <div className="bg-gray-50 p-4 rounded-xl max-h-64 overflow-y-auto">
                       <div className="prose prose-sm max-w-none">
-                        <ReactMarkdown>{aiResponse.itinerary.substring(0, 500)}...</ReactMarkdown>
+                        <ReactMarkdown>
+                          {aiResponse.itinerary.substring(0, 500) + '...'}
+                        </ReactMarkdown>
                       </div>
                     </div>
                     <p className="text-sm text-gray-500 mt-2">
@@ -846,7 +848,7 @@ export default function EnhancedAIGeneratorPage() {
             )}
 
             {/* How It Works Panel */}
-            <div className="luxury-card p-8">
+            <div className="bg-white rounded-2xl shadow-xl p-8">
               <h3 className="text-xl font-bold mb-6 text-gray-900">How Our AI Works</h3>
               
               <div className="space-y-6">
@@ -920,7 +922,7 @@ export default function EnhancedAIGeneratorPage() {
               </p>
               <a 
                 href="/contact" 
-                className="block w-full luxury-button py-3 text-center"
+                className="block w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white font-semibold py-3 px-8 rounded-xl hover:from-blue-700 hover:to-teal-700 transition-all text-center"
               >
                 Talk to Kiran's Team
               </a>
