@@ -147,17 +147,25 @@ function ContactFormContent() {
     setFormData(prev => ({ ...prev, interests: newInterests }));
   };
 
-  // ✅ FIXED FORMSPREE SUBMISSION FUNCTION
+  // ✅ FORMSPREE SUBMISSION FUNCTION WITH DEBUG LOGGING
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    
+    // 🔍 DEBUG: Start logging
+    console.log('🔍 DEBUG: Form submission starting...');
+    console.log('📊 DEBUG: Form data:', formData);
+    console.log('📊 DEBUG: Interests:', interests);
+    console.log('📊 DEBUG: Estimated value:', estimatedValue);
     
     // Get AI itinerary if exists
     const aiItinerary = localStorage.getItem('ai-itinerary') || '';
     const aiPreferences = localStorage.getItem('ai-preferences') || '';
     
     // ✅ CORRECT FORMSPREE ENDPOINT
-    const FORMSPREE_ENDPOINT = "https://formspree.io/f/meeqkvpp"; // Your form ID
+    const FORMSPREE_ENDPOINT = "https://formspree.io/f/meeqkvpp";
+    
+    console.log('🔗 DEBUG: Formspree endpoint:', FORMSPREE_ENDPOINT);
     
     try {
       // Get budget label
@@ -208,6 +216,12 @@ function ContactFormContent() {
         formDataObj.append('aiItineraryContent', itineraryPreview);
       }
       
+      // 🔍 DEBUG: Log FormData contents
+      console.log('📤 DEBUG: FormData contents:');
+      for (let [key, value] of formDataObj.entries()) {
+        console.log(`  ${key}:`, value);
+      }
+      
       const response = await fetch(FORMSPREE_ENDPOINT, {
         method: 'POST',
         body: formDataObj,
@@ -216,7 +230,13 @@ function ContactFormContent() {
         },
       });
       
+      console.log('📨 DEBUG: Response status:', response.status);
+      console.log('📨 DEBUG: Response ok:', response.ok);
+      
       if (response.ok) {
+        const responseData = await response.json();
+        console.log('✅ DEBUG: Formspree success response:', responseData);
+        
         toast.success(`✨ Thank you ${formData.name}! Your luxury inquiry has been received. Kiran's team will respond within ${formData.urgency === 'urgent' ? '12 hours' : '24 hours'}.`, {
           duration: 8000,
           icon: '🌟',
@@ -256,13 +276,13 @@ function ContactFormContent() {
         
       } else {
         const errorData = await response.json();
-        console.error('Formspree error:', errorData);
-        throw new Error(errorData.error || 'Form submission failed');
+        console.error('❌ DEBUG: Formspree error response:', errorData);
+        throw new Error(errorData.error || `HTTP ${response.status}: Form submission failed`);
       }
     } catch (error) {
-      console.error('Form submission error:', error);
-      toast.error('There was an error sending your message. Please email kiran@curatedascents.com directly.', {
-        duration: 5000,
+      console.error('❌ DEBUG: Submission error:', error);
+      toast.error(`There was an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please email kiran@curatedascents.com directly.`, {
+        duration: 8000,
       });
     } finally {
       setIsSubmitting(false);
