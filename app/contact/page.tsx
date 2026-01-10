@@ -163,7 +163,7 @@ function ContactFormContent() {
     const aiPreferences = localStorage.getItem('ai-preferences') || '';
     
     // ✅ CORRECT FORMSPREE ENDPOINT
-    const FORMSPREE_ENDPOINT = "https://formspree.io/f/meeqkvpp";
+    const FORMSPREE_ENDPOINT = "https://formspree.io/f/xeeejkpl";
     
     console.log('🔗 DEBUG: Formspree endpoint:', FORMSPREE_ENDPOINT);
     
