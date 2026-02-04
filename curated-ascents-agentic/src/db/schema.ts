@@ -1298,3 +1298,267 @@ export const clientMilestones = pgTable('client_milestones', {
 
   createdAt: timestamp('created_at').defaultNow(),
 });
+
+// ============================================
+// FINANCIAL OPERATIONS AGENT TABLES
+// ============================================
+
+// Invoice status enum
+export const invoiceStatusEnum = pgEnum('invoice_status', [
+  'draft',          // Not yet finalized
+  'sent',           // Sent to client
+  'paid',           // Fully paid
+  'partially_paid', // Some payment received
+  'overdue',        // Past due date
+  'cancelled',      // Cancelled/void
+  'refunded'        // Refunded
+]);
+
+// Payment method enum
+export const paymentMethodEnum = pgEnum('payment_method', [
+  'bank_transfer',
+  'credit_card',
+  'debit_card',
+  'cash',
+  'check',
+  'paypal',
+  'stripe',
+  'wire_transfer',
+  'other'
+]);
+
+// Invoices - billing records
+export const invoices = pgTable('invoices', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+  bookingId: integer('booking_id').references(() => bookings.id),
+  clientId: integer('client_id').references(() => clients.id).notNull(),
+
+  // Invoice identification
+  invoiceNumber: text('invoice_number').unique().notNull(), // INV-2026-00001
+  invoiceDate: date('invoice_date').notNull(),
+  dueDate: date('due_date').notNull(),
+
+  // Amounts
+  subtotal: decimal('subtotal', { precision: 12, scale: 2 }).notNull(),
+
+  // Nepal tax structure
+  taxRate: decimal('tax_rate', { precision: 5, scale: 2 }).default('13.00'), // 13% VAT
+  taxAmount: decimal('tax_amount', { precision: 12, scale: 2 }).default('0'),
+  serviceChargeRate: decimal('service_charge_rate', { precision: 5, scale: 2 }).default('10.00'), // 10% service
+  serviceChargeAmount: decimal('service_charge_amount', { precision: 12, scale: 2 }).default('0'),
+
+  // Discounts
+  discountAmount: decimal('discount_amount', { precision: 12, scale: 2 }).default('0'),
+  discountReason: text('discount_reason'),
+
+  // Totals
+  totalAmount: decimal('total_amount', { precision: 12, scale: 2 }).notNull(),
+  currency: text('currency').default('USD').notNull(),
+
+  // Payment tracking
+  paidAmount: decimal('paid_amount', { precision: 12, scale: 2 }).default('0'),
+  balanceAmount: decimal('balance_amount', { precision: 12, scale: 2 }).notNull(),
+
+  // Status
+  status: text('status').default('draft').notNull(),
+
+  // Content
+  notes: text('notes'),
+  termsConditions: text('terms_conditions'),
+  internalNotes: text('internal_notes'),
+
+  // Delivery tracking
+  sentAt: timestamp('sent_at'),
+  sentTo: text('sent_to'), // Email address
+  paidAt: timestamp('paid_at'),
+
+  // PDF
+  pdfUrl: text('pdf_url'),
+  pdfGeneratedAt: timestamp('pdf_generated_at'),
+
+  // Reminder tracking
+  lastReminderAt: timestamp('last_reminder_at'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Invoice line items
+export const invoiceItems = pgTable('invoice_items', {
+  id: serial('id').primaryKey(),
+  invoiceId: integer('invoice_id').references(() => invoices.id).notNull(),
+
+  // Item details
+  description: text('description').notNull(),
+  quantity: integer('quantity').default(1).notNull(),
+  unitPrice: decimal('unit_price', { precision: 12, scale: 2 }).notNull(),
+  amount: decimal('amount', { precision: 12, scale: 2 }).notNull(),
+
+  // Optional service reference
+  serviceType: text('service_type'), // hotel, transportation, guide, etc.
+  serviceId: integer('service_id'),
+  quoteItemId: integer('quote_item_id').references(() => quoteItems.id),
+
+  // Sorting
+  sortOrder: integer('sort_order').default(0),
+
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Payments - payment records
+export const payments = pgTable('payments', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+  invoiceId: integer('invoice_id').references(() => invoices.id),
+  bookingId: integer('booking_id').references(() => bookings.id),
+  clientId: integer('client_id').references(() => clients.id).notNull(),
+  milestoneId: integer('milestone_id').references(() => paymentMilestones.id),
+
+  // Payment identification
+  paymentNumber: text('payment_number').unique().notNull(), // PAY-2026-00001
+  paymentDate: date('payment_date').notNull(),
+
+  // Amount
+  amount: decimal('amount', { precision: 12, scale: 2 }).notNull(),
+  currency: text('currency').default('USD').notNull(),
+
+  // Method & reference
+  paymentMethod: text('payment_method').notNull(),
+  transactionReference: text('transaction_reference'), // Bank ref, card auth, check #
+  bankName: text('bank_name'),
+
+  // Status
+  status: text('status').default('completed').notNull(), // pending, completed, failed, refunded
+
+  // Notes
+  notes: text('notes'),
+  internalNotes: text('internal_notes'),
+
+  // Processing
+  processedAt: timestamp('processed_at'),
+  processedBy: text('processed_by'), // Admin who recorded it
+
+  // Receipt
+  receiptSentAt: timestamp('receipt_sent_at'),
+  receiptSentTo: text('receipt_sent_to'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Payment allocations - link payments to specific invoices/items
+export const paymentAllocations = pgTable('payment_allocations', {
+  id: serial('id').primaryKey(),
+  paymentId: integer('payment_id').references(() => payments.id).notNull(),
+  invoiceId: integer('invoice_id').references(() => invoices.id).notNull(),
+  milestoneId: integer('milestone_id').references(() => paymentMilestones.id),
+
+  // Allocation
+  allocatedAmount: decimal('allocated_amount', { precision: 12, scale: 2 }).notNull(),
+
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Financial periods - for reporting
+export const financialPeriods = pgTable('financial_periods', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Period definition
+  periodType: text('period_type').notNull(), // daily, weekly, monthly, quarterly, yearly
+  periodName: text('period_name').notNull(), // "January 2026", "Q1 2026", "2026"
+  startDate: date('start_date').notNull(),
+  endDate: date('end_date').notNull(),
+
+  // Revenue metrics
+  grossRevenue: decimal('gross_revenue', { precision: 14, scale: 2 }).default('0'),
+  netRevenue: decimal('net_revenue', { precision: 14, scale: 2 }).default('0'),
+  taxCollected: decimal('tax_collected', { precision: 12, scale: 2 }).default('0'),
+  serviceChargeCollected: decimal('service_charge_collected', { precision: 12, scale: 2 }).default('0'),
+
+  // Booking metrics
+  bookingsCount: integer('bookings_count').default(0),
+  quotesCount: integer('quotes_count').default(0),
+  conversionRate: decimal('conversion_rate', { precision: 5, scale: 2 }),
+
+  // Invoice metrics
+  invoicesIssued: integer('invoices_issued').default(0),
+  invoicesIssuedAmount: decimal('invoices_issued_amount', { precision: 14, scale: 2 }).default('0'),
+  invoicesPaid: integer('invoices_paid').default(0),
+  invoicesPaidAmount: decimal('invoices_paid_amount', { precision: 14, scale: 2 }).default('0'),
+
+  // Payment metrics
+  paymentsReceived: integer('payments_received').default(0),
+  paymentsReceivedAmount: decimal('payments_received_amount', { precision: 14, scale: 2 }).default('0'),
+
+  // Outstanding
+  outstandingInvoices: integer('outstanding_invoices').default(0),
+  outstandingAmount: decimal('outstanding_amount', { precision: 14, scale: 2 }).default('0'),
+  overdueInvoices: integer('overdue_invoices').default(0),
+  overdueAmount: decimal('overdue_amount', { precision: 14, scale: 2 }).default('0'),
+
+  // Calculation tracking
+  calculatedAt: timestamp('calculated_at'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Commission records - for agency commissions
+export const commissionRecords = pgTable('commission_records', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id).notNull(),
+  bookingId: integer('booking_id').references(() => bookings.id).notNull(),
+  invoiceId: integer('invoice_id').references(() => invoices.id),
+
+  // Commission calculation
+  bookingAmount: decimal('booking_amount', { precision: 12, scale: 2 }).notNull(),
+  commissionRate: decimal('commission_rate', { precision: 5, scale: 2 }).notNull(),
+  commissionAmount: decimal('commission_amount', { precision: 12, scale: 2 }).notNull(),
+  currency: text('currency').default('USD').notNull(),
+
+  // Status
+  status: text('status').default('pending').notNull(), // pending, approved, paid, cancelled
+
+  // Payment
+  paidAt: timestamp('paid_at'),
+  paidAmount: decimal('paid_amount', { precision: 12, scale: 2 }),
+  paymentReference: text('payment_reference'),
+
+  // Notes
+  notes: text('notes'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Credit notes - for refunds/adjustments
+export const creditNotes = pgTable('credit_notes', {
+  id: serial('id').primaryKey(),
+  invoiceId: integer('invoice_id').references(() => invoices.id).notNull(),
+  clientId: integer('client_id').references(() => clients.id).notNull(),
+
+  // Credit note identification
+  creditNoteNumber: text('credit_note_number').unique().notNull(), // CN-2026-00001
+  creditNoteDate: date('credit_note_date').notNull(),
+
+  // Amount
+  amount: decimal('amount', { precision: 12, scale: 2 }).notNull(),
+  currency: text('currency').default('USD').notNull(),
+
+  // Reason
+  reason: text('reason').notNull(),
+  description: text('description'),
+
+  // Status
+  status: text('status').default('issued').notNull(), // issued, applied, refunded
+
+  // Application
+  appliedToInvoiceId: integer('applied_to_invoice_id').references(() => invoices.id),
+  appliedAt: timestamp('applied_at'),
+  refundedAt: timestamp('refunded_at'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
