@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/supplier-followup",
       "schedule": "0 11 * * *"
+    },
+    {
+      "path": "/api/cron/lead-reengagement",
+      "schedule": "0 14 * * *"
     }
   ]
 }

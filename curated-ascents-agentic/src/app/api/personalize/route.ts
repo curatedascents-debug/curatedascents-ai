@@ -7,6 +7,10 @@ import React from "react";
 import { sendEmail } from "@/lib/email/send-email";
 import WelcomeEmail from "@/lib/email/templates/welcome";
 import AdminNotificationEmail from "@/lib/email/templates/admin-notification";
+import {
+  getOrCreateLeadScore,
+  recordLeadEvent,
+} from "@/lib/lead-intelligence/scoring-engine";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "curatedascents@gmail.com";
 
@@ -71,6 +75,13 @@ export async function POST(req: NextRequest) {
         "[personalize] clients table write skipped:",
         dbError instanceof Error ? dbError.message : dbError
       );
+    }
+
+    // ── initialize lead scoring for new clients ─────────────────────────
+    if (clientId && isNewClient) {
+      getOrCreateLeadScore(clientId)
+        .then(() => recordLeadEvent(clientId, "conversation_started", {}, "chat"))
+        .catch((err) => console.error("Lead scoring init failed:", err));
     }
 
     // ── send welcome email to client (fire-and-forget) ──────────────────

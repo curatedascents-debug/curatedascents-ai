@@ -933,3 +933,142 @@ export const emailLogs = pgTable('email_logs', {
   sentAt: timestamp('sent_at'),
   createdAt: timestamp('created_at').defaultNow(),
 });
+
+// ============================================
+// LEAD INTELLIGENCE TABLES
+// ============================================
+
+// Lead status enum
+export const leadStatusEnum = pgEnum('lead_status', [
+  'new',           // Just captured, no engagement analysis yet
+  'browsing',      // Low intent - just exploring
+  'comparing',     // Medium intent - comparing options
+  'interested',    // High intent - actively interested
+  'ready_to_book', // Very high intent - ready to convert
+  'qualified',     // HNW or priority lead
+  'converted',     // Converted to booking
+  'lost',          // Did not convert
+  'dormant'        // No activity for extended period
+]);
+
+// Lead scores and intelligence
+export const leadScores = pgTable('lead_scores', {
+  id: serial('id').primaryKey(),
+  clientId: integer('client_id').references(() => clients.id).notNull().unique(),
+
+  // Current score (0-100)
+  currentScore: integer('current_score').default(0).notNull(),
+  status: text('status').default('new').notNull(), // lead_status enum values
+
+  // Score components (for transparency)
+  budgetSignalScore: integer('budget_signal_score').default(0),
+  timelineScore: integer('timeline_score').default(0),
+  engagementScore: integer('engagement_score').default(0),
+  intentScore: integer('intent_score').default(0),
+
+  // Detected signals
+  detectedBudget: decimal('detected_budget', { precision: 12, scale: 2 }),
+  budgetCurrency: text('budget_currency'),
+  detectedTravelDates: jsonb('detected_travel_dates'), // { start: Date, end: Date }
+  detectedDestinations: jsonb('detected_destinations'), // string[]
+  detectedPax: integer('detected_pax'),
+
+  // Engagement metrics
+  totalConversations: integer('total_conversations').default(0),
+  totalMessages: integer('total_messages').default(0),
+  quotesRequested: integer('quotes_requested').default(0),
+  quotesReceived: integer('quotes_received').default(0),
+  emailsOpened: integer('emails_opened').default(0),
+  linksClicked: integer('links_clicked').default(0),
+
+  // Activity tracking
+  firstActivityAt: timestamp('first_activity_at'),
+  lastActivityAt: timestamp('last_activity_at'),
+  lastConversationAt: timestamp('last_conversation_at'),
+
+  // Re-engagement tracking
+  reengagementSentAt: timestamp('reengagement_sent_at'),
+  reengagementCount: integer('reengagement_count').default(0),
+
+  // HNW flags
+  isHighValue: boolean('is_high_value').default(false),
+  requiresHumanHandoff: boolean('requires_human_handoff').default(false),
+  handoffReason: text('handoff_reason'),
+
+  // Attribution
+  source: text('source'), // chat, referral, organic, paid, etc.
+  campaign: text('campaign'),
+  referredBy: integer('referred_by').references(() => clients.id),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Lead events - tracks all scoring events
+export const leadEvents = pgTable('lead_events', {
+  id: serial('id').primaryKey(),
+  clientId: integer('client_id').references(() => clients.id).notNull(),
+
+  // Event details
+  eventType: text('event_type').notNull(), // budget_mentioned, dates_mentioned, quote_requested, email_opened, etc.
+  eventData: jsonb('event_data'), // { amount: 10000, currency: 'USD' } or { dates: {...} }
+
+  // Score impact
+  scoreChange: integer('score_change').default(0), // Points added/removed
+  scoreBefore: integer('score_before'),
+  scoreAfter: integer('score_after'),
+
+  // Source of event
+  source: text('source'), // chat, email, website, admin
+  conversationId: text('conversation_id'), // If from chat
+
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Nurture sequences - predefined email campaigns
+export const nurtureSequences = pgTable('nurture_sequences', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+
+  // Trigger conditions
+  triggerType: text('trigger_type').notNull(), // new_lead, abandoned_conversation, post_quote, post_inquiry
+  triggerConditions: jsonb('trigger_conditions'), // { minScore: 20, maxScore: 60, daysInactive: 2 }
+
+  // Sequence config
+  emails: jsonb('emails').notNull(), // Array of { dayOffset: 0, subject, templateId, conditions }
+  totalEmails: integer('total_emails').default(0),
+
+  // Status
+  isActive: boolean('is_active').default(true),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Nurture enrollments - tracks client enrollment in sequences
+export const nurtureEnrollments = pgTable('nurture_enrollments', {
+  id: serial('id').primaryKey(),
+  clientId: integer('client_id').references(() => clients.id).notNull(),
+  sequenceId: integer('sequence_id').references(() => nurtureSequences.id).notNull(),
+
+  // Progress tracking
+  currentStep: integer('current_step').default(0), // Index in emails array
+  status: text('status').default('active').notNull(), // active, completed, paused, cancelled
+
+  // Email tracking
+  emailsSent: integer('emails_sent').default(0),
+  emailsOpened: integer('emails_opened').default(0),
+  linksClicked: integer('links_clicked').default(0),
+
+  // Scheduling
+  enrolledAt: timestamp('enrolled_at').defaultNow(),
+  nextEmailAt: timestamp('next_email_at'),
+  lastEmailSentAt: timestamp('last_email_sent_at'),
+  completedAt: timestamp('completed_at'),
+  cancelledAt: timestamp('cancelled_at'),
+  cancelReason: text('cancel_reason'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
