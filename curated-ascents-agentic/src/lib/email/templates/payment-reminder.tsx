@@ -1,0 +1,226 @@
+import {
+  Html,
+  Head,
+  Body,
+  Container,
+  Section,
+  Text,
+  Hr,
+} from "@react-email/components";
+import * as React from "react";
+
+interface PaymentReminderEmailProps {
+  clientName?: string;
+  bookingReference: string;
+  destination?: string;
+  totalAmount?: string;
+  paidAmount?: string;
+  balanceAmount?: string;
+  currency?: string;
+  startDate?: string;
+  daysUntilTravel?: number;
+}
+
+export default function PaymentReminderEmail({
+  clientName,
+  bookingReference,
+  destination,
+  totalAmount,
+  paidAmount,
+  balanceAmount,
+  currency = "USD",
+  startDate,
+  daysUntilTravel,
+}: PaymentReminderEmailProps) {
+  const formatDate = (d?: string) => {
+    if (!d) return "";
+    return new Date(d).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const formatCurrency = (val?: string) => {
+    if (!val) return "$0";
+    return `$${parseFloat(val).toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+  };
+
+  const getUrgencyMessage = () => {
+    if (daysUntilTravel !== undefined) {
+      if (daysUntilTravel <= 7) {
+        return "Your trip is in less than a week! Please complete your payment as soon as possible.";
+      } else if (daysUntilTravel <= 14) {
+        return "Your trip is coming up in 2 weeks. Please ensure your balance is settled before departure.";
+      } else if (daysUntilTravel <= 30) {
+        return "Your trip is approaching. This is a friendly reminder about your outstanding balance.";
+      }
+    }
+    return "This is a friendly reminder about the outstanding balance on your booking.";
+  };
+
+  return (
+    <Html>
+      <Head />
+      <Body style={body}>
+        <Container style={container}>
+          <Text style={brand}>CuratedAscents</Text>
+          <Text style={tagline}>Luxury Adventure Travel</Text>
+          <Hr style={hr} />
+
+          <Text style={heading}>Payment Reminder</Text>
+
+          <Text style={paragraph}>
+            Dear {clientName || "Traveler"},
+          </Text>
+
+          <Text style={paragraph}>
+            {getUrgencyMessage()}
+          </Text>
+
+          <Section style={detailsBox}>
+            <Text style={detailLabel}>Booking Reference</Text>
+            <Text style={referenceText}>{bookingReference}</Text>
+
+            {destination && (
+              <>
+                <Text style={detailLabel}>Destination</Text>
+                <Text style={detailValue}>{destination}</Text>
+              </>
+            )}
+
+            {startDate && (
+              <>
+                <Text style={detailLabel}>Travel Date</Text>
+                <Text style={detailValue}>{formatDate(startDate)}</Text>
+              </>
+            )}
+
+            <Hr style={hrLight} />
+
+            <Text style={detailLabel}>Total Amount ({currency})</Text>
+            <Text style={detailValue}>{formatCurrency(totalAmount)}</Text>
+
+            <Text style={detailLabel}>Amount Paid</Text>
+            <Text style={paidText}>{formatCurrency(paidAmount)}</Text>
+
+            <Text style={detailLabel}>Balance Due</Text>
+            <Text style={balanceText}>{formatCurrency(balanceAmount)}</Text>
+          </Section>
+
+          <Text style={paragraph}>
+            <strong>Payment Options:</strong> Please reply to this email or contact our team
+            to arrange payment. We accept bank transfers, credit cards, and other methods.
+          </Text>
+
+          <Text style={paragraph}>
+            If you have already made this payment, please disregard this reminder.
+            Payments may take 1-2 business days to reflect in our system.
+          </Text>
+
+          <Text style={paragraph}>
+            If you have any questions about your booking or payment, please don&apos;t
+            hesitate to reach out.
+          </Text>
+
+          <Hr style={hr} />
+          <Text style={footer}>
+            CuratedAscents | Luxury Adventure Travel | Nepal | Tibet | Bhutan | India
+          </Text>
+        </Container>
+      </Body>
+    </Html>
+  );
+}
+
+const body: React.CSSProperties = {
+  backgroundColor: "#f6f9fc",
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+};
+
+const container: React.CSSProperties = {
+  backgroundColor: "#ffffff",
+  margin: "0 auto",
+  padding: "40px 30px",
+  maxWidth: "600px",
+};
+
+const brand: React.CSSProperties = {
+  fontSize: "28px",
+  fontWeight: "bold",
+  color: "#0d5e3f",
+  margin: "0",
+};
+
+const tagline: React.CSSProperties = {
+  fontSize: "14px",
+  color: "#6b7280",
+  margin: "0 0 16px",
+};
+
+const hr: React.CSSProperties = { borderColor: "#e5e7eb", margin: "20px 0" };
+const hrLight: React.CSSProperties = { borderColor: "#e5e7eb", margin: "12px 0" };
+
+const heading: React.CSSProperties = {
+  fontSize: "22px",
+  fontWeight: "bold",
+  color: "#b45309",
+  margin: "0 0 16px",
+};
+
+const paragraph: React.CSSProperties = {
+  fontSize: "15px",
+  lineHeight: "1.6",
+  color: "#374151",
+  margin: "0 0 16px",
+};
+
+const detailsBox: React.CSSProperties = {
+  backgroundColor: "#fffbeb",
+  borderRadius: "8px",
+  padding: "20px",
+  margin: "16px 0",
+  border: "1px solid #fde68a",
+};
+
+const detailLabel: React.CSSProperties = {
+  fontSize: "12px",
+  fontWeight: "600",
+  color: "#6b7280",
+  textTransform: "uppercase" as const,
+  margin: "0",
+};
+
+const detailValue: React.CSSProperties = {
+  fontSize: "16px",
+  color: "#111827",
+  margin: "0 0 12px",
+};
+
+const referenceText: React.CSSProperties = {
+  fontSize: "20px",
+  fontWeight: "bold",
+  color: "#0d5e3f",
+  margin: "0 0 12px",
+  letterSpacing: "1px",
+};
+
+const paidText: React.CSSProperties = {
+  fontSize: "16px",
+  color: "#059669",
+  margin: "0 0 12px",
+};
+
+const balanceText: React.CSSProperties = {
+  fontSize: "20px",
+  fontWeight: "bold",
+  color: "#b45309",
+  margin: "0 0 12px",
+};
+
+const footer: React.CSSProperties = {
+  fontSize: "12px",
+  color: "#9ca3af",
+  textAlign: "center" as const,
+  margin: "0",
+};

@@ -1,0 +1,266 @@
+"use client";
+
+import ReactMarkdown from 'react-markdown';
+import { useState, useRef, useEffect } from "react";
+import { Send, Loader2, Mountain } from "lucide-react";
+
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export default function ChatInterface() {
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "assistant",
+      content: "Welcome to CuratedAscents! I'm your Expedition Architect. I specialize in crafting bespoke luxury adventures across Nepal, Tibet, Bhutan, and India. Whether you're dreaming of trekking to Everest Base Camp, finding peace in a Bhutanese monastery, or tracking tigers in Ranthambore, I'm here to design your perfect journey. What kind of adventure speaks to you?",
+    },
+  ]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [clientEmail, setClientEmail] = useState("");
+  const [clientName, setClientName] = useState("");
+  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
+
+  // ── NEW: states for the personalization save flow ────────────────────────
+  const [personalizeLoading, setPersonalizeLoading] = useState(false);
+  const [personalizeSuccess, setPersonalizeSuccess] = useState(false);
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = input.trim();
+    setInput("");
+    
+    const newMessages = [...messages, { role: "user" as const, content: userMessage }];
+    setMessages(newMessages);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: newMessages,
+          clientEmail: clientEmail || undefined,
+          clientName: clientName || undefined,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to get response");
+
+      const data = await response.json();
+      
+      setMessages([...newMessages, { role: "assistant", content: data.message }]);
+      
+      if (!clientEmail && newMessages.length >= 4) {
+        setShowEmailPrompt(true);
+      }
+    } catch (error) {
+      console.error("Chat error:", error);
+      setMessages([
+        ...newMessages,
+        {
+          role: "assistant",
+          content: "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ── REPLACED: was just setShowEmailPrompt(false) ────────────────────────
+  const handleEmailSubmit = async () => {
+    if (!clientName.trim() || !clientEmail.trim()) return;
+
+    setPersonalizeLoading(true);
+
+    try {
+      const res = await fetch("/api/personalize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: clientName.trim(),
+          email: clientEmail.trim(),
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.error || "Failed to save. Please try again.");
+        setPersonalizeLoading(false);
+        return;
+      }
+
+      // ✅ success
+      setPersonalizeSuccess(true);
+      setPersonalizeLoading(false);
+
+      // close dialog after a beat so the user sees the confirmation
+      setTimeout(() => {
+        setShowEmailPrompt(false);
+        setPersonalizeSuccess(false);
+      }, 1400);
+
+    } catch {
+      setPersonalizeLoading(false);
+      alert("Network error — please check your connection and try again.");
+    }
+  };
+  // ─────────────────────────────────────────────────────────────────────────
+
+  return (
+    <div className="flex flex-col h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Header */}
+      <div className="bg-slate-900/80 backdrop-blur-sm border-b border-slate-700 px-6 py-4">
+        <div className="max-w-4xl mx-auto flex items-center gap-3">
+          <Mountain className="w-8 h-8 text-emerald-400" />
+          <div>
+            <h1 className="text-2xl font-bold text-white">CuratedAscents</h1>
+            <p className="text-sm text-slate-400">Luxury Adventure Travel</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto space-y-6" style={{ paddingLeft: 0, paddingRight: 0 }}>
+      {messages.map((msg, idx) => (
+  <div
+    key={idx}
+    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+  >
+    <div
+      className="rounded-2xl shadow-lg"
+      style={{
+        maxWidth: '85%',
+        padding: '1.5rem 2rem',
+        backgroundColor: msg.role === "user" ? '#059669' : '#1e293b',
+        color: '#f1f5f9',
+        border: msg.role === "assistant" ? '1px solid #334155' : 'none',
+        overflow: 'hidden',
+        wordWrap: 'break-word',
+      }}
+    >
+      {msg.role === "user" ? (
+        <p style={{ margin: 0, padding: 0, lineHeight: 1.6 }}>{msg.content}</p>
+      ) : (
+        <div className="markdown-content" style={{ margin: 0, padding: 0 }}>
+          <ReactMarkdown>{msg.content}</ReactMarkdown>
+        </div>
+      )}
+    </div>
+  </div>
+))}
+          
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
+                <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
+              </div>
+            </div>
+          )}
+          
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+
+      {/* Email Prompt Modal */}
+      {showEmailPrompt && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-8 max-w-md w-full">
+            <h3 className="text-xl font-bold text-white mb-4">
+              Let's personalize your experience
+            </h3>
+            <p className="text-slate-300 mb-6">
+              Share your details so I can create a tailored itinerary and save our conversation.
+            </p>
+
+            {/* ── NEW: success state shown for ~1.4s before dialog closes ── */}
+            {personalizeSuccess ? (
+              <div className="flex flex-col items-center py-6 gap-3">
+                <div className="text-4xl">✅</div>
+                <p className="text-emerald-400 font-semibold text-center">
+                  Details saved! Tailoring your experience…
+                </p>
+              </div>
+            ) : (
+              // ── original form, with the Continue button wired up ─────────
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Your name"
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
+                  disabled={personalizeLoading}
+                  className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+                />
+                <input
+                  type="email"
+                  placeholder="Your email"
+                  value={clientEmail}
+                  onChange={(e) => setClientEmail(e.target.value)}
+                  disabled={personalizeLoading}
+                  className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+                />
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowEmailPrompt(false)}
+                    disabled={personalizeLoading}
+                    className="flex-1 px-4 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition disabled:opacity-50"
+                  >
+                    Skip for now
+                  </button>
+                  <button
+                    onClick={handleEmailSubmit}
+                    disabled={personalizeLoading || !clientName.trim() || !clientEmail.trim()}
+                    className="flex-1 px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {personalizeLoading ? "Saving…" : "Continue"}
+                  </button>
+                </div>
+              </div>
+            )}
+            {/* ──────────────────────────────────────────────────────────── */}
+          </div>
+        </div>
+      )}
+
+      {/* Input */}
+      <div className="border-t border-slate-700 bg-slate-900/80 backdrop-blur-sm px-4 py-4">
+        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Tell me about your dream adventure..."
+              disabled={isLoading}
+              className="flex-1 px-6 py-4 bg-slate-800 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={isLoading || !input.trim()}
+              className="px-6 py-4 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Send className="w-5 h-5" />
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
