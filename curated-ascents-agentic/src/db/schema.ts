@@ -1562,3 +1562,173 @@ export const creditNotes = pgTable('credit_notes', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
+
+// ============================================
+// DYNAMIC PRICING AGENT TABLES
+// ============================================
+
+// Pricing rules - define dynamic pricing strategies
+export const pricingRules = pgTable('pricing_rules', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Rule identification
+  name: text('name').notNull(),
+  description: text('description'),
+  ruleType: text('rule_type').notNull(), // seasonal, demand, early_bird, last_minute, group, loyalty, promotional
+
+  // Scope - what this rule applies to
+  serviceType: text('service_type'), // hotel, transportation, guide, package, etc. (null = all)
+  destinationId: integer('destination_id').references(() => destinations.id),
+  supplierId: integer('supplier_id').references(() => suppliers.id),
+  serviceId: integer('service_id'), // Specific service ID if applicable
+
+  // Rule conditions (JSONB for flexibility)
+  conditions: jsonb('conditions'), // { daysInAdvance: 30, minPax: 10, loyaltyTier: 'gold', etc. }
+
+  // Adjustment
+  adjustmentType: text('adjustment_type').notNull(), // percentage, fixed_amount
+  adjustmentValue: decimal('adjustment_value', { precision: 10, scale: 2 }).notNull(), // +10 = 10% increase, -15 = 15% discount
+  minPrice: decimal('min_price', { precision: 10, scale: 2 }), // Floor price
+  maxPrice: decimal('max_price', { precision: 10, scale: 2 }), // Ceiling price
+
+  // Validity
+  validFrom: date('valid_from'),
+  validTo: date('valid_to'),
+  daysOfWeek: jsonb('days_of_week'), // [0,1,2,3,4,5,6] - Sunday to Saturday
+
+  // Priority and status
+  priority: integer('priority').default(0), // Higher priority rules applied first
+  isActive: boolean('is_active').default(true),
+  isAutoApply: boolean('is_auto_apply').default(true), // Automatically apply or require manual approval
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Demand metrics - track demand signals for yield management
+export const demandMetrics = pgTable('demand_metrics', {
+  id: serial('id').primaryKey(),
+
+  // What we're tracking
+  metricDate: date('metric_date').notNull(),
+  serviceType: text('service_type'), // hotel, transportation, package, etc.
+  destinationId: integer('destination_id').references(() => destinations.id),
+
+  // Search/inquiry metrics
+  searchCount: integer('search_count').default(0),
+  inquiryCount: integer('inquiry_count').default(0),
+  quoteRequestCount: integer('quote_request_count').default(0),
+
+  // Conversion metrics
+  quotesGenerated: integer('quotes_generated').default(0),
+  bookingsConfirmed: integer('bookings_confirmed').default(0),
+  conversionRate: decimal('conversion_rate', { precision: 5, scale: 2 }),
+
+  // Revenue metrics
+  totalRevenue: decimal('total_revenue', { precision: 12, scale: 2 }).default('0'),
+  averageOrderValue: decimal('average_order_value', { precision: 10, scale: 2 }),
+
+  // Capacity metrics
+  availableInventory: integer('available_inventory'),
+  bookedInventory: integer('booked_inventory'),
+  occupancyRate: decimal('occupancy_rate', { precision: 5, scale: 2 }),
+
+  // Demand score (calculated)
+  demandScore: decimal('demand_score', { precision: 5, scale: 2 }), // 0-100, higher = more demand
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Price adjustments - audit log of all price changes
+export const priceAdjustments = pgTable('price_adjustments', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // What was adjusted
+  serviceType: text('service_type').notNull(),
+  serviceId: integer('service_id').notNull(),
+  serviceName: text('service_name'),
+
+  // The adjustment
+  ruleId: integer('rule_id').references(() => pricingRules.id),
+  ruleName: text('rule_name'),
+  adjustmentType: text('adjustment_type').notNull(), // percentage, fixed_amount, manual
+  adjustmentValue: decimal('adjustment_value', { precision: 10, scale: 2 }).notNull(),
+
+  // Prices
+  originalPrice: decimal('original_price', { precision: 10, scale: 2 }).notNull(),
+  adjustedPrice: decimal('adjusted_price', { precision: 10, scale: 2 }).notNull(),
+  currency: text('currency').default('USD'),
+
+  // Context
+  adjustmentDate: date('adjustment_date').notNull(),
+  travelDate: date('travel_date'), // The date the service is for
+  reason: text('reason'),
+
+  // Who/what triggered it
+  triggeredBy: text('triggered_by'), // system, admin, cron
+  approvedBy: text('approved_by'),
+
+  // Quote/booking reference if applicable
+  quoteId: integer('quote_id').references(() => quotes.id),
+  bookingId: integer('booking_id').references(() => bookings.id),
+
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Price history - track historical prices for analysis
+export const priceHistory = pgTable('price_history', {
+  id: serial('id').primaryKey(),
+
+  // What we're tracking
+  serviceType: text('service_type').notNull(),
+  serviceId: integer('service_id').notNull(),
+  serviceName: text('service_name'),
+
+  // Price snapshot
+  recordDate: date('record_date').notNull(),
+  basePrice: decimal('base_price', { precision: 10, scale: 2 }).notNull(),
+  adjustedPrice: decimal('adjusted_price', { precision: 10, scale: 2 }).notNull(),
+  currency: text('currency').default('USD'),
+
+  // Context
+  seasonId: integer('season_id').references(() => seasons.id),
+  demandScore: decimal('demand_score', { precision: 5, scale: 2 }),
+  occupancyRate: decimal('occupancy_rate', { precision: 5, scale: 2 }),
+
+  // Applied rules (JSONB array of rule IDs and their effects)
+  appliedRules: jsonb('applied_rules'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Competitor rates - track competitor pricing (optional)
+export const competitorRates = pgTable('competitor_rates', {
+  id: serial('id').primaryKey(),
+
+  // Competitor info
+  competitorName: text('competitor_name').notNull(),
+  competitorUrl: text('competitor_url'),
+
+  // What we're comparing
+  serviceType: text('service_type').notNull(),
+  serviceName: text('service_name').notNull(),
+  destinationId: integer('destination_id').references(() => destinations.id),
+
+  // Their pricing
+  price: decimal('price', { precision: 10, scale: 2 }).notNull(),
+  currency: text('currency').default('USD'),
+
+  // Validity
+  priceDate: date('price_date').notNull(),
+  travelDateStart: date('travel_date_start'),
+  travelDateEnd: date('travel_date_end'),
+
+  // Source
+  source: text('source'), // manual, scraper, api
+  notes: text('notes'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+});
