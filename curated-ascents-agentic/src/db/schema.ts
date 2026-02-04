@@ -1072,3 +1072,229 @@ export const nurtureEnrollments = pgTable('nurture_enrollments', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
+
+// ============================================
+// CUSTOMER SUCCESS AGENT TABLES
+// ============================================
+
+// Loyalty tier enum
+export const loyaltyTierEnum = pgEnum('loyalty_tier', [
+  'bronze',   // 0-999 points (default)
+  'silver',   // 1,000-4,999 points (5% discount)
+  'gold',     // 5,000-14,999 points (10% discount)
+  'platinum'  // 15,000+ points (15% discount + priority)
+]);
+
+// Loyalty accounts - one per client
+export const loyaltyAccounts = pgTable('loyalty_accounts', {
+  id: serial('id').primaryKey(),
+  clientId: integer('client_id').references(() => clients.id).notNull().unique(),
+
+  // Points tracking
+  totalPoints: integer('total_points').default(0).notNull(), // Current balance
+  lifetimePoints: integer('lifetime_points').default(0).notNull(), // Total ever earned
+  redeemedPoints: integer('redeemed_points').default(0).notNull(),
+
+  // Tier management
+  tier: text('tier').default('bronze').notNull(),
+  tierUpdatedAt: timestamp('tier_updated_at'),
+
+  // Referral program
+  referralCode: text('referral_code').unique().notNull(),
+  referralCount: integer('referral_count').default(0),
+  referralEarnings: integer('referral_earnings').default(0), // Points from referrals
+
+  // Engagement metrics
+  totalBookings: integer('total_bookings').default(0),
+  totalSpent: decimal('total_spent', { precision: 12, scale: 2 }).default('0'),
+  lastBookingAt: timestamp('last_booking_at'),
+
+  // Status
+  isActive: boolean('is_active').default(true),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Loyalty transaction types
+export const loyaltyTransactionTypeEnum = pgEnum('loyalty_transaction_type', [
+  'earned_booking',      // Points from booking
+  'earned_referral',     // Points from successful referral
+  'earned_review',       // Points from submitting review
+  'earned_survey',       // Points from completing survey
+  'earned_bonus',        // Bonus points (promo, anniversary, etc.)
+  'redeemed',           // Points used for discount
+  'expired',            // Points expired
+  'adjusted'            // Manual adjustment by admin
+]);
+
+// Loyalty transactions - points history
+export const loyaltyTransactions = pgTable('loyalty_transactions', {
+  id: serial('id').primaryKey(),
+  loyaltyAccountId: integer('loyalty_account_id').references(() => loyaltyAccounts.id).notNull(),
+
+  // Transaction details
+  type: text('type').notNull(), // matches loyaltyTransactionTypeEnum
+  points: integer('points').notNull(), // positive for earned, negative for redeemed/expired
+  balanceAfter: integer('balance_after').notNull(),
+
+  // Reference
+  reason: text('reason').notNull(), // Human-readable description
+  referenceType: text('reference_type'), // booking, referral, survey, etc.
+  referenceId: integer('reference_id'), // ID of related record
+
+  // Audit
+  performedBy: text('performed_by'), // admin email for manual adjustments
+
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Referral status enum
+export const referralStatusEnum = pgEnum('referral_status', [
+  'pending',    // Referral link shared, not yet used
+  'registered', // Referred person registered but hasn't booked
+  'converted',  // Referred person completed a booking
+  'expired'     // Referral expired (e.g., 90 days)
+]);
+
+// Referrals - track referral relationships
+export const referrals = pgTable('referrals', {
+  id: serial('id').primaryKey(),
+
+  // Participants
+  referrerClientId: integer('referrer_client_id').references(() => clients.id).notNull(),
+  referredClientId: integer('referred_client_id').references(() => clients.id),
+  referredEmail: text('referred_email'), // Before they register
+
+  // Tracking
+  referralCode: text('referral_code').notNull(),
+  status: text('status').default('pending').notNull(),
+
+  // Rewards
+  referrerRewardPoints: integer('referrer_reward_points').default(500), // Points for referrer
+  referredRewardPoints: integer('referred_reward_points').default(250), // Points for new client
+  referrerRewardGiven: boolean('referrer_reward_given').default(false),
+  referredRewardGiven: boolean('referred_reward_given').default(false),
+
+  // Conversion tracking
+  convertedBookingId: integer('converted_booking_id').references(() => bookings.id),
+  convertedAt: timestamp('converted_at'),
+
+  // Expiry
+  expiresAt: timestamp('expires_at'), // 90 days from creation
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Trip check-in types
+export const checkinTypeEnum = pgEnum('checkin_type', [
+  'pre_departure',  // 24-48 hours before trip
+  'day_1',          // First day of trip
+  'mid_trip',       // Middle of trip
+  'post_trip'       // 24-48 hours after trip ends
+]);
+
+// Trip check-ins - during-trip engagement
+export const tripCheckins = pgTable('trip_checkins', {
+  id: serial('id').primaryKey(),
+  bookingId: integer('booking_id').references(() => bookings.id).notNull(),
+  clientId: integer('client_id').references(() => clients.id).notNull(),
+
+  // Check-in type and schedule
+  checkinType: text('checkin_type').notNull(),
+  scheduledAt: timestamp('scheduled_at').notNull(),
+
+  // Status
+  sentAt: timestamp('sent_at'),
+  emailId: text('email_id'), // Resend email ID for tracking
+
+  // Response tracking
+  responseReceived: boolean('response_received').default(false),
+  responseAt: timestamp('response_at'),
+  responseRating: integer('response_rating'), // 1-5 stars
+  responseNotes: text('response_notes'),
+  requiresFollowup: boolean('requires_followup').default(false),
+  followupNotes: text('followup_notes'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Feedback survey types
+export const surveyTypeEnum = pgEnum('survey_type', [
+  'post_trip',      // Comprehensive post-trip survey
+  'nps',            // Net Promoter Score only
+  'review_request', // Request for public review
+  'quick_feedback'  // Single question feedback
+]);
+
+// Feedback surveys - post-trip feedback collection
+export const feedbackSurveys = pgTable('feedback_surveys', {
+  id: serial('id').primaryKey(),
+  bookingId: integer('booking_id').references(() => bookings.id).notNull(),
+  clientId: integer('client_id').references(() => clients.id).notNull(),
+
+  // Survey type and delivery
+  surveyType: text('survey_type').notNull(),
+  sentAt: timestamp('sent_at'),
+  reminderSentAt: timestamp('reminder_sent_at'),
+
+  // Completion
+  completedAt: timestamp('completed_at'),
+
+  // Scores
+  npsScore: integer('nps_score'), // 0-10
+  overallRating: integer('overall_rating'), // 1-5 stars
+
+  // Detailed responses (JSONB)
+  responses: jsonb('responses'), // { question_id: answer, ... }
+
+  // Testimonial
+  testimonial: text('testimonial'),
+  canUseAsTestimonial: boolean('can_use_as_testimonial').default(false),
+  testimonialApproved: boolean('testimonial_approved').default(false),
+
+  // Points awarded
+  pointsAwarded: integer('points_awarded').default(0),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Client milestone types
+export const milestoneTypeEnum = pgEnum('milestone_type', [
+  'first_booking',       // Completed first booking
+  'booking_anniversary', // 1 year since a memorable trip
+  'membership_anniversary', // 1 year as a member
+  'tier_upgrade',        // Upgraded to new loyalty tier
+  'vip_status',          // Reached platinum status
+  'referral_milestone',  // 5, 10, 25 successful referrals
+  'spending_milestone'   // $10K, $25K, $50K, $100K lifetime spend
+]);
+
+// Client milestones - anniversary and achievement tracking
+export const clientMilestones = pgTable('client_milestones', {
+  id: serial('id').primaryKey(),
+  clientId: integer('client_id').references(() => clients.id).notNull(),
+
+  // Milestone details
+  milestoneType: text('milestone_type').notNull(),
+  milestoneName: text('milestone_name').notNull(), // "1 Year Anniversary: Everest Base Camp"
+  milestoneDate: date('milestone_date').notNull(),
+
+  // Related records
+  relatedBookingId: integer('related_booking_id').references(() => bookings.id),
+  relatedData: jsonb('related_data'), // Additional context
+
+  // Notification tracking
+  notificationScheduledAt: timestamp('notification_scheduled_at'),
+  notificationSentAt: timestamp('notification_sent_at'),
+
+  // Rewards
+  bonusPointsAwarded: integer('bonus_points_awarded').default(0),
+  specialOfferCode: text('special_offer_code'),
+  specialOfferExpiry: timestamp('special_offer_expiry'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+});

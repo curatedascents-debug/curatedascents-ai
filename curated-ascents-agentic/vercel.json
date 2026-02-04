@@ -15,6 +15,18 @@
     {
       "path": "/api/cron/lead-reengagement",
       "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/trip-checkins",
+      "schedule": "0 8,12,16,20 * * *"
+    },
+    {
+      "path": "/api/cron/feedback-requests",
+      "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/milestone-notifications",
+      "schedule": "0 9 * * *"
     }
   ]
 }
