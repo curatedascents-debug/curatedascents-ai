@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
+
+export const dynamic = "force-dynamic";
 import { suppliers } from "@/db/schema";
 import { eq, ilike } from "drizzle-orm";
 

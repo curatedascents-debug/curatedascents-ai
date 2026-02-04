@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
+
+export const dynamic = "force-dynamic";
 import { supplierUsers, suppliers } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getSupplierSession } from "@/lib/auth/supplier-auth";

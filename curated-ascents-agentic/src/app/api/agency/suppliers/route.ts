@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
+
+export const dynamic = "force-dynamic";
 import { suppliers, agencies, agencySuppliers } from "@/db/schema";
 import { eq, and, inArray, sql } from "drizzle-orm";
 import { requireAgencyContext, AgencyAuthError } from "@/lib/api/agency-context";
