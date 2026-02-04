@@ -1,5 +1,5 @@
 import React from "react";
-import { Document, Page, Text, View } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Link } from "@react-pdf/renderer";
 import { pdfStyles as styles } from "./styles";
 
 interface QuoteData {
@@ -21,6 +21,11 @@ interface QuoteData {
   termsConditions?: string;
   notes?: string;
   createdAt?: string;
+  // Payment terms
+  depositPercent?: number;
+  balancePercent?: number;
+  depositDeadline?: string;
+  balanceDeadline?: string;
 }
 
 interface QuoteItem {
@@ -156,6 +161,42 @@ export default function QuoteDocument({ quote, items }: QuoteDocumentProps) {
           </View>
         </View>
 
+        {/* Payment Schedule */}
+        <Text style={styles.sectionTitle}>Payment Schedule</Text>
+        <View style={styles.paymentSchedule}>
+          <View style={styles.paymentRow}>
+            <View style={styles.paymentItem}>
+              <Text style={styles.paymentLabel}>Deposit ({quote.depositPercent || 30}%)</Text>
+              <Text style={styles.paymentAmount}>
+                {formatCurrency(
+                  quote.totalSellPrice
+                    ? (parseFloat(quote.totalSellPrice) * ((quote.depositPercent || 30) / 100)).toFixed(2)
+                    : "0"
+                )}
+              </Text>
+              <Text style={styles.paymentDue}>
+                Due: {quote.depositDeadline ? formatDate(quote.depositDeadline) : "Upon confirmation"}
+              </Text>
+            </View>
+            <View style={styles.paymentItem}>
+              <Text style={styles.paymentLabel}>Final Balance ({quote.balancePercent || 70}%)</Text>
+              <Text style={styles.paymentAmount}>
+                {formatCurrency(
+                  quote.totalSellPrice
+                    ? (parseFloat(quote.totalSellPrice) * ((quote.balancePercent || 70) / 100)).toFixed(2)
+                    : "0"
+                )}
+              </Text>
+              <Text style={styles.paymentDue}>
+                Due: {quote.balanceDeadline ? formatDate(quote.balanceDeadline) : "30 days before departure"}
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.paymentNote}>
+            Payment can be made via bank transfer or credit card. Details will be provided upon confirmation.
+          </Text>
+        </View>
+
         {/* Inclusions */}
         {quote.inclusionsSummary && (
           <>
@@ -188,13 +229,20 @@ export default function QuoteDocument({ quote, items }: QuoteDocumentProps) {
           </>
         )}
 
-        {/* Footer */}
+        {/* Footer with Contact Info */}
         <View style={styles.footer}>
+          <View style={styles.contactSection}>
+            <Text style={styles.contactTitle}>Contact Us</Text>
+            <Text style={styles.contactText}>Email: curatedascents@gmail.com</Text>
+            <Text style={styles.contactText}>Website: curatedascents.com</Text>
+            <Text style={styles.contactText}>WhatsApp: +977-9851-000000</Text>
+          </View>
           <Text style={styles.footerText}>
-            CuratedAscents | Luxury Adventure Travel | curatedascents.com
+            CuratedAscents | Luxury Adventure Travel | Nepal • Tibet • Bhutan • India
           </Text>
-          <Text style={styles.footerText}>
-            This quote is subject to availability. Prices may vary based on season and group size.
+          <Text style={styles.footerDisclaimer}>
+            This quote is subject to availability. Prices may vary based on season, exchange rates, and group size.
+            Valid for {quote.validUntil ? `until ${formatDate(quote.validUntil)}` : "14 days from issue date"}.
           </Text>
         </View>
       </Page>

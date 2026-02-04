@@ -2,17 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { quotes, quoteItems, clients } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { sendEmail } from "@/lib/email/send-email";
+import React from "react";
+import QuotePdfEmail from "@/lib/email/templates/quote-pdf-email";
 
-export async function GET(
+export const dynamic = "force-dynamic";
+
+export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
+    const body = await req.json().catch(() => ({}));
+    const { personalMessage } = body;
 
-    // Dynamically import to keep server-only
+    // Dynamically import PDF rendering
     const { renderToBuffer } = await import("@react-pdf/renderer");
-    const { default: React } = await import("react");
     const { default: QuoteDocument } = await import("@/lib/pdf/QuoteDocument");
 
     // Fetch quote with client info
@@ -22,6 +28,7 @@ export async function GET(
         quoteNumber: quotes.quoteNumber,
         quoteName: quotes.quoteName,
         destination: quotes.destination,
+        clientId: quotes.clientId,
         clientName: clients.name,
         clientEmail: clients.email,
         numberOfPax: quotes.numberOfPax,
@@ -49,6 +56,13 @@ export async function GET(
 
     const quote = quoteResult[0];
 
+    if (!quote.clientEmail) {
+      return NextResponse.json(
+        { error: "No client email associated with this quote" },
+        { status: 400 }
+      );
+    }
+
     // Fetch line items
     const items = await db
       .select()
@@ -60,7 +74,7 @@ export async function GET(
     let balanceDeadline: string | undefined;
 
     if (quote.startDate) {
-      // Deposit due 7 days from now
+      // Deposit due 7 days from now or quote creation
       const depositDate = new Date();
       depositDate.setDate(depositDate.getDate() + 7);
       depositDeadline = depositDate.toISOString();
@@ -108,21 +122,63 @@ export async function GET(
         notes: item.notes || undefined,
       })),
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const buffer = await renderToBuffer(pdfElement as any);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pdfBuffer = await renderToBuffer(pdfElement as any);
     const filename = `${quote.quoteNumber || `Quote-${quote.id}`}.pdf`;
 
-    return new NextResponse(new Uint8Array(buffer), {
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${filename}"`,
+    // Send email with PDF attachment
+    const emailResult = await sendEmail({
+      to: quote.clientEmail,
+      subject: `Your Travel Proposal ${quote.quoteNumber} — CuratedAscents`,
+      react: React.createElement(QuotePdfEmail, {
+        clientName: quote.clientName || undefined,
+        quoteNumber: quote.quoteNumber || `QT-${quote.id}`,
+        quoteName: quote.quoteName || undefined,
+        destination: quote.destination || undefined,
+        startDate: quote.startDate || undefined,
+        endDate: quote.endDate || undefined,
+        totalAmount: quote.totalSellPrice || undefined,
+        validUntil: quote.validUntil || undefined,
+        personalMessage: personalMessage || undefined,
+      }),
+      attachments: [
+        {
+          filename,
+          content: Buffer.from(pdfBuffer),
+        },
+      ],
+      logContext: {
+        templateType: "quote_pdf",
+        toName: quote.clientName || quote.clientEmail,
+        quoteId: quote.id,
+        metadata: {
+          quoteNumber: quote.quoteNumber,
+          destination: quote.destination,
+          hasPersonalMessage: !!personalMessage,
+        },
       },
     });
+
+    if (!emailResult.sent) {
+      return NextResponse.json(
+        { error: "Failed to send email", details: emailResult.error },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `Quote PDF sent to ${quote.clientEmail}`,
+      emailLogId: emailResult.emailLogId,
+    });
   } catch (error) {
-    console.error("Error generating PDF:", error);
+    console.error("Error sending quote PDF email:", error);
     return NextResponse.json(
-      { error: "Failed to generate PDF", details: error instanceof Error ? error.message : "Unknown error" },
+      {
+        error: "Failed to send quote PDF",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }

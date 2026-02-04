@@ -152,18 +152,82 @@ export const pdfStyles = StyleSheet.create({
     lineHeight: 1.5,
     marginBottom: 5,
   },
+  // Payment Schedule styles
+  paymentSchedule: {
+    marginTop: 10,
+    marginBottom: 15,
+    padding: 12,
+    backgroundColor: "#f0fdf4",
+    borderRadius: 4,
+    borderLeftWidth: 3,
+    borderLeftColor: "#10b981",
+  },
+  paymentRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  paymentItem: {
+    width: "48%",
+    padding: 10,
+    backgroundColor: "#ffffff",
+    borderRadius: 4,
+  },
+  paymentLabel: {
+    fontSize: 9,
+    color: "#64748b",
+    marginBottom: 4,
+    textTransform: "uppercase" as const,
+  },
+  paymentAmount: {
+    fontSize: 14,
+    fontFamily: "Helvetica-Bold",
+    color: "#10b981",
+    marginBottom: 4,
+  },
+  paymentDue: {
+    fontSize: 8,
+    color: "#475569",
+  },
+  paymentNote: {
+    fontSize: 8,
+    color: "#64748b",
+    fontStyle: "italic" as const,
+    textAlign: "center" as const,
+  },
+  // Footer styles
   footer: {
     position: "absolute" as const,
-    bottom: 30,
+    bottom: 25,
     left: 40,
     right: 40,
     textAlign: "center" as const,
     borderTopWidth: 1,
     borderTopColor: "#e2e8f0",
-    paddingTop: 10,
+    paddingTop: 12,
+  },
+  contactSection: {
+    marginBottom: 8,
+  },
+  contactTitle: {
+    fontSize: 9,
+    fontFamily: "Helvetica-Bold",
+    color: "#1e293b",
+    marginBottom: 4,
+  },
+  contactText: {
+    fontSize: 8,
+    color: "#475569",
+    marginBottom: 2,
   },
   footerText: {
     fontSize: 8,
     color: "#94a3b8",
+    marginBottom: 4,
+  },
+  footerDisclaimer: {
+    fontSize: 7,
+    color: "#94a3b8",
+    fontStyle: "italic" as const,
   },
 });

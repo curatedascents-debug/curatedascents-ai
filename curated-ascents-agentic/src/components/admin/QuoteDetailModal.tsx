@@ -27,6 +27,9 @@ export default function QuoteDetailModal({ quoteId, onClose, onUpdate, apiBasePa
   const [actionLoading, setActionLoading] = useState(false);
   const [emailBanner, setEmailBanner] = useState<{ type: "sent" | "skipped"; message: string } | null>(null);
   const [bookingBanner, setBookingBanner] = useState<{ type: "success" | "error"; message: string; bookingRef?: string } | null>(null);
+  const [pdfEmailBanner, setPdfEmailBanner] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [personalMessage, setPersonalMessage] = useState("");
 
   // Edit mode state
   const [isEditing, setIsEditing] = useState(false);
@@ -237,6 +240,34 @@ export default function QuoteDetailModal({ quoteId, onClose, onUpdate, apiBasePa
     window.open(`${apiBasePath}/quotes/${quoteId}/pdf`, "_blank");
   };
 
+  const sendPdfEmail = async () => {
+    if (!quote.clientEmail) {
+      setPdfEmailBanner({ type: "error", message: "No client email associated with this quote" });
+      return;
+    }
+    setActionLoading(true);
+    setPdfEmailBanner(null);
+    try {
+      const res = await fetch(`${apiBasePath}/quotes/${quoteId}/email-pdf`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ personalMessage: personalMessage || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPdfEmailBanner({ type: "error", message: data.error || "Failed to send email" });
+        return;
+      }
+      setPdfEmailBanner({ type: "success", message: `PDF sent to ${quote.clientEmail}` });
+      setShowEmailModal(false);
+      setPersonalMessage("");
+    } catch (error) {
+      setPdfEmailBanner({ type: "error", message: "Failed to send email" });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const convertToBooking = async () => {
     if (!confirm("Convert this quote to a booking? This will create a new booking record.")) return;
     setActionLoading(true);
@@ -333,6 +364,52 @@ export default function QuoteDetailModal({ quoteId, onClose, onUpdate, apiBasePa
                 )}
               </span>
               <button onClick={() => setBookingBanner(null)} className="ml-3 hover:opacity-70">x</button>
+            </div>
+          )}
+
+          {/* PDF email banner */}
+          {pdfEmailBanner && (
+            <div className={`flex items-center justify-between px-4 py-2 rounded text-sm ${
+              pdfEmailBanner.type === "success"
+                ? "bg-green-900/50 text-green-300 border border-green-700"
+                : "bg-red-900/50 text-red-300 border border-red-700"
+            }`}>
+              <span>{pdfEmailBanner.message}</span>
+              <button onClick={() => setPdfEmailBanner(null)} className="ml-3 hover:opacity-70">x</button>
+            </div>
+          )}
+
+          {/* Email PDF Modal */}
+          {showEmailModal && (
+            <div className="bg-slate-900 rounded-lg p-4 border border-slate-600">
+              <h4 className="text-sm font-semibold text-slate-300 mb-3">Email PDF to Client</h4>
+              <p className="text-sm text-slate-400 mb-3">
+                Sending to: <span className="text-emerald-400">{quote.clientEmail || "No email"}</span>
+              </p>
+              <div className="mb-3">
+                <label className="block text-slate-400 text-sm mb-1">Personal Message (optional)</label>
+                <textarea
+                  value={personalMessage}
+                  onChange={(e) => setPersonalMessage(e.target.value)}
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 focus:outline-none focus:border-emerald-500 h-20 text-sm"
+                  placeholder="Add a personal message to include in the email..."
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={sendPdfEmail}
+                  disabled={actionLoading || !quote.clientEmail}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded text-sm transition-colors disabled:opacity-50"
+                >
+                  {actionLoading ? "Sending..." : "Send Email"}
+                </button>
+                <button
+                  onClick={() => { setShowEmailModal(false); setPersonalMessage(""); }}
+                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-sm transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           )}
 
@@ -783,6 +860,14 @@ export default function QuoteDetailModal({ quoteId, onClose, onUpdate, apiBasePa
                   className="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded transition-colors"
                 >
                   Download PDF
+                </button>
+                <button
+                  onClick={() => setShowEmailModal(true)}
+                  disabled={!quote.clientEmail}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={quote.clientEmail ? "Email PDF to client" : "No client email"}
+                >
+                  Email PDF
                 </button>
                 {quote.status === "draft" && (
                   <button
