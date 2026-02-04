@@ -1732,3 +1732,217 @@ export const competitorRates = pgTable('competitor_rates', {
 
   createdAt: timestamp('created_at').defaultNow(),
 });
+
+// ============================================
+// AVAILABILITY & INVENTORY AGENT TABLES
+// ============================================
+
+// Service availability calendar - track daily availability for services
+export const availabilityCalendar = pgTable('availability_calendar', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // What service this availability is for
+  serviceType: text('service_type').notNull(), // hotel, transportation, guide, package, helicopter, etc.
+  serviceId: integer('service_id').notNull(),
+  serviceName: text('service_name'),
+  supplierId: integer('supplier_id').references(() => suppliers.id),
+
+  // Date and availability
+  availabilityDate: date('availability_date').notNull(),
+  totalCapacity: integer('total_capacity').default(1), // Total units available
+  bookedCapacity: integer('booked_capacity').default(0), // Units already booked
+  heldCapacity: integer('held_capacity').default(0), // Units temporarily held
+  availableCapacity: integer('available_capacity').default(1), // Computed: total - booked - held
+
+  // Status
+  status: text('status').default('available').notNull(), // available, limited, sold_out, blocked
+  isBlocked: boolean('is_blocked').default(false), // Manually blocked
+
+  // Pricing override for this date (optional)
+  priceOverride: decimal('price_override', { precision: 10, scale: 2 }),
+  priceOverrideReason: text('price_override_reason'),
+
+  // Notes
+  notes: text('notes'),
+  internalNotes: text('internal_notes'),
+
+  // Sync tracking
+  lastSyncedAt: timestamp('last_synced_at'),
+  syncSource: text('sync_source'), // manual, api, supplier_portal
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Blackout dates - define periods when services are unavailable
+export const blackoutDates = pgTable('blackout_dates', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Scope - what this blackout applies to
+  serviceType: text('service_type'), // null = all services
+  serviceId: integer('service_id'), // null = all services of type
+  supplierId: integer('supplier_id').references(() => suppliers.id),
+  destinationId: integer('destination_id').references(() => destinations.id),
+
+  // Blackout period
+  startDate: date('start_date').notNull(),
+  endDate: date('end_date').notNull(),
+
+  // Reason
+  reason: text('reason').notNull(), // maintenance, holiday, weather, festival, full_capacity, etc.
+  description: text('description'),
+
+  // Type
+  blackoutType: text('blackout_type').default('full').notNull(), // full, partial (reduced capacity)
+  reducedCapacity: integer('reduced_capacity'), // For partial blackouts
+
+  // Recurrence (optional)
+  isRecurring: boolean('is_recurring').default(false),
+  recurrencePattern: text('recurrence_pattern'), // yearly, monthly
+
+  isActive: boolean('is_active').default(true),
+  createdBy: text('created_by'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Permit inventory - track permit allocations (trekking permits, national park entries, etc.)
+export const permitInventory = pgTable('permit_inventory', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Permit details
+  permitType: text('permit_type').notNull(), // TIMS, Annapurna, Everest, Langtang, etc.
+  permitName: text('permit_name').notNull(),
+  issuingAuthority: text('issuing_authority'), // NTB, ACAP, SPCC, etc.
+  destinationId: integer('destination_id').references(() => destinations.id),
+
+  // Date range
+  validDate: date('valid_date').notNull(), // The date this inventory is for
+
+  // Quotas
+  dailyQuota: integer('daily_quota'), // Total permits available per day (if known)
+  agencyAllocation: integer('agency_allocation'), // Our agency's allocation
+  bookedCount: integer('booked_count').default(0), // Permits we've used
+  heldCount: integer('held_count').default(0), // Permits temporarily held
+  availableCount: integer('available_count'), // Computed available
+
+  // Pricing
+  permitCost: decimal('permit_cost', { precision: 10, scale: 2 }),
+  permitSellPrice: decimal('permit_sell_price', { precision: 10, scale: 2 }),
+  currency: text('currency').default('USD'),
+
+  // Status
+  status: text('status').default('available').notNull(), // available, limited, sold_out, not_required
+
+  // Notes
+  notes: text('notes'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Inventory holds - temporary reservations during booking process
+export const inventoryHolds = pgTable('inventory_holds', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // What is being held
+  holdType: text('hold_type').notNull(), // service, permit
+  serviceType: text('service_type'),
+  serviceId: integer('service_id'),
+  permitInventoryId: integer('permit_inventory_id').references(() => permitInventory.id),
+
+  // Hold details
+  holdDate: date('hold_date').notNull(), // The date the hold is for
+  quantity: integer('quantity').default(1).notNull(),
+
+  // Hold metadata
+  holdReference: text('hold_reference').unique().notNull(), // Unique reference for this hold
+  quoteId: integer('quote_id').references(() => quotes.id),
+  clientId: integer('client_id').references(() => clients.id),
+
+  // Expiration
+  expiresAt: timestamp('expires_at').notNull(),
+  isExpired: boolean('is_expired').default(false),
+
+  // Status
+  status: text('status').default('active').notNull(), // active, converted, released, expired
+
+  // Conversion (when hold becomes booking)
+  convertedToBookingId: integer('converted_to_booking_id').references(() => bookings.id),
+  convertedAt: timestamp('converted_at'),
+
+  // Release tracking
+  releasedAt: timestamp('released_at'),
+  releaseReason: text('release_reason'),
+
+  createdBy: text('created_by'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Capacity configuration - define capacity limits for services
+export const capacityConfig = pgTable('capacity_config', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // What this config applies to
+  serviceType: text('service_type').notNull(),
+  serviceId: integer('service_id'),
+  supplierId: integer('supplier_id').references(() => suppliers.id),
+
+  // Capacity settings
+  defaultCapacity: integer('default_capacity').default(1).notNull(),
+  maxCapacity: integer('max_capacity'),
+  minBookingNotice: integer('min_booking_notice').default(0), // Hours in advance required
+  maxAdvanceBooking: integer('max_advance_booking').default(365), // Days in advance allowed
+
+  // Overbooking settings
+  allowOverbooking: boolean('allow_overbooking').default(false),
+  overbookingLimit: integer('overbooking_limit').default(0), // Percentage or count
+
+  // Day-of-week capacity (JSONB)
+  weekdayCapacity: jsonb('weekday_capacity'), // { "0": 5, "1": 10, ... } Sunday to Saturday
+
+  // Hold settings
+  holdDurationMinutes: integer('hold_duration_minutes').default(30),
+  maxHoldsPerClient: integer('max_holds_per_client').default(3),
+
+  isActive: boolean('is_active').default(true),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Availability sync log - track supplier calendar syncs
+export const availabilitySyncLog = pgTable('availability_sync_log', {
+  id: serial('id').primaryKey(),
+
+  // What was synced
+  supplierId: integer('supplier_id').references(() => suppliers.id),
+  serviceType: text('service_type'),
+  serviceId: integer('service_id'),
+
+  // Sync details
+  syncType: text('sync_type').notNull(), // manual, scheduled, webhook
+  syncStatus: text('sync_status').notNull(), // success, partial, failed
+
+  // Results
+  datesProcessed: integer('dates_processed').default(0),
+  datesUpdated: integer('dates_updated').default(0),
+  errorsCount: integer('errors_count').default(0),
+  errorDetails: jsonb('error_details'),
+
+  // Timing
+  startedAt: timestamp('started_at').notNull(),
+  completedAt: timestamp('completed_at'),
+  durationMs: integer('duration_ms'),
+
+  triggeredBy: text('triggered_by'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+});

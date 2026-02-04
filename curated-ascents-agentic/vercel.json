@@ -18,7 +18,7 @@
     },
     {
       "path": "/api/cron/trip-checkins",
-      "schedule": "0 8,12,16,20 * * *"
+      "schedule": "0 8 * * *"
     },
     {
       "path": "/api/cron/feedback-requests",
@@ -39,6 +39,10 @@
     {
       "path": "/api/cron/price-optimization",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/release-expired-holds",
+      "schedule": "0 5 * * *"
     }
   ]
 }
