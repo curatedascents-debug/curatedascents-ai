@@ -10,7 +10,7 @@ import {
   clients,
   bookings,
 } from "@/db/schema";
-import { eq, sql, and } from "drizzle-orm";
+import { eq, sql, and, desc } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 // ============================================
@@ -552,4 +552,130 @@ export async function recalculateAllTiers(): Promise<{
   }
 
   return { processed: allAccounts.length, upgraded, downgraded };
+}
+
+// ============================================
+// POINTS EXPIRY
+// ============================================
+
+// Points expire after 24 months of inactivity
+const POINTS_EXPIRY_MONTHS = 24;
+
+/**
+ * Expire points for inactive accounts
+ */
+export async function expireInactivePoints(): Promise<{
+  accountsProcessed: number;
+  accountsExpired: number;
+  totalPointsExpired: number;
+}> {
+  const cutoffDate = new Date();
+  cutoffDate.setMonth(cutoffDate.getMonth() - POINTS_EXPIRY_MONTHS);
+
+  // Find accounts with no activity in the last 24 months and positive balance
+  const inactiveAccounts = await db
+    .select()
+    .from(loyaltyAccounts)
+    .where(
+      and(
+        sql`${loyaltyAccounts.totalPoints} > 0`,
+        sql`COALESCE(${loyaltyAccounts.lastBookingAt}, ${loyaltyAccounts.createdAt}) < ${cutoffDate}`
+      )
+    );
+
+  let accountsExpired = 0;
+  let totalPointsExpired = 0;
+
+  for (const account of inactiveAccounts) {
+    // Check if there was recent transaction activity
+    const recentActivity = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(loyaltyTransactions)
+      .where(
+        and(
+          eq(loyaltyTransactions.loyaltyAccountId, account.id),
+          sql`${loyaltyTransactions.createdAt} > ${cutoffDate}`
+        )
+      );
+
+    if (recentActivity[0]?.count === 0) {
+      const pointsToExpire = account.totalPoints;
+
+      // Record expiry transaction
+      await db.insert(loyaltyTransactions).values({
+        loyaltyAccountId: account.id,
+        type: "expired",
+        points: -pointsToExpire,
+        balanceAfter: 0,
+        reason: `Points expired due to ${POINTS_EXPIRY_MONTHS} months of inactivity`,
+      });
+
+      // Update account
+      await db
+        .update(loyaltyAccounts)
+        .set({
+          totalPoints: 0,
+          updatedAt: new Date(),
+        })
+        .where(eq(loyaltyAccounts.id, account.id));
+
+      accountsExpired++;
+      totalPointsExpired += pointsToExpire;
+    }
+  }
+
+  return {
+    accountsProcessed: inactiveAccounts.length,
+    accountsExpired,
+    totalPointsExpired,
+  };
+}
+
+/**
+ * Get accounts at risk of points expiry (warning period)
+ */
+export async function getAccountsAtExpiryRisk(warningMonths: number = 3): Promise<
+  Array<{
+    clientId: number;
+    clientName: string | null;
+    clientEmail: string;
+    totalPoints: number;
+    lastActivity: Date | null;
+    monthsUntilExpiry: number;
+  }>
+> {
+  const warningCutoff = new Date();
+  warningCutoff.setMonth(warningCutoff.getMonth() - (POINTS_EXPIRY_MONTHS - warningMonths));
+
+  const expiryCutoff = new Date();
+  expiryCutoff.setMonth(expiryCutoff.getMonth() - POINTS_EXPIRY_MONTHS);
+
+  const atRiskAccounts = await db
+    .select({
+      clientId: loyaltyAccounts.clientId,
+      clientName: clients.name,
+      clientEmail: clients.email,
+      totalPoints: loyaltyAccounts.totalPoints,
+      lastActivity: loyaltyAccounts.lastBookingAt,
+    })
+    .from(loyaltyAccounts)
+    .innerJoin(clients, eq(loyaltyAccounts.clientId, clients.id))
+    .where(
+      and(
+        sql`${loyaltyAccounts.totalPoints} > 0`,
+        sql`COALESCE(${loyaltyAccounts.lastBookingAt}, ${loyaltyAccounts.createdAt}) < ${warningCutoff}`,
+        sql`COALESCE(${loyaltyAccounts.lastBookingAt}, ${loyaltyAccounts.createdAt}) > ${expiryCutoff}`
+      )
+    );
+
+  return atRiskAccounts.map((account) => {
+    const lastActivity = account.lastActivity || new Date();
+    const monthsSinceActivity = Math.floor(
+      (Date.now() - new Date(lastActivity).getTime()) / (30 * 24 * 60 * 60 * 1000)
+    );
+    return {
+      ...account,
+      monthsUntilExpiry: POINTS_EXPIRY_MONTHS - monthsSinceActivity,
+    };
+  });
 }

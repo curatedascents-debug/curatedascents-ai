@@ -2433,3 +2433,82 @@ export const riskAlertNotifications = pgTable('risk_alert_notifications', {
 
   createdAt: timestamp('created_at').defaultNow(),
 });
+
+// ============================================
+// CUSTOMER SUPPORT TICKETS
+// ============================================
+
+// Customer support tickets for in-trip and general support
+export const supportTickets = pgTable('support_tickets', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Ticket reference
+  ticketNumber: text('ticket_number').notNull().unique(),
+
+  // Who created it
+  clientId: integer('client_id').references(() => clients.id),
+  bookingId: integer('booking_id').references(() => bookings.id),
+
+  // Ticket details
+  subject: text('subject').notNull(),
+  description: text('description'),
+  category: text('category').notNull(), // booking_issue, payment, itinerary_change, emergency, feedback, general
+  priority: text('priority').default('normal'), // low, normal, high, urgent
+
+  // Status
+  status: text('status').default('open'), // open, in_progress, waiting_client, resolved, closed
+
+  // Assignment
+  assignedTo: text('assigned_to'),
+  assignedAt: timestamp('assigned_at'),
+
+  // In-trip flag
+  isInTrip: boolean('is_in_trip').default(false),
+  tripLocation: text('trip_location'),
+
+  // Resolution
+  resolution: text('resolution'),
+  resolvedBy: text('resolved_by'),
+  resolvedAt: timestamp('resolved_at'),
+
+  // SLA tracking
+  firstResponseAt: timestamp('first_response_at'),
+  slaBreached: boolean('sla_breached').default(false),
+
+  // Satisfaction
+  satisfactionRating: integer('satisfaction_rating'), // 1-5
+  satisfactionFeedback: text('satisfaction_feedback'),
+
+  // Internal notes
+  internalNotes: text('internal_notes'),
+  tags: jsonb('tags'), // Array of tags
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Messages within a support ticket
+export const supportMessages = pgTable('support_messages', {
+  id: serial('id').primaryKey(),
+  ticketId: integer('ticket_id').notNull().references(() => supportTickets.id),
+
+  // Who sent it
+  senderType: text('sender_type').notNull(), // client, agent, system
+  senderName: text('sender_name'),
+  senderId: integer('sender_id'), // clientId or agentId depending on senderType
+
+  // Message content
+  message: text('message').notNull(),
+  attachments: jsonb('attachments'), // Array of { name, url, type }
+
+  // Email tracking
+  sentViaEmail: boolean('sent_via_email').default(false),
+  emailMessageId: text('email_message_id'),
+
+  // Read tracking
+  isRead: boolean('is_read').default(false),
+  readAt: timestamp('read_at'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+});

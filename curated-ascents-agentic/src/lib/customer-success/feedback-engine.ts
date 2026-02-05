@@ -544,3 +544,152 @@ export async function markMilestoneNotified(
     })
     .where(eq(clientMilestones.id, milestoneId));
 }
+
+// ============================================
+// TESTIMONIAL MANAGEMENT
+// ============================================
+
+/**
+ * Get pending testimonials for approval
+ */
+export async function getPendingTestimonials(): Promise<
+  Array<{
+    id: number;
+    clientId: number;
+    clientName: string | null;
+    bookingId: number;
+    destination: string | null;
+    testimonial: string | null;
+    overallRating: number | null;
+    npsScore: number | null;
+    completedAt: Date | null;
+  }>
+> {
+  const testimonials = await db
+    .select({
+      id: feedbackSurveys.id,
+      clientId: feedbackSurveys.clientId,
+      clientName: clients.name,
+      bookingId: feedbackSurveys.bookingId,
+      destination: quotes.destination,
+      testimonial: feedbackSurveys.testimonial,
+      overallRating: feedbackSurveys.overallRating,
+      npsScore: feedbackSurveys.npsScore,
+      completedAt: feedbackSurveys.completedAt,
+    })
+    .from(feedbackSurveys)
+    .leftJoin(clients, eq(feedbackSurveys.clientId, clients.id))
+    .leftJoin(bookings, eq(feedbackSurveys.bookingId, bookings.id))
+    .leftJoin(quotes, eq(bookings.quoteId, quotes.id))
+    .where(
+      and(
+        eq(feedbackSurveys.canUseAsTestimonial, true),
+        eq(feedbackSurveys.testimonialApproved, false),
+        sql`${feedbackSurveys.testimonial} IS NOT NULL`
+      )
+    )
+    .orderBy(sql`${feedbackSurveys.completedAt} DESC`);
+
+  return testimonials;
+}
+
+/**
+ * Approve or reject a testimonial
+ */
+export async function approveTestimonial(
+  surveyId: number,
+  approved: boolean
+): Promise<{ success: boolean }> {
+  if (approved) {
+    await db
+      .update(feedbackSurveys)
+      .set({ testimonialApproved: true, updatedAt: new Date() })
+      .where(eq(feedbackSurveys.id, surveyId));
+  } else {
+    // If rejected, mark canUseAsTestimonial as false
+    await db
+      .update(feedbackSurveys)
+      .set({ canUseAsTestimonial: false, updatedAt: new Date() })
+      .where(eq(feedbackSurveys.id, surveyId));
+  }
+
+  return { success: true };
+}
+
+/**
+ * Get approved testimonials for display
+ */
+export async function getApprovedTestimonials(params?: {
+  limit?: number;
+  destination?: string;
+}): Promise<
+  Array<{
+    id: number;
+    clientName: string | null;
+    destination: string | null;
+    testimonial: string | null;
+    overallRating: number | null;
+    completedAt: Date | null;
+  }>
+> {
+  const conditions = [
+    eq(feedbackSurveys.testimonialApproved, true),
+    sql`${feedbackSurveys.testimonial} IS NOT NULL`,
+  ];
+
+  if (params?.destination) {
+    conditions.push(sql`${quotes.destination} ILIKE ${'%' + params.destination + '%'}`);
+  }
+
+  const testimonials = await db
+    .select({
+      id: feedbackSurveys.id,
+      clientName: clients.name,
+      destination: quotes.destination,
+      testimonial: feedbackSurveys.testimonial,
+      overallRating: feedbackSurveys.overallRating,
+      completedAt: feedbackSurveys.completedAt,
+    })
+    .from(feedbackSurveys)
+    .leftJoin(clients, eq(feedbackSurveys.clientId, clients.id))
+    .leftJoin(bookings, eq(feedbackSurveys.bookingId, bookings.id))
+    .leftJoin(quotes, eq(bookings.quoteId, quotes.id))
+    .where(and(...conditions))
+    .orderBy(sql`${feedbackSurveys.completedAt} DESC`)
+    .limit(params?.limit || 20);
+
+  return testimonials;
+}
+
+/**
+ * Get survey for client to complete
+ */
+export async function getSurveyForCompletion(surveyId: number) {
+  const [survey] = await db
+    .select({
+      id: feedbackSurveys.id,
+      surveyType: feedbackSurveys.surveyType,
+      completedAt: feedbackSurveys.completedAt,
+      bookingId: feedbackSurveys.bookingId,
+      destination: quotes.destination,
+      clientName: clients.name,
+    })
+    .from(feedbackSurveys)
+    .leftJoin(bookings, eq(feedbackSurveys.bookingId, bookings.id))
+    .leftJoin(quotes, eq(bookings.quoteId, quotes.id))
+    .leftJoin(clients, eq(feedbackSurveys.clientId, clients.id))
+    .where(eq(feedbackSurveys.id, surveyId))
+    .limit(1);
+
+  if (!survey) {
+    return null;
+  }
+
+  return {
+    id: survey.id,
+    surveyType: survey.surveyType,
+    isCompleted: !!survey.completedAt,
+    destination: survey.destination,
+    clientName: survey.clientName,
+  };
+}

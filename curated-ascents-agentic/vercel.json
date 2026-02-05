@@ -51,6 +51,10 @@
     {
       "path": "/api/cron/risk-monitoring",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/points-expiry",
+      "schedule": "0 2 * * *"
     }
   ]
 }
