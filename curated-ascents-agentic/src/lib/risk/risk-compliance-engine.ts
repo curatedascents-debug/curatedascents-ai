@@ -1,6 +1,7 @@
 /**
  * Risk & Compliance Engine
  * Handles travel advisories, weather monitoring, compliance checks, and risk assessments
+ * @module risk/risk-compliance-engine
  */
 
 import { db } from "@/db";
