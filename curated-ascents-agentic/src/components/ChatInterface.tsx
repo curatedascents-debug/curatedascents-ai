@@ -9,11 +9,17 @@ interface Message {
   content: string;
 }
 
-export default function ChatInterface() {
+interface ChatInterfaceProps {
+  isWidget?: boolean;
+}
+
+export default function ChatInterface({ isWidget = false }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Welcome to CuratedAscents! I'm your Expedition Architect. I specialize in crafting bespoke luxury adventures across Nepal, Tibet, Bhutan, and India. Whether you're dreaming of trekking to Everest Base Camp, finding peace in a Bhutanese monastery, or tracking tigers in Ranthambore, I'm here to design your perfect journey. What kind of adventure speaks to you?",
+      content: isWidget
+        ? "Hello! I'm your Expedition Architect. How can I help you plan your perfect Himalayan adventure today?"
+        : "Welcome to CuratedAscents! I'm your Expedition Architect. I specialize in crafting bespoke luxury adventures across Nepal, Tibet, Bhutan, and India. Whether you're dreaming of trekking to Everest Base Camp, finding peace in a Bhutanese monastery, or tracking tigers in Ranthambore, I'm here to design your perfect journey. What kind of adventure speaks to you?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -48,7 +54,7 @@ export default function ChatInterface() {
 
     const userMessage = input.trim();
     setInput("");
-    
+
     const newMessages = [...messages, { role: "user" as const, content: userMessage }];
     setMessages(newMessages);
     setIsLoading(true);
@@ -69,9 +75,9 @@ export default function ChatInterface() {
       if (!response.ok) throw new Error("Failed to get response");
 
       const data = await response.json();
-      
+
       setMessages([...newMessages, { role: "assistant", content: data.message }]);
-      
+
       if (!clientEmail && newMessages.length >= 4) {
         setShowEmailPrompt(true);
       }
@@ -134,6 +140,131 @@ export default function ChatInterface() {
   };
   // ─────────────────────────────────────────────────────────────────────────
 
+  // Widget mode styling
+  if (isWidget) {
+    return (
+      <div className="flex flex-col h-full bg-slate-900">
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto px-4 py-4 scrollbar-custom">
+          <div className="space-y-4">
+            {messages.map((msg, idx) => (
+              <div
+                key={idx}
+                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+                    msg.role === "user"
+                      ? "bg-emerald-600 text-white"
+                      : "bg-slate-800 border border-slate-700 text-slate-100"
+                  }`}
+                >
+                  {msg.role === "user" ? (
+                    <p className="text-sm leading-relaxed">{msg.content}</p>
+                  ) : (
+                    <div className="markdown-content text-sm">
+                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3">
+                  <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+        </div>
+
+        {/* Email Prompt Modal */}
+        {showEmailPrompt && (
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-sm w-full">
+              <h3 className="text-lg font-bold text-white mb-3">
+                Let's personalize your experience
+              </h3>
+              <p className="text-slate-300 text-sm mb-4">
+                Share your details to save our conversation.
+              </p>
+
+              {personalizeSuccess ? (
+                <div className="flex flex-col items-center py-4 gap-2">
+                  <div className="text-3xl">✅</div>
+                  <p className="text-emerald-400 font-semibold text-center text-sm">
+                    Details saved!
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    placeholder="Your name"
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                    disabled={personalizeLoading}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Your email"
+                    value={clientEmail}
+                    onChange={(e) => setClientEmail(e.target.value)}
+                    disabled={personalizeLoading}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowEmailPrompt(false)}
+                      disabled={personalizeLoading}
+                      className="flex-1 px-3 py-2 bg-slate-700 text-white text-sm rounded-lg hover:bg-slate-600 transition disabled:opacity-50"
+                    >
+                      Skip
+                    </button>
+                    <button
+                      onClick={handleEmailSubmit}
+                      disabled={personalizeLoading || !clientName.trim() || !clientEmail.trim()}
+                      className="flex-1 px-3 py-2 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {personalizeLoading ? "Saving…" : "Continue"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Input */}
+        <div className="border-t border-slate-700 bg-slate-800 px-4 py-3">
+          <form onSubmit={handleSubmit} className="flex gap-2">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Type your message..."
+              disabled={isLoading}
+              className="flex-1 px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={isLoading || !input.trim()}
+              className="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Full-page mode (original layout)
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
@@ -177,17 +308,17 @@ export default function ChatInterface() {
     </div>
   </div>
 ))}
-          
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
-                <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
-              </div>
+
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
+              <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
             </div>
-          )}
-          
-          <div ref={messagesEndRef} />
-        </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
       </div>
 
       {/* Email Prompt Modal */}
