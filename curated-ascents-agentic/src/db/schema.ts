@@ -688,6 +688,7 @@ export const clients = pgTable('clients', {
   email: text('email').unique().notNull(),
   name: text('name'),
   phone: text('phone'),
+  whatsappPhoneNumber: text('whatsapp_phone_number').unique(), // E.164 format for WhatsApp integration
   country: text('country'),
   preferredCurrency: text('preferred_currency').default('USD'),
   locale: text('locale').default('en-US'),
@@ -2984,4 +2985,176 @@ export const blogSocialPosts = pgTable('blog_social_posts', {
   errorMessage: text('error_message'),
 
   createdAt: timestamp('created_at').defaultNow(),
+});
+
+// ============================================
+// WHATSAPP BUSINESS API TABLES
+// ============================================
+
+// WhatsApp message direction enum
+export const whatsappMessageDirectionEnum = pgEnum('whatsapp_message_direction', [
+  'inbound',   // From user to business
+  'outbound'   // From business to user
+]);
+
+// WhatsApp message type enum
+export const whatsappMessageTypeEnum = pgEnum('whatsapp_message_type', [
+  'text',
+  'image',
+  'document',
+  'audio',
+  'video',
+  'location',
+  'contacts',
+  'interactive',
+  'template'
+]);
+
+// WhatsApp message status enum
+export const whatsappMessageStatusEnum = pgEnum('whatsapp_message_status', [
+  'pending',
+  'sent',
+  'delivered',
+  'read',
+  'failed'
+]);
+
+// WhatsApp template status enum
+export const whatsappTemplateStatusEnum = pgEnum('whatsapp_template_status', [
+  'draft',
+  'pending',    // Submitted to Meta for approval
+  'approved',   // Approved by Meta
+  'rejected'    // Rejected by Meta
+]);
+
+// WhatsApp template category enum
+export const whatsappTemplateCategoryEnum = pgEnum('whatsapp_template_category', [
+  'marketing',
+  'utility',
+  'authentication'
+]);
+
+// WhatsApp conversations - tracks conversation sessions with users
+export const whatsappConversations = pgTable('whatsapp_conversations', {
+  id: serial('id').primaryKey(),
+
+  // Phone identification (E.164 format, e.g., +14155552671)
+  whatsappPhoneNumber: text('whatsapp_phone_number').unique().notNull(),
+  whatsappDisplayName: text('whatsapp_display_name'), // Profile name from WhatsApp
+
+  // Client linking
+  clientId: integer('client_id').references(() => clients.id),
+
+  // Session window management (24-hour free-form messaging window)
+  sessionWindowStart: timestamp('session_window_start'),
+  isSessionActive: boolean('is_session_active').default(false),
+
+  // Conversation metrics
+  lastMessageAt: timestamp('last_message_at'),
+  messageCount: integer('message_count').default(0),
+
+  // Opt-in tracking for marketing messages
+  marketingOptIn: boolean('marketing_opt_in').default(false),
+  marketingOptInAt: timestamp('marketing_opt_in_at'),
+
+  // Conversation state
+  lastAiResponse: text('last_ai_response'), // Cache last AI response for context
+  conversationContext: jsonb('conversation_context'), // Additional context for AI
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// WhatsApp messages - individual message records
+export const whatsappMessages = pgTable('whatsapp_messages', {
+  id: serial('id').primaryKey(),
+  conversationId: integer('conversation_id').references(() => whatsappConversations.id).notNull(),
+
+  // Meta's message identifiers
+  whatsappMessageId: text('whatsapp_message_id').unique(), // WAMID from Meta
+
+  // Message direction and type
+  direction: text('direction').notNull(), // 'inbound' or 'outbound'
+  messageType: text('message_type').default('text').notNull(), // text, image, document, template, etc.
+
+  // Message content
+  content: text('content'), // Text content or caption
+
+  // Media attachment details
+  mediaUrl: text('media_url'),
+  mediaType: text('media_type'), // MIME type
+  mediaCaption: text('media_caption'),
+  mediaId: text('media_id'), // Meta's media ID
+
+  // Template message details
+  templateName: text('template_name'),
+  templateVariables: jsonb('template_variables'), // Array of variable values
+
+  // Message status tracking
+  status: text('status').default('pending').notNull(), // pending, sent, delivered, read, failed
+
+  // Error handling
+  errorCode: text('error_code'),
+  errorMessage: text('error_message'),
+
+  // AI processing flag
+  aiProcessed: boolean('ai_processed').default(false),
+  aiResponse: text('ai_response'), // The AI's response to this message
+
+  // Raw webhook payload for debugging
+  webhookPayload: jsonb('webhook_payload'),
+
+  // Timestamps
+  sentAt: timestamp('sent_at'),
+  deliveredAt: timestamp('delivered_at'),
+  readAt: timestamp('read_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// WhatsApp templates - pre-approved message templates
+export const whatsappTemplates = pgTable('whatsapp_templates', {
+  id: serial('id').primaryKey(),
+
+  // Template identification
+  templateName: text('template_name').unique().notNull(), // Must match Meta's template name
+  templateId: text('template_id'), // Meta's template ID after approval
+
+  // Template category (determines approval process)
+  category: text('category').default('utility').notNull(), // marketing, utility, authentication
+
+  // Template structure
+  language: text('language').default('en').notNull(),
+
+  // Header (optional)
+  headerType: text('header_type'), // text, image, document, video
+  headerContent: text('header_content'), // Text or media URL/handle
+
+  // Body (required)
+  bodyText: text('body_text').notNull(), // Template body with {{1}}, {{2}}, etc. placeholders
+
+  // Footer (optional)
+  footerText: text('footer_text'),
+
+  // Buttons (optional)
+  buttons: jsonb('buttons'), // Array of { type: 'QUICK_REPLY'|'URL', text, url? }
+
+  // Variable tracking
+  variableCount: integer('variable_count').default(0),
+  variableDescriptions: jsonb('variable_descriptions'), // Array of descriptions for each variable
+
+  // Approval status
+  status: text('status').default('draft').notNull(), // draft, pending, approved, rejected
+  rejectionReason: text('rejection_reason'),
+  approvedAt: timestamp('approved_at'),
+
+  // Usage tracking
+  usageCount: integer('usage_count').default(0),
+  lastUsedAt: timestamp('last_used_at'),
+
+  // Internal notes
+  description: text('description'), // Internal description of when to use this template
+  internalNotes: text('internal_notes'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });

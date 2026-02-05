@@ -39,6 +39,11 @@ Defined in `.env.local`:
 - `STRIPE_WEBHOOK_SECRET` — Stripe webhook signature verification
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` — Stripe public key for client-side
 - `CRON_SECRET` — Secret for Vercel cron job authentication
+- `WHATSAPP_PHONE_NUMBER_ID` — WhatsApp Business phone number ID
+- `WHATSAPP_ACCESS_TOKEN` — WhatsApp permanent access token
+- `WHATSAPP_WEBHOOK_VERIFY_TOKEN` — Custom token for webhook verification
+- `WHATSAPP_BUSINESS_ACCOUNT_ID` — WhatsApp Business account ID
+- `WHATSAPP_APP_SECRET` — Meta app secret for webhook signature verification
 
 ## Development Workflow
 
@@ -83,6 +88,7 @@ Defined in `.env.local`:
 - `/api/currency/*` — Currency conversion
 - `/api/customer/*` — Customer loyalty & surveys
 - `/api/cron/*` — Scheduled background jobs
+- `/api/whatsapp/*` — WhatsApp Business API integration
 
 ### AI Chat Flow (`/api/chat`)
 
@@ -122,6 +128,7 @@ Defined in `.env.local`:
 - `src/lib/agents/tool-executor.ts` — Dispatches tool calls to the appropriate handler
 - `src/lib/agents/database-tools.ts` — Database query functions for all service types
 - `src/lib/agents/fallback-rate-research.ts` — Estimated market rates when DB has no data
+- `src/lib/agents/chat-processor.ts` — Shared AI chat logic for web and WhatsApp channels
 
 **Pricing & Currency:**
 - `src/lib/pricing/pricing-engine.ts` — Dynamic pricing with seasonal, demand, early bird, group, loyalty rules
@@ -133,6 +140,14 @@ Defined in `.env.local`:
 
 **Email Templates:**
 - `src/components/emails/` — React Email templates for all notifications
+
+**WhatsApp Integration:**
+- `src/lib/whatsapp/whatsapp-client.ts` — Meta Cloud API client
+- `src/lib/whatsapp/message-processor.ts` — Incoming message handler
+- `src/lib/whatsapp/message-sender.ts` — Outbound message sender
+- `src/lib/whatsapp/session-manager.ts` — 24-hour session window logic
+- `src/lib/whatsapp/client-linker.ts` — Phone-to-client linking
+- `src/lib/whatsapp/formatters.ts` — WhatsApp markdown formatting
 
 ### Database Schema (`src/db/schema.ts`)
 
@@ -182,6 +197,11 @@ Defined in `.env.local`:
 - `riskAlerts` — Travel advisories and weather alerts
 - `clientNotifications` — Risk notification tracking
 
+**WhatsApp:**
+- `whatsappConversations` — WhatsApp conversation sessions
+- `whatsappMessages` — Individual message records
+- `whatsappTemplates` — Pre-approved template messages
+
 ### Component Patterns
 
 All React components in `src/components/` are client components (`"use client"`). No global state management — components use local `useState`/`useRef`. Conversation history is sent with every chat request (stateless backend).
@@ -197,6 +217,7 @@ All React components in `src/components/` are client components (`"use client"`)
 - **Pricing** — Dynamic pricing rules, demand metrics, price simulator
 - **Nurture** — Email nurture sequences and enrollments
 - **Competitors** — Competitor rate monitoring and comparison
+- **WhatsApp** — WhatsApp conversations, templates, and analytics
 - **Reports** — Advanced analytics with sub-tabs (Overview, Financial, Suppliers, Leads, Operations)
 
 ### Pricing Rules
@@ -334,9 +355,40 @@ Autonomous content creation for organic traffic and social media:
 - Daily 6 AM: `/api/cron/blog-publishing` — Publish scheduled posts
 - Daily 7 AM: `/api/cron/social-media-posting` — Social media distribution
 
-### 🔮 Phase 5: Future Enhancements
+### ✅ Phase 5.1: WhatsApp Business API Integration (Complete)
+AI chat via WhatsApp with full tool-calling capabilities:
+- **Webhook Endpoint** — Receives messages and status updates from Meta
+- **Session Management** — 24-hour free-form messaging window tracking
+- **Client Linking** — Auto-link phone numbers to existing clients
+- **Message Formatting** — WhatsApp-specific markdown and chunking (4096 char limit)
+- **Template Messages** — Pre-approved templates for out-of-window messaging
+- **Shared AI Processor** — Same AI logic as web chat with WhatsApp optimizations
+- **Admin Dashboard** — Conversations, templates, and analytics sub-tabs
+
+**WhatsApp Components:** `src/lib/whatsapp/`
+- `whatsapp-client.ts` — Meta Cloud API wrapper
+- `message-processor.ts` — Incoming message orchestration
+- `message-sender.ts` — Outbound message handling
+- `session-manager.ts` — 24-hour window tracking
+- `client-linker.ts` — Phone-to-client matching
+- `formatters.ts` — WhatsApp markdown conversion
+
+**Admin Component:** `src/components/admin/WhatsAppTab.tsx`
+- Conversations sub-tab with real-time messaging
+- Templates sub-tab for template management
+- Analytics sub-tab with engagement metrics
+
+**Database Tables:** `whatsappConversations`, `whatsappMessages`, `whatsappTemplates`
+
+**Template Messages (for Meta approval):**
+- `session_greeting` — Re-engage after 24-hour expiry
+- `quote_ready` — Quote PDF notification
+- `booking_confirmed` — Booking confirmation
+- `payment_reminder` — Payment due reminder
+- `trip_briefing` — Pre-departure briefing
+
+### 🔮 Phase 6: Future Enhancements
 - **Mobile App** — React Native companion app
-- **WhatsApp Integration** — AI chat via WhatsApp Business API
 - **Video Consultations** — Scheduled video calls with travel experts
 - **AR/VR Previews** — Virtual destination tours
 - **Carbon Offset** — Sustainability tracking and offsets
@@ -438,3 +490,14 @@ Autonomous content creation for organic traffic and social media:
 | GET | `/api/supplier/auth/me` | Current supplier |
 | GET | `/api/supplier/bookings` | Supplier's bookings |
 | GET/PUT | `/api/supplier/rates` | Supplier's rates |
+
+### WhatsApp APIs
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/api/whatsapp/webhook` | Meta webhook verification |
+| POST | `/api/whatsapp/webhook` | Incoming messages & status |
+| POST | `/api/whatsapp/send` | Send outbound message |
+| GET | `/api/admin/whatsapp/conversations` | List conversations |
+| GET | `/api/admin/whatsapp/conversations/[id]` | Conversation detail |
+| POST | `/api/admin/whatsapp/conversations` | Link conversation to client |
+| GET/POST/PUT/DELETE | `/api/admin/whatsapp/templates` | Template management |
