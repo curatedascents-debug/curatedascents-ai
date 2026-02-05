@@ -13,6 +13,9 @@ import {
   saveConversationMessage,
   buildPersonalizedSystemPrompt,
 } from "@/lib/agents/expedition-architect-enhanced";
+import { db } from "@/db";
+import { clients } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
@@ -120,6 +123,14 @@ You help clients plan extraordinary journeys by:
 - Mention what's included and excluded
 - Offer to prepare a detailed proposal
 
+### Language Rules:
+1. Detect the language of the user's message and ALWAYS respond in that same language.
+2. If the user switches language mid-conversation, switch with them immediately.
+3. Keep tool calls (function names and arguments) in English — only your natural-language responses should be in the user's language.
+4. Use number/date formatting conventions appropriate to the user's language and locale.
+5. If you cannot determine the language from the first message, default to English.
+6. All pricing rules and security constraints apply regardless of language. NEVER reveal cost, margin, or internal pricing data in ANY language.
+
 ${FALLBACK_SYSTEM_PROMPT}
 
 ## Destinations You Specialize In:
@@ -160,6 +171,44 @@ export interface ChatProcessorResult {
   error?: string;
 }
 
+// ─── LANGUAGE DETECTION ─────────────────────────────────────────────────────
+/**
+ * Detect non-Latin scripts using Unicode ranges.
+ * Returns a BCP 47 language hint or null for Latin/unknown scripts.
+ */
+function detectLanguageScript(text: string): string | null {
+  // Strip whitespace and punctuation for analysis
+  const cleaned = text.replace(/[\s\p{P}\p{S}\d]/gu, "");
+  if (cleaned.length === 0) return null;
+
+  const scriptTests: Array<{ pattern: RegExp; lang: string }> = [
+    { pattern: /[\u0900-\u097F]/u, lang: "hi" },       // Devanagari (Hindi/Nepali)
+    { pattern: /[\u4E00-\u9FFF]/u, lang: "zh" },       // CJK Unified (Chinese)
+    { pattern: /[\u3040-\u309F\u30A0-\u30FF]/u, lang: "ja" }, // Hiragana + Katakana (Japanese)
+    { pattern: /[\uAC00-\uD7AF]/u, lang: "ko" },       // Hangul (Korean)
+    { pattern: /[\u0600-\u06FF]/u, lang: "ar" },       // Arabic
+    { pattern: /[\u0400-\u04FF]/u, lang: "ru" },       // Cyrillic (Russian default)
+    { pattern: /[\u0E00-\u0E7F]/u, lang: "th" },       // Thai
+    { pattern: /[\u0980-\u09FF]/u, lang: "bn" },       // Bengali
+    { pattern: /[\u0A80-\u0AFF]/u, lang: "gu" },       // Gujarati
+    { pattern: /[\u0B80-\u0BFF]/u, lang: "ta" },       // Tamil
+    { pattern: /[\u0C00-\u0C7F]/u, lang: "te" },       // Telugu
+    { pattern: /[\u0C80-\u0CFF]/u, lang: "kn" },       // Kannada
+    { pattern: /[\u0D00-\u0D7F]/u, lang: "ml" },       // Malayalam
+    { pattern: /[\u0A00-\u0A7F]/u, lang: "pa" },       // Gurmukhi (Punjabi)
+    { pattern: /[\u1200-\u137F]/u, lang: "am" },       // Ethiopic (Amharic)
+    { pattern: /[\u0D80-\u0DFF]/u, lang: "si" },       // Sinhala
+    { pattern: /[\u1000-\u109F]/u, lang: "my" },       // Myanmar (Burmese)
+    { pattern: /[\u0F00-\u0FFF]/u, lang: "bo" },       // Tibetan
+  ];
+
+  for (const { pattern, lang } of scriptTests) {
+    if (pattern.test(cleaned)) return lang;
+  }
+
+  return null; // Latin or undetermined
+}
+
 /**
  * Process a chat message through the AI
  */
@@ -191,6 +240,15 @@ export async function processChatMessage(
           role: "user",
           content: latestUserMessage.content,
         }).catch((err) => console.error("Failed to save message:", err));
+
+        // Detect non-English language and update client locale
+        const detectedLang = detectLanguageScript(latestUserMessage.content);
+        if (detectedLang && detectedLang !== "en") {
+          db.update(clients)
+            .set({ locale: detectedLang })
+            .where(eq(clients.id, clientId))
+            .catch((err) => console.error("Failed to update client locale:", err));
+        }
       }
     }
 

@@ -387,12 +387,26 @@ AI chat via WhatsApp with full tool-calling capabilities:
 - `payment_reminder` — Payment due reminder
 - `trip_briefing` — Pre-departure briefing
 
+### ✅ Phase 5.2: Multi-Language AI Chat (Complete)
+Prompt-driven multilingual support — no i18n library needed:
+- **Auto Language Detection** — AI detects user's language and responds in kind
+- **Mid-Conversation Switching** — Seamlessly switches when user changes language
+- **Script-Based Locale Storage** — Detects non-Latin scripts (CJK, Devanagari, Arabic, Cyrillic, Thai, etc.) and stores locale on client record
+- **Personalized Language Preference** — Uses `clientContentPreferences.preferredLanguage` in system prompt
+- **WhatsApp Language Support** — Media acknowledgments routed through AI for language-aware responses
+- **Security Preserved** — All pricing/margin rules enforced regardless of language
+- **Tool Calls Stay English** — Only natural-language responses are translated
+
+**Files Modified:**
+- `src/lib/agents/chat-processor.ts` — Language rules in system prompt, `detectLanguageScript()` helper, locale storage
+- `src/lib/agents/expedition-architect-enhanced.ts` — Preferred language in personalized prompt
+- `src/lib/whatsapp/message-processor.ts` — AI-routed media acknowledgments
+
 ### 🔮 Phase 6: Future Enhancements
 - **Mobile App** — React Native companion app
 - **Video Consultations** — Scheduled video calls with travel experts
 - **AR/VR Previews** — Virtual destination tours
 - **Carbon Offset** — Sustainability tracking and offsets
-- **Multi-language** — AI chat in multiple languages
 
 ## API Endpoints Reference
 

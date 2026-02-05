@@ -158,11 +158,19 @@ async function processIncomingMessage(
       await sendAIResponse(conversation.id, aiResponse);
     }
   } else if (messageType === 'image' || messageType === 'document') {
-    // Acknowledge media messages
-    aiResponse =
-      "Thank you for sharing that. I can see you've sent a " +
-      messageType +
-      '. How can I help you with your travel plans?';
+    // Acknowledge media messages through AI so it respects the user's language
+    const history = await loadConversationHistory(conversation.id);
+    const mediaPrompt = `[The user sent a ${messageType}. Briefly acknowledge it and ask how you can help with their travel plans.]`;
+    const aiResult = await processWhatsAppMessage(
+      mediaPrompt,
+      conversation.clientId || undefined,
+      history
+    );
+    if (aiResult.success && aiResult.response) {
+      aiResponse = aiResult.response;
+    } else {
+      aiResponse = "Thank you for sharing that. How can I help with your travel plans?";
+    }
     await sendAIResponse(conversation.id, aiResponse);
   }
 

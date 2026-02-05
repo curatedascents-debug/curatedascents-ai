@@ -868,6 +868,9 @@ You are speaking with ${clientProfile.name || "a returning client"}.`;
     if (clientProfile.preferences.communicationStyle) {
       prompt += `\n- Communication Preference: ${clientProfile.preferences.communicationStyle}`;
     }
+    if (clientProfile.preferences.preferredLanguage && clientProfile.preferences.preferredLanguage !== "en") {
+      prompt += `\n- Preferred Language: ${clientProfile.preferences.preferredLanguage} (respond in this language unless the user writes in a different language)`;
+    }
     if (clientProfile.preferences.dietaryRestrictions?.length) {
       prompt += `\n- Dietary Restrictions: ${clientProfile.preferences.dietaryRestrictions.join(", ")}`;
     }
