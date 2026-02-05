@@ -232,8 +232,8 @@ All React components in `src/components/` are client components (`"use client"`)
 | Weekly | `/api/cron/feedback-requests` | Post-trip feedback requests |
 | Monthly | `/api/cron/points-expiry` | Loyalty points expiry warnings |
 | Daily | `/api/cron/invoice-overdue` | Overdue invoice reminders |
-| Hourly | `/api/cron/blog-publishing` | Publish scheduled blog posts |
-| Every 30 min | `/api/cron/social-media-posting` | Social media distribution |
+| Daily 6 AM | `/api/cron/blog-publishing` | Publish scheduled blog posts |
+| Daily 7 AM | `/api/cron/social-media-posting` | Social media distribution |
 
 ## User Roles
 
@@ -331,8 +331,8 @@ Autonomous content creation for organic traffic and social media:
 **Database Tables:** `blogCategories`, `blogPosts`, `blogSocialPosts`
 
 **Cron Jobs:**
-- Hourly: `/api/cron/blog-publishing` — Publish scheduled posts
-- Every 30 min: `/api/cron/social-media-posting` — Social media distribution
+- Daily 6 AM: `/api/cron/blog-publishing` — Publish scheduled posts
+- Daily 7 AM: `/api/cron/social-media-posting` — Social media distribution
 
 ### 🔮 Phase 5: Future Enhancements
 - **Mobile App** — React Native companion app
