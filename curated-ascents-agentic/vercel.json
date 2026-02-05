@@ -43,6 +43,10 @@
     {
       "path": "/api/cron/release-expired-holds",
       "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/supplier-performance",
+      "schedule": "0 4 * * *"
     }
   ]
 }

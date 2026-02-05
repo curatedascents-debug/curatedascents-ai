@@ -1946,3 +1946,207 @@ export const availabilitySyncLog = pgTable('availability_sync_log', {
 
   createdAt: timestamp('created_at').defaultNow(),
 });
+
+// ============================================
+// SUPPLIER RELATIONS TABLES
+// ============================================
+
+// Supplier performance tracking - aggregated metrics
+export const supplierPerformance = pgTable('supplier_performance', {
+  id: serial('id').primaryKey(),
+  supplierId: integer('supplier_id').references(() => suppliers.id).notNull(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Performance period
+  periodStart: date('period_start').notNull(),
+  periodEnd: date('period_end').notNull(),
+
+  // Response metrics
+  totalRequests: integer('total_requests').default(0),
+  respondedRequests: integer('responded_requests').default(0),
+  confirmedRequests: integer('confirmed_requests').default(0),
+  declinedRequests: integer('declined_requests').default(0),
+
+  // Response time (in hours)
+  avgResponseTimeHours: decimal('avg_response_time_hours', { precision: 10, scale: 2 }),
+  minResponseTimeHours: decimal('min_response_time_hours', { precision: 10, scale: 2 }),
+  maxResponseTimeHours: decimal('max_response_time_hours', { precision: 10, scale: 2 }),
+
+  // Quality metrics
+  confirmationRate: decimal('confirmation_rate', { precision: 5, scale: 2 }), // Percentage
+  onTimeDeliveryRate: decimal('on_time_delivery_rate', { precision: 5, scale: 2 }),
+  issueRate: decimal('issue_rate', { precision: 5, scale: 2 }), // Problems reported
+
+  // Booking metrics
+  totalBookings: integer('total_bookings').default(0),
+  totalRevenue: decimal('total_revenue', { precision: 12, scale: 2 }),
+  cancelledBookings: integer('cancelled_bookings').default(0),
+
+  // Overall score (0-100)
+  performanceScore: decimal('performance_score', { precision: 5, scale: 2 }),
+  reliabilityScore: decimal('reliability_score', { precision: 5, scale: 2 }),
+  qualityScore: decimal('quality_score', { precision: 5, scale: 2 }),
+  overallScore: decimal('overall_score', { precision: 5, scale: 2 }),
+
+  // Tier based on performance
+  performanceTier: text('performance_tier').default('standard'), // premium, standard, probation
+
+  calculatedAt: timestamp('calculated_at').defaultNow(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Supplier communication log - track all interactions
+export const supplierCommunications = pgTable('supplier_communications', {
+  id: serial('id').primaryKey(),
+  supplierId: integer('supplier_id').references(() => suppliers.id).notNull(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Communication type
+  communicationType: text('communication_type').notNull(), // booking_request, rate_request, confirmation_request, followup, general
+
+  // Related entities
+  bookingId: integer('booking_id').references(() => bookings.id),
+  quoteId: integer('quote_id').references(() => quotes.id),
+  confirmationRequestId: integer('confirmation_request_id').references(() => supplierConfirmationRequests.id),
+
+  // Communication details
+  subject: text('subject'),
+  message: text('message'),
+  channel: text('channel').default('email'), // email, phone, whatsapp, portal
+
+  // Direction
+  direction: text('direction').notNull(), // outbound, inbound
+
+  // Status
+  status: text('status').default('sent'), // draft, sent, delivered, read, replied, failed
+  sentAt: timestamp('sent_at'),
+  deliveredAt: timestamp('delivered_at'),
+  readAt: timestamp('read_at'),
+  repliedAt: timestamp('replied_at'),
+
+  // Recipient info
+  recipientEmail: text('recipient_email'),
+  recipientName: text('recipient_name'),
+
+  // Response tracking
+  responseRequired: boolean('response_required').default(false),
+  responseDeadline: timestamp('response_deadline'),
+  hasResponse: boolean('has_response').default(false),
+  responseReceivedAt: timestamp('response_received_at'),
+
+  // Attachments
+  attachments: jsonb('attachments'), // Array of { name, url, type }
+
+  // Email tracking
+  emailMessageId: text('email_message_id'),
+  emailThreadId: text('email_thread_id'),
+
+  sentBy: text('sent_by'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Supplier rate requests - request rates from suppliers
+export const supplierRateRequests = pgTable('supplier_rate_requests', {
+  id: serial('id').primaryKey(),
+  supplierId: integer('supplier_id').references(() => suppliers.id).notNull(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Request details
+  requestType: text('request_type').notNull(), // seasonal_rates, special_rates, group_rates, event_rates
+  serviceTypes: jsonb('service_types'), // Array of service types requested
+
+  // Date range for rates
+  validFrom: date('valid_from').notNull(),
+  validTo: date('valid_to').notNull(),
+
+  // Request status
+  status: text('status').default('pending'), // pending, sent, received, processed, cancelled
+  priority: text('priority').default('normal'), // urgent, high, normal, low
+
+  // Communication
+  sentAt: timestamp('sent_at'),
+  sentTo: text('sent_to'), // Email address
+  sentBy: text('sent_by'),
+
+  // Response
+  receivedAt: timestamp('received_at'),
+  responseNotes: text('response_notes'),
+  ratesReceived: boolean('rates_received').default(false),
+  ratesProcessedAt: timestamp('rates_processed_at'),
+
+  // Reminders
+  reminderCount: integer('reminder_count').default(0),
+  lastReminderAt: timestamp('last_reminder_at'),
+  nextReminderAt: timestamp('next_reminder_at'),
+
+  // Notes
+  internalNotes: text('internal_notes'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Supplier issues/incidents tracking
+export const supplierIssues = pgTable('supplier_issues', {
+  id: serial('id').primaryKey(),
+  supplierId: integer('supplier_id').references(() => suppliers.id).notNull(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Related entities
+  bookingId: integer('booking_id').references(() => bookings.id),
+  confirmationRequestId: integer('confirmation_request_id').references(() => supplierConfirmationRequests.id),
+
+  // Issue details
+  issueType: text('issue_type').notNull(), // no_response, late_response, service_quality, overbooking, cancellation, pricing_dispute, other
+  severity: text('severity').default('medium'), // critical, high, medium, low
+  description: text('description').notNull(),
+
+  // Status
+  status: text('status').default('open'), // open, investigating, resolved, closed
+
+  // Resolution
+  resolution: text('resolution'),
+  resolvedAt: timestamp('resolved_at'),
+  resolvedBy: text('resolved_by'),
+
+  // Impact
+  financialImpact: decimal('financial_impact', { precision: 10, scale: 2 }),
+  clientImpacted: boolean('client_impacted').default(false),
+  compensationProvided: boolean('compensation_provided').default(false),
+  compensationAmount: decimal('compensation_amount', { precision: 10, scale: 2 }),
+
+  reportedBy: text('reported_by'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Preferred supplier rankings by service type
+export const supplierRankings = pgTable('supplier_rankings', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Service categorization
+  serviceType: text('service_type').notNull(), // hotel, transport, helicopter, etc.
+  destinationId: integer('destination_id').references(() => destinations.id),
+  country: text('country'),
+
+  // Ranked suppliers (ordered array)
+  rankedSuppliers: jsonb('ranked_suppliers').notNull(), // Array of { supplierId, rank, score, notes }
+
+  // Ranking criteria weights
+  criteriaWeights: jsonb('criteria_weights'), // { responseTime: 0.3, confirmationRate: 0.3, quality: 0.2, price: 0.2 }
+
+  // Auto-calculated or manual
+  isAutoCalculated: boolean('is_auto_calculated').default(true),
+  lastCalculatedAt: timestamp('last_calculated_at'),
+
+  // Override
+  manualOverride: boolean('manual_override').default(false),
+  overrideReason: text('override_reason'),
+  overrideBy: text('override_by'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
