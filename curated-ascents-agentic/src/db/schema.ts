@@ -2150,3 +2150,286 @@ export const supplierRankings = pgTable('supplier_rankings', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
+
+// ============================================
+// RISK & COMPLIANCE TABLES
+// ============================================
+
+// Travel advisories for destinations
+export const travelAdvisories = pgTable('travel_advisories', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Location
+  country: text('country').notNull(),
+  region: text('region'), // Specific region/state if applicable
+  destinationId: integer('destination_id').references(() => destinations.id),
+
+  // Advisory details
+  advisoryLevel: text('advisory_level').notNull(), // level_1_exercise_caution, level_2_increased_caution, level_3_reconsider_travel, level_4_do_not_travel
+  advisoryTitle: text('advisory_title').notNull(),
+  advisoryDescription: text('advisory_description'),
+  advisoryType: text('advisory_type').notNull(), // health, security, natural_disaster, political, covid, general
+
+  // Source information
+  source: text('source'), // US State Dept, UK FCO, Local Government, Internal
+  sourceUrl: text('source_url'),
+  externalId: text('external_id'), // ID from external source
+
+  // Validity
+  effectiveFrom: date('effective_from').notNull(),
+  effectiveTo: date('effective_to'),
+  isActive: boolean('is_active').default(true),
+
+  // Impact assessment
+  impactLevel: text('impact_level').default('moderate'), // minimal, moderate, significant, severe
+  affectedServices: jsonb('affected_services'), // Array of service types affected
+
+  // Actions taken
+  clientsNotified: boolean('clients_notified').default(false),
+  notifiedAt: timestamp('notified_at'),
+  internalNotes: text('internal_notes'),
+
+  createdBy: text('created_by'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Weather alerts for destinations
+export const weatherAlerts = pgTable('weather_alerts', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Location
+  country: text('country').notNull(),
+  region: text('region'),
+  destinationId: integer('destination_id').references(() => destinations.id),
+  coordinates: jsonb('coordinates'), // { lat, lng }
+
+  // Alert details
+  alertType: text('alert_type').notNull(), // storm, flood, avalanche, extreme_heat, extreme_cold, wildfire, earthquake, other
+  severity: text('severity').notNull(), // watch, warning, advisory, emergency
+  alertTitle: text('alert_title').notNull(),
+  alertDescription: text('alert_description'),
+
+  // Weather data
+  weatherData: jsonb('weather_data'), // Temperature, conditions, etc.
+
+  // Timing
+  expectedStart: timestamp('expected_start'),
+  expectedEnd: timestamp('expected_end'),
+  isActive: boolean('is_active').default(true),
+
+  // Source
+  source: text('source'), // Weather API, Local Authority, Internal
+  externalId: text('external_id'),
+
+  // Actions
+  affectedBookings: jsonb('affected_bookings'), // Array of booking IDs
+  clientsNotified: boolean('clients_notified').default(false),
+  notifiedAt: timestamp('notified_at'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Compliance requirements and checks
+export const complianceRequirements = pgTable('compliance_requirements', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // What this requirement applies to
+  country: text('country'),
+  destinationId: integer('destination_id').references(() => destinations.id),
+  serviceType: text('service_type'), // If applicable to specific service
+
+  // Requirement details
+  requirementType: text('requirement_type').notNull(), // visa, permit, vaccination, insurance, registration, equipment
+  requirementName: text('requirement_name').notNull(),
+  description: text('description'),
+
+  // Applicability
+  applicableTo: text('applicable_to').default('all'), // all, foreign_nationals, specific_nationalities
+  applicableNationalities: jsonb('applicable_nationalities'), // Array of country codes if specific
+
+  // Processing
+  processingDays: integer('processing_days'),
+  costEstimate: decimal('cost_estimate', { precision: 10, scale: 2 }),
+  currency: text('currency').default('USD'),
+
+  // Documentation
+  requiredDocuments: jsonb('required_documents'), // Array of document names
+  applicationProcess: text('application_process'),
+  issuingAuthority: text('issuing_authority'),
+  authorityContact: jsonb('authority_contact'), // { phone, email, website }
+
+  // Validity
+  validFrom: date('valid_from'),
+  validTo: date('valid_to'),
+  isActive: boolean('is_active').default(true),
+  isMandatory: boolean('is_mandatory').default(true),
+
+  // Last verification
+  lastVerifiedAt: timestamp('last_verified_at'),
+  verifiedBy: text('verified_by'),
+  verificationNotes: text('verification_notes'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Booking compliance status tracking
+export const bookingComplianceChecks = pgTable('booking_compliance_checks', {
+  id: serial('id').primaryKey(),
+  bookingId: integer('booking_id').references(() => bookings.id).notNull(),
+  requirementId: integer('requirement_id').references(() => complianceRequirements.id).notNull(),
+
+  // Client-specific
+  clientId: integer('client_id').references(() => clients.id),
+
+  // Check status
+  status: text('status').default('pending'), // pending, in_progress, completed, not_applicable, waived
+
+  // Document tracking
+  documentProvided: boolean('document_provided').default(false),
+  documentName: text('document_name'),
+  documentReference: text('document_reference'),
+  documentExpiryDate: date('document_expiry_date'),
+
+  // Verification
+  verifiedAt: timestamp('verified_at'),
+  verifiedBy: text('verified_by'),
+  verificationNotes: text('verification_notes'),
+
+  // Reminders
+  reminderSentAt: timestamp('reminder_sent_at'),
+  reminderCount: integer('reminder_count').default(0),
+
+  // Waiver if applicable
+  waivedAt: timestamp('waived_at'),
+  waivedBy: text('waived_by'),
+  waiverReason: text('waiver_reason'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Emergency contacts by region
+export const emergencyContacts = pgTable('emergency_contacts', {
+  id: serial('id').primaryKey(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Location
+  country: text('country').notNull(),
+  region: text('region'),
+  destinationId: integer('destination_id').references(() => destinations.id),
+
+  // Contact type
+  contactType: text('contact_type').notNull(), // embassy, hospital, police, rescue, local_partner, agency_emergency
+  contactName: text('contact_name').notNull(),
+  organization: text('organization'),
+
+  // Contact details
+  phoneNumber: text('phone_number'),
+  alternatePhone: text('alternate_phone'),
+  whatsapp: text('whatsapp'),
+  email: text('email'),
+  address: text('address'),
+  coordinates: jsonb('coordinates'), // { lat, lng }
+
+  // Availability
+  availability: text('availability').default('24_7'), // 24_7, business_hours, on_call
+  operatingHours: text('operating_hours'),
+  languages: jsonb('languages'), // Array of languages spoken
+
+  // Priority
+  priority: integer('priority').default(1), // 1 = primary, 2 = secondary, etc.
+  isActive: boolean('is_active').default(true),
+
+  // Notes
+  specialInstructions: text('special_instructions'),
+  internalNotes: text('internal_notes'),
+
+  lastVerifiedAt: timestamp('last_verified_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Risk assessments for bookings
+export const bookingRiskAssessments = pgTable('booking_risk_assessments', {
+  id: serial('id').primaryKey(),
+  bookingId: integer('booking_id').references(() => bookings.id).notNull(),
+  agencyId: integer('agency_id').references(() => agencies.id),
+
+  // Assessment period
+  assessmentDate: date('assessment_date').notNull(),
+
+  // Overall risk score (0-100, higher = more risk)
+  overallRiskScore: decimal('overall_risk_score', { precision: 5, scale: 2 }),
+  riskLevel: text('risk_level').notNull(), // low, moderate, elevated, high, critical
+
+  // Component scores
+  weatherRiskScore: decimal('weather_risk_score', { precision: 5, scale: 2 }),
+  securityRiskScore: decimal('security_risk_score', { precision: 5, scale: 2 }),
+  healthRiskScore: decimal('health_risk_score', { precision: 5, scale: 2 }),
+  operationalRiskScore: decimal('operational_risk_score', { precision: 5, scale: 2 }),
+  complianceRiskScore: decimal('compliance_risk_score', { precision: 5, scale: 2 }),
+
+  // Risk factors identified
+  riskFactors: jsonb('risk_factors'), // Array of { factor, severity, description, mitigation }
+
+  // Active advisories affecting this booking
+  activeAdvisories: jsonb('active_advisories'), // Array of advisory IDs
+  activeWeatherAlerts: jsonb('active_weather_alerts'), // Array of alert IDs
+
+  // Compliance status
+  complianceComplete: boolean('compliance_complete').default(false),
+  pendingRequirements: jsonb('pending_requirements'), // Array of requirement IDs
+
+  // Recommendations
+  recommendations: jsonb('recommendations'), // Array of { action, priority, description }
+
+  // Mitigation actions taken
+  mitigationActions: jsonb('mitigation_actions'), // Array of { action, takenAt, takenBy }
+
+  // Client notification
+  clientNotified: boolean('client_notified').default(false),
+  notifiedAt: timestamp('notified_at'),
+  clientAcknowledged: boolean('client_acknowledged').default(false),
+  acknowledgedAt: timestamp('acknowledged_at'),
+
+  assessedBy: text('assessed_by'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Risk alert notifications sent to clients
+export const riskAlertNotifications = pgTable('risk_alert_notifications', {
+  id: serial('id').primaryKey(),
+
+  // What triggered the alert
+  alertType: text('alert_type').notNull(), // weather, advisory, compliance, emergency
+  sourceType: text('source_type'), // travel_advisory, weather_alert, compliance_check
+  sourceId: integer('source_id'),
+
+  // Who was notified
+  bookingId: integer('booking_id').references(() => bookings.id),
+  clientId: integer('client_id').references(() => clients.id),
+
+  // Notification details
+  notificationChannel: text('notification_channel').notNull(), // email, sms, whatsapp, push
+  subject: text('subject'),
+  message: text('message'),
+
+  // Status
+  status: text('status').default('pending'), // pending, sent, delivered, failed
+  sentAt: timestamp('sent_at'),
+  deliveredAt: timestamp('delivered_at'),
+  failureReason: text('failure_reason'),
+
+  // Response
+  clientResponse: text('client_response'),
+  respondedAt: timestamp('responded_at'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+});
