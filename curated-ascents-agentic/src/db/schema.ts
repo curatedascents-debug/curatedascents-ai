@@ -2516,3 +2516,281 @@ export const supportMessages = pgTable('support_messages', {
 
   createdAt: timestamp('created_at').defaultNow(),
 });
+
+// ============================================
+// CONTENT & PERSONALIZATION AGENT TABLES
+// ============================================
+
+// Content type enum
+export const contentTypeEnum = pgEnum('content_type', [
+  'destination_overview',
+  'destination_highlights',
+  'travel_tips',
+  'packing_list',
+  'cultural_notes',
+  'activity_description',
+  'hotel_description',
+  'itinerary_narrative',
+  'email_template',
+  'testimonial_snippet'
+]);
+
+// Language enum for multi-language support
+export const languageEnum = pgEnum('language', [
+  'en',  // English
+  'hi',  // Hindi
+  'zh',  // Mandarin Chinese
+  'es',  // Spanish
+  'fr',  // French
+  'de'   // German
+]);
+
+// Destination content library - reusable content per destination
+export const destinationContent = pgTable('destination_content', {
+  id: serial('id').primaryKey(),
+  destinationId: integer('destination_id').references(() => destinations.id),
+
+  // Content identification
+  contentType: text('content_type').notNull(), // destination_overview, highlights, tips, etc.
+  language: text('language').default('en').notNull(),
+  title: text('title').notNull(),
+
+  // Content body
+  content: text('content').notNull(), // Main content text
+  summary: text('summary'), // Short version for previews
+  highlights: jsonb('highlights'), // Array of key points
+
+  // SEO and search
+  keywords: jsonb('keywords'), // Array of searchable keywords
+  tags: jsonb('tags'), // Array of category tags
+
+  // Seasonal variations
+  seasonalVariations: jsonb('seasonal_variations'), // { spring: "...", monsoon: "...", autumn: "...", winter: "..." }
+
+  // Media associations
+  featuredImage: text('featured_image'), // Primary image URL
+  gallery: jsonb('gallery'), // Array of { url, caption, alt }
+
+  // Usage tracking
+  usageCount: integer('usage_count').default(0),
+  lastUsedAt: timestamp('last_used_at'),
+
+  // Quality control
+  isApproved: boolean('is_approved').default(false),
+  approvedBy: text('approved_by'),
+  approvedAt: timestamp('approved_at'),
+
+  // Version control
+  version: integer('version').default(1),
+  previousVersionId: integer('previous_version_id'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Content templates - reusable templates for emails, PDFs, etc.
+export const contentTemplates = pgTable('content_templates', {
+  id: serial('id').primaryKey(),
+
+  // Template identification
+  name: text('name').notNull(),
+  slug: text('slug').notNull().unique(), // e.g., 'quote-intro', 'booking-welcome'
+  category: text('category').notNull(), // email, pdf, sms, notification
+  subcategory: text('subcategory'), // quote, booking, nurture, marketing
+
+  // Template content
+  subject: text('subject'), // For emails
+  content: text('content').notNull(), // Main template with {{placeholders}}
+  htmlContent: text('html_content'), // Rich HTML version
+  plainTextContent: text('plain_text_content'), // Plain text fallback
+
+  // Personalization tokens
+  availableTokens: jsonb('available_tokens'), // Array of { token: "{{name}}", description: "..." }
+  requiredTokens: jsonb('required_tokens'), // Tokens that must be provided
+
+  // Variants
+  language: text('language').default('en').notNull(),
+  variants: jsonb('variants'), // { luxury: "...", adventure: "...", budget: "..." }
+
+  // Usage and testing
+  isActive: boolean('is_active').default(true),
+  usageCount: integer('usage_count').default(0),
+  lastUsedAt: timestamp('last_used_at'),
+
+  // A/B testing
+  isTestVariant: boolean('is_test_variant').default(false),
+  parentTemplateId: integer('parent_template_id'),
+  testWeight: integer('test_weight').default(50), // Percentage weight in A/B test
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Content assets - photos, videos, documents
+export const contentAssets = pgTable('content_assets', {
+  id: serial('id').primaryKey(),
+
+  // Asset identification
+  name: text('name').notNull(),
+  filename: text('filename').notNull(),
+  assetType: text('asset_type').notNull(), // image, video, document, audio
+
+  // Storage
+  url: text('url').notNull(),
+  thumbnailUrl: text('thumbnail_url'),
+  storageProvider: text('storage_provider').default('local'), // local, s3, cloudinary
+  storagePath: text('storage_path'),
+
+  // Metadata
+  mimeType: text('mime_type'),
+  fileSize: integer('file_size'), // bytes
+  dimensions: jsonb('dimensions'), // { width, height } for images/videos
+  duration: integer('duration'), // seconds for videos/audio
+
+  // Content associations
+  destinationId: integer('destination_id').references(() => destinations.id),
+  hotelId: integer('hotel_id').references(() => hotels.id),
+  supplierId: integer('supplier_id').references(() => suppliers.id),
+
+  // Categorization
+  category: text('category'), // landscape, activity, food, culture, wildlife
+  tags: jsonb('tags'), // Array of tags
+  caption: text('caption'),
+  altText: text('alt_text'),
+  credits: text('credits'), // Photographer/source credits
+
+  // Rights management
+  licenseType: text('license_type'), // owned, licensed, royalty_free
+  licenseExpiry: timestamp('license_expiry'),
+  usageRights: jsonb('usage_rights'), // { web: true, print: true, social: true }
+
+  // Quality and usage
+  qualityScore: integer('quality_score'), // 1-10 rating
+  usageCount: integer('usage_count').default(0),
+  isFeatured: boolean('is_featured').default(false),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Generated content cache - AI-generated content for reuse
+export const generatedContent = pgTable('generated_content', {
+  id: serial('id').primaryKey(),
+
+  // What was generated
+  contentType: text('content_type').notNull(), // itinerary_narrative, destination_guide, email_body
+  language: text('language').default('en').notNull(),
+
+  // Input context
+  contextType: text('context_type'), // quote, booking, client, destination
+  contextId: integer('context_id'), // ID of the related entity
+  inputData: jsonb('input_data'), // The data used to generate content
+
+  // Generated output
+  content: text('content').notNull(),
+  metadata: jsonb('metadata'), // Additional structured data from generation
+
+  // Generation details
+  modelUsed: text('model_used'), // deepseek-chat, gpt-4, etc.
+  promptTemplate: text('prompt_template'), // Which prompt was used
+  generationParams: jsonb('generation_params'), // temperature, max_tokens, etc.
+  tokensUsed: integer('tokens_used'),
+
+  // Quality and approval
+  qualityScore: integer('quality_score'), // 1-10 rating
+  wasEdited: boolean('was_edited').default(false),
+  editedContent: text('edited_content'),
+  isApproved: boolean('is_approved').default(false),
+  approvedBy: text('approved_by'),
+
+  // Caching
+  expiresAt: timestamp('expires_at'),
+  usageCount: integer('usage_count').default(0),
+  lastUsedAt: timestamp('last_used_at'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Client content preferences - personalization settings per client
+export const clientContentPreferences = pgTable('client_content_preferences', {
+  id: serial('id').primaryKey(),
+  clientId: integer('client_id').references(() => clients.id).notNull().unique(),
+
+  // Communication preferences
+  preferredLanguage: text('preferred_language').default('en'),
+  formalityLevel: text('formality_level').default('professional'), // casual, professional, formal
+  communicationStyle: text('communication_style').default('detailed'), // brief, detailed, comprehensive
+
+  // Content interests
+  interests: jsonb('interests'), // Array of interest tags
+  preferredActivities: jsonb('preferred_activities'), // trekking, cultural, wildlife, etc.
+  travelStyle: text('travel_style'), // luxury, comfort, adventure, budget
+
+  // Personalization data
+  specialOccasions: jsonb('special_occasions'), // { birthday: "...", anniversary: "..." }
+  dietaryRestrictions: jsonb('dietary_restrictions'),
+  accessibilityNeeds: jsonb('accessibility_needs'),
+
+  // Past content engagement
+  contentEngagement: jsonb('content_engagement'), // { opened: [], clicked: [], ignored: [] }
+  preferredTopics: jsonb('preferred_topics'), // Topics they engage with most
+
+  // Do not contact preferences
+  emailOptOut: boolean('email_opt_out').default(false),
+  smsOptOut: boolean('sms_opt_out').default(false),
+  marketingOptOut: boolean('marketing_opt_out').default(false),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Destination guides - generated travel guides per destination
+export const destinationGuides = pgTable('destination_guides', {
+  id: serial('id').primaryKey(),
+  destinationId: integer('destination_id').references(() => destinations.id).notNull(),
+
+  // Guide metadata
+  title: text('title').notNull(),
+  subtitle: text('subtitle'),
+  language: text('language').default('en').notNull(),
+  guideType: text('guide_type').default('comprehensive'), // quick, comprehensive, expert
+
+  // Guide sections (structured content)
+  overview: text('overview'),
+  highlights: jsonb('highlights'), // Array of highlight items
+  bestTimeToVisit: jsonb('best_time_to_visit'), // { months, weather, crowds, prices }
+  gettingThere: text('getting_there'),
+  gettingAround: text('getting_around'),
+  whereToStay: jsonb('where_to_stay'), // Array of accommodation recommendations
+  whatToSee: jsonb('what_to_see'), // Array of attractions with descriptions
+  whatToDo: jsonb('what_to_do'), // Array of activities
+  whereToEat: jsonb('where_to_eat'), // Array of dining recommendations
+  culturalTips: jsonb('cultural_tips'), // Array of cultural notes
+  packingList: jsonb('packing_list'), // Seasonal packing suggestions
+  healthAndSafety: text('health_and_safety'),
+  moneyMatters: text('money_matters'), // Currency, tipping, costs
+  usefulPhrases: jsonb('useful_phrases'), // { phrase, pronunciation, meaning }
+  emergencyInfo: jsonb('emergency_info'), // Contacts, hospitals, embassy
+
+  // Media
+  coverImage: text('cover_image'),
+  gallery: jsonb('gallery'), // Array of images with captions
+
+  // SEO
+  metaDescription: text('meta_description'),
+  keywords: jsonb('keywords'),
+
+  // Publication
+  isPublished: boolean('is_published').default(false),
+  publishedAt: timestamp('published_at'),
+  version: integer('version').default(1),
+  lastReviewedAt: timestamp('last_reviewed_at'),
+
+  // Generation tracking
+  isAutoGenerated: boolean('is_auto_generated').default(false),
+  generatedContentId: integer('generated_content_id').references(() => generatedContent.id),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
