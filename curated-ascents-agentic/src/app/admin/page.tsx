@@ -15,6 +15,7 @@ import AdvancedReportsTab from "@/components/admin/AdvancedReportsTab";
 import SupplierPortalTab from "@/components/admin/SupplierPortalTab";
 import PricingTab from "@/components/admin/PricingTab";
 import NurtureTab from "@/components/admin/NurtureTab";
+import CompetitorTab from "@/components/admin/CompetitorTab";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -88,6 +89,7 @@ export default function AdminDashboard() {
     { key: "agencies" as TabType, label: "Supplier Portal" },
     { key: "pricing" as TabType, label: "Pricing" },
     { key: "nurture" as TabType, label: "Nurture" },
+    { key: "competitors" as TabType, label: "Competitors" },
     { key: "reports" as TabType, label: "Reports" },
   ];
 
@@ -132,6 +134,7 @@ export default function AdminDashboard() {
         {activeTab === "agencies" && <SupplierPortalTab />}
         {activeTab === "pricing" && <PricingTab />}
         {activeTab === "nurture" && <NurtureTab />}
+        {activeTab === "competitors" && <CompetitorTab />}
         {activeTab === "reports" && <AdvancedReportsTab />}
       </div>
     </div>
