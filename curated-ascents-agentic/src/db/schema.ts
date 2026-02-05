@@ -826,6 +826,36 @@ export const paymentMilestones = pgTable('payment_milestones', {
 
   currency: text('currency').default('USD'),
   notes: text('notes'),
+
+  // Stripe integration
+  stripePaymentLinkId: text('stripe_payment_link_id'),
+  stripePaymentLinkUrl: text('stripe_payment_link_url'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Stripe payment tracking
+export const stripePayments = pgTable('stripe_payments', {
+  id: serial('id').primaryKey(),
+  milestoneId: integer('milestone_id').references(() => paymentMilestones.id).notNull(),
+  bookingId: integer('booking_id').references(() => bookings.id).notNull(),
+
+  // Stripe identifiers
+  stripeSessionId: text('stripe_session_id'),
+  stripePaymentIntentId: text('stripe_payment_intent_id'),
+  stripePaymentLinkId: text('stripe_payment_link_id'),
+
+  // Payment info
+  amount: decimal('amount', { precision: 12, scale: 2 }).notNull(),
+  currency: text('currency').default('USD').notNull(),
+
+  // Status: pending, completed, failed, expired, refunded
+  status: text('status').default('pending').notNull(),
+  errorMessage: text('error_message'),
+
+  // Timestamps
+  completedAt: timestamp('completed_at'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

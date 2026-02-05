@@ -65,6 +65,7 @@ export default function BookingDetailModal({ bookingId, onClose, onUpdate, apiBa
   const [emailBanner, setEmailBanner] = useState<{ type: "sent" | "skipped"; message: string } | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "payments" | "suppliers" | "briefings" | "history">("overview");
   const [showEventsExpanded, setShowEventsExpanded] = useState(false);
+  const [stripeLoading, setStripeLoading] = useState<number | null>(null);
 
   useEffect(() => {
     fetchBookingDetails();
@@ -231,6 +232,34 @@ export default function BookingDetailModal({ bookingId, onClose, onUpdate, apiBa
       alert("Failed to generate briefing");
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const createStripeCheckout = async (milestoneId: number, type: "checkout" | "payment_link" = "checkout") => {
+    setStripeLoading(milestoneId);
+    try {
+      const res = await fetch("/api/payments/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ milestoneId, type }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Failed to create payment");
+        return;
+      }
+      if (type === "payment_link") {
+        // Copy payment link to clipboard
+        await navigator.clipboard.writeText(data.url);
+        setEmailBanner({ type: "sent", message: "Payment link copied to clipboard!" });
+      } else {
+        // Redirect to Stripe Checkout
+        window.open(data.url, "_blank");
+      }
+    } catch (error) {
+      alert("Failed to create Stripe checkout");
+    } finally {
+      setStripeLoading(null);
     }
   };
 
@@ -641,18 +670,46 @@ export default function BookingDetailModal({ bookingId, onClose, onUpdate, apiBa
                           )}
                         </div>
 
-                        {/* Action */}
+                        {/* Actions */}
                         {milestone.status !== "paid" && (
-                          <button
-                            onClick={() => setSelectedMilestone(milestone.id)}
-                            className={`px-3 py-1.5 rounded text-sm transition-colors ${
-                              selectedMilestone === milestone.id
-                                ? "bg-emerald-600 text-white"
-                                : "bg-slate-700 hover:bg-slate-600"
-                            }`}
-                          >
-                            {selectedMilestone === milestone.id ? "Selected" : "Pay"}
-                          </button>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => setSelectedMilestone(milestone.id)}
+                              className={`px-3 py-1.5 rounded text-sm transition-colors ${
+                                selectedMilestone === milestone.id
+                                  ? "bg-emerald-600 text-white"
+                                  : "bg-slate-700 hover:bg-slate-600"
+                              }`}
+                              title="Record manual payment"
+                            >
+                              {selectedMilestone === milestone.id ? "Selected" : "Manual"}
+                            </button>
+                            <button
+                              onClick={() => createStripeCheckout(milestone.id, "checkout")}
+                              disabled={stripeLoading === milestone.id}
+                              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-sm transition-colors disabled:opacity-50 flex items-center gap-1"
+                              title="Open Stripe checkout"
+                            >
+                              {stripeLoading === milestone.id ? (
+                                <span className="animate-spin">...</span>
+                              ) : (
+                                <>
+                                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/>
+                                  </svg>
+                                  Card
+                                </>
+                              )}
+                            </button>
+                            <button
+                              onClick={() => createStripeCheckout(milestone.id, "payment_link")}
+                              disabled={stripeLoading === milestone.id}
+                              className="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 rounded text-sm transition-colors disabled:opacity-50"
+                              title="Copy payment link for client"
+                            >
+                              Link
+                            </button>
+                          </div>
                         )}
                       </div>
                     ))}
