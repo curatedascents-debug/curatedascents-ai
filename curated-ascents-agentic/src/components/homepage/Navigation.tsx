@@ -12,6 +12,7 @@ interface NavigationProps {
 const navLinks = [
   { label: "Experiences", href: "#experiences" },
   { label: "Destinations", href: "#destinations" },
+  { label: "Blog", href: "/blog", isExternal: true },
   { label: "About", href: "#about" },
 ];
 
@@ -67,15 +68,25 @@ export default function Navigation({ onChatOpen }: NavigationProps) {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <button
-                  key={link.label}
-                  onClick={() => scrollToSection(link.href)}
-                  className="text-slate-300 hover:text-white transition-colors link-underline"
-                >
-                  {link.label}
-                </button>
-              ))}
+              {navLinks.map((link) =>
+                link.isExternal ? (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className="text-slate-300 hover:text-white transition-colors link-underline"
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <button
+                    key={link.label}
+                    onClick={() => scrollToSection(link.href)}
+                    className="text-slate-300 hover:text-white transition-colors link-underline"
+                  >
+                    {link.label}
+                  </button>
+                )
+              )}
             </nav>
 
             {/* Desktop CTA */}
@@ -146,16 +157,27 @@ export default function Navigation({ onChatOpen }: NavigationProps) {
                   }}
                   className="flex flex-col gap-4"
                 >
-                  {navLinks.map((link) => (
-                    <motion.button
-                      key={link.label}
-                      variants={fadeInUp}
-                      onClick={() => scrollToSection(link.href)}
-                      className="text-left text-2xl font-serif text-white hover:text-emerald-400 transition-colors py-2"
-                    >
-                      {link.label}
-                    </motion.button>
-                  ))}
+                  {navLinks.map((link) =>
+                    link.isExternal ? (
+                      <motion.a
+                        key={link.label}
+                        variants={fadeInUp}
+                        href={link.href}
+                        className="text-left text-2xl font-serif text-white hover:text-emerald-400 transition-colors py-2"
+                      >
+                        {link.label}
+                      </motion.a>
+                    ) : (
+                      <motion.button
+                        key={link.label}
+                        variants={fadeInUp}
+                        onClick={() => scrollToSection(link.href)}
+                        className="text-left text-2xl font-serif text-white hover:text-emerald-400 transition-colors py-2"
+                      >
+                        {link.label}
+                      </motion.button>
+                    )
+                  )}
                 </motion.nav>
 
                 {/* Mobile CTA */}

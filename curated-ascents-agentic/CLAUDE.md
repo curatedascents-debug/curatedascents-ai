@@ -61,6 +61,8 @@ Defined in `.env.local`:
 
 **Public Routes:**
 - `/` — Luxury homepage with floating AI chat widget
+- `/blog` — Blog listing page with category filters
+- `/blog/[slug]` — Individual blog post with related articles
 - `/payment/success` — Payment confirmation page
 - `/payment/cancelled` — Payment cancellation page
 
@@ -230,6 +232,8 @@ All React components in `src/components/` are client components (`"use client"`)
 | Weekly | `/api/cron/feedback-requests` | Post-trip feedback requests |
 | Monthly | `/api/cron/points-expiry` | Loyalty points expiry warnings |
 | Daily | `/api/cron/invoice-overdue` | Overdue invoice reminders |
+| Hourly | `/api/cron/blog-publishing` | Publish scheduled blog posts |
+| Every 30 min | `/api/cron/social-media-posting` | Social media distribution |
 
 ## User Roles
 
@@ -298,21 +302,37 @@ Premium landing page targeting high-net-worth travelers:
 
 **Animations:** `src/lib/animations.ts` — Framer Motion variants
 
-### 🚧 Phase 4.2: AI-Powered Blog & SEO Engine (Planned)
+### ✅ Phase 4.2: AI-Powered Blog & SEO Engine (Complete)
 Autonomous content creation for organic traffic and social media:
-- **AI Blog Writer Agent** — Generates SEO-optimized travel articles
-- **Content Calendar** — Automated weekly/bi-weekly publishing schedule
-- **SEO Optimization** — Meta tags, structured data, keyword targeting
-- **Social Media Integration** — Auto-share to Instagram, Facebook, LinkedIn, Twitter/X
+- **AI Blog Writer Agent** — DeepSeek-powered content generation with structured prompts
+- **Content Calendar** — Admin dashboard with scheduling and bulk management
+- **SEO Optimization** — Auto-generated meta tags, keywords, slugs, read time
+- **Social Media Integration** — Platform-specific formatting for Instagram, Facebook, LinkedIn, Twitter/X
 - **Content Types:**
-  - Destination guides (e.g., "Ultimate Guide to Everest Base Camp")
-  - Travel tips (e.g., "What to Pack for a Himalayan Trek")
-  - Seasonal content (e.g., "Best Time to Visit Bhutan")
-  - Trip reports (with client permission)
-  - Cultural insights (e.g., "Understanding Nepali Festivals")
-- **CTA Integration** — Each blog links to relevant packages/chat
-- **Analytics** — Track blog → inquiry → booking conversion
-- **Admin Controls** — Review/edit before publish, topic suggestions
+  - Destination guides, Travel tips, Packing lists
+  - Cultural insights, Seasonal content, Trip reports
+- **Public Blog** — Responsive blog listing and article pages with markdown rendering
+- **Admin Controls** — Full CRUD, AI generation, category management, analytics
+
+**Blog Components:** `src/components/blog/`
+- `BlogList.tsx` — Category-filtered post grid with pagination
+- `BlogCard.tsx` — Post preview cards with hover effects
+- `BlogPost.tsx` — Full article with markdown, share buttons, related posts
+
+**Admin Components:** `src/components/admin/`
+- `BlogTab.tsx` — Posts, categories, schedule, analytics sub-tabs
+- `BlogPostModal.tsx` — Create/edit with AI generation
+
+**Blog Libraries:** `src/lib/blog/`
+- `blog-writer-agent.ts` — DeepSeek content generation
+- `seo-optimizer.ts` — SEO analysis, keyword suggestions, metadata
+- `social-media-formatter.ts` — Platform-specific post formatting
+
+**Database Tables:** `blogCategories`, `blogPosts`, `blogSocialPosts`
+
+**Cron Jobs:**
+- Hourly: `/api/cron/blog-publishing` — Publish scheduled posts
+- Every 30 min: `/api/cron/social-media-posting` — Social media distribution
 
 ### 🔮 Phase 5: Future Enhancements
 - **Mobile App** — React Native companion app
@@ -373,6 +393,16 @@ Autonomous content creation for organic traffic and social media:
 | GET/POST | `/api/admin/competitors` | Competitor rates |
 | GET/PUT/DELETE | `/api/admin/competitors/[id]` | Individual rate |
 | GET | `/api/admin/competitors/compare` | Price comparison |
+
+### Blog APIs
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET/POST | `/api/admin/blog/posts` | Blog post management |
+| GET/PUT/DELETE | `/api/admin/blog/posts/[id]` | Individual post CRUD |
+| GET/POST/PUT/DELETE | `/api/admin/blog/categories` | Category management |
+| POST | `/api/admin/blog/generate` | AI content generation |
+| GET | `/api/blog/posts` | Public blog listing |
+| GET | `/api/blog/posts/[slug]` | Public post by slug |
 
 ### Reports APIs
 | Method | Endpoint | Purpose |
