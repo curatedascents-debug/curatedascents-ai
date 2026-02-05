@@ -17,6 +17,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { executeToolCall } from "@/lib/agents/tool-executor";
 import { TOOL_DEFINITIONS } from "@/lib/agents/tool-definitions";
 import { FALLBACK_SYSTEM_PROMPT } from "@/lib/agents/fallback-rate-research";
+import { processConversationForScoring } from "@/lib/lead-intelligence/scoring-engine";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
@@ -144,13 +145,26 @@ Remember: You're not just booking travel - you're crafting life-changing adventu
 // ─── MAIN HANDLER ───────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
-    const { messages, conversationHistory = [] } = await req.json();
+    const { messages, conversationHistory = [], clientId, conversationId } = await req.json();
 
     if (!DEEPSEEK_API_KEY) {
       return NextResponse.json(
         { error: "DeepSeek API key not configured" },
         { status: 500 }
       );
+    }
+
+    // ── Lead scoring (non-blocking) ─────────────────────────────────────────
+    // Process the latest user message for lead scoring signals
+    if (clientId && messages.length > 0) {
+      const latestUserMessage = messages[messages.length - 1];
+      if (latestUserMessage.role === "user" && latestUserMessage.content) {
+        processConversationForScoring(
+          clientId,
+          latestUserMessage.content,
+          conversationId
+        ).catch((err) => console.error("Lead scoring failed:", err));
+      }
     }
 
     // Build messages array with system prompt

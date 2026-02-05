@@ -1000,6 +1000,10 @@ export const leadScores = pgTable('lead_scores', {
   campaign: text('campaign'),
   referredBy: integer('referred_by').references(() => clients.id),
 
+  // Conversion tracking
+  convertedAt: timestamp('converted_at'),
+  lostReason: text('lost_reason'),
+
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

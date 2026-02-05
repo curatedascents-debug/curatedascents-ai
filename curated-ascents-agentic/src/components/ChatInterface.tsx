@@ -27,6 +27,11 @@ export default function ChatInterface() {
   const [personalizeSuccess, setPersonalizeSuccess] = useState(false);
   // ─────────────────────────────────────────────────────────────────────────
 
+  // ── Lead scoring integration ─────────────────────────────────────────────
+  const [clientId, setClientId] = useState<number | null>(null);
+  const [conversationId] = useState(() => `conv_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`);
+  // ─────────────────────────────────────────────────────────────────────────
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -56,6 +61,8 @@ export default function ChatInterface() {
           messages: newMessages,
           clientEmail: clientEmail || undefined,
           clientName: clientName || undefined,
+          clientId: clientId || undefined,
+          conversationId,
         }),
       });
 
@@ -105,7 +112,12 @@ export default function ChatInterface() {
         return;
       }
 
-      // ✅ success
+      // ✅ success - store clientId for lead scoring
+      const data = await res.json();
+      if (data.clientId) {
+        setClientId(data.clientId);
+      }
+
       setPersonalizeSuccess(true);
       setPersonalizeLoading(false);
 

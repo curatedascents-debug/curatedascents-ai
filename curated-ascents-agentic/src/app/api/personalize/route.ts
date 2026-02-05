@@ -120,6 +120,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `Welcome aboard, ${trimmedName}! Your details have been saved.`,
+      clientId, // Return clientId for lead scoring integration
     });
   } catch (error) {
     console.error("[personalize] Unexpected error:", error);

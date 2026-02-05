@@ -17,6 +17,10 @@
       "schedule": "0 14 * * *"
     },
     {
+      "path": "/api/cron/nurture-sequences",
+      "schedule": "0 12 * * *"
+    },
+    {
       "path": "/api/cron/trip-checkins",
       "schedule": "0 8 * * *"
     },

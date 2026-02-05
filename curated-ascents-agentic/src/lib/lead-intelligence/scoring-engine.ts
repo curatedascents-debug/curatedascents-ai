@@ -496,6 +496,90 @@ export async function processConversationForScoring(
 }
 
 /**
+ * Mark a lead as converted (when they book)
+ */
+export async function markLeadConverted(
+  clientId: number,
+  bookingId?: number
+): Promise<{ success: boolean; previousStatus: string }> {
+  const leadScore = await getOrCreateLeadScore(clientId);
+  const previousStatus = leadScore.status;
+
+  // Update lead score to converted
+  await db
+    .update(leadScores)
+    .set({
+      status: "converted",
+      currentScore: 100,
+      isHighValue: true,
+      convertedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(leadScores.clientId, clientId));
+
+  // Log conversion event
+  await db.insert(leadEvents).values({
+    clientId,
+    eventType: "manual_adjustment",
+    eventData: { reason: "converted", bookingId },
+    scoreChange: 100 - leadScore.currentScore,
+    scoreBefore: leadScore.currentScore,
+    scoreAfter: 100,
+    source: "system",
+  });
+
+  // Cancel any active nurture sequences
+  try {
+    const { cancelOnConversion } = await import("./nurture-engine");
+    await cancelOnConversion(clientId);
+  } catch (error) {
+    console.error("Failed to cancel nurture sequences on conversion:", error);
+  }
+
+  return { success: true, previousStatus };
+}
+
+/**
+ * Mark a lead as lost
+ */
+export async function markLeadLost(
+  clientId: number,
+  reason: string
+): Promise<{ success: boolean }> {
+  const leadScore = await getOrCreateLeadScore(clientId);
+
+  await db
+    .update(leadScores)
+    .set({
+      status: "lost",
+      lostReason: reason,
+      updatedAt: new Date(),
+    })
+    .where(eq(leadScores.clientId, clientId));
+
+  // Log lost event
+  await db.insert(leadEvents).values({
+    clientId,
+    eventType: "manual_adjustment",
+    eventData: { reason: "lost", lostReason: reason },
+    scoreChange: 0,
+    scoreBefore: leadScore.currentScore,
+    scoreAfter: leadScore.currentScore,
+    source: "system",
+  });
+
+  // Cancel any active nurture sequences
+  try {
+    const { cancelOnConversion } = await import("./nurture-engine");
+    await cancelOnConversion(clientId);
+  } catch (error) {
+    console.error("Failed to cancel nurture sequences on lost:", error);
+  }
+
+  return { success: true };
+}
+
+/**
  * Get lead score summary for a client
  */
 export async function getLeadScoreSummary(clientId: number) {
