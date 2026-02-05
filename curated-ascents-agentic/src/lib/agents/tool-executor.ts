@@ -15,6 +15,13 @@ import {
   getTripBriefing,
 } from "./database-tools";
 import { researchExternalRates } from "./fallback-rate-research";
+import {
+  checkAvailability,
+  validateAcclimatization,
+  validatePermits,
+  generateUpsellSuggestions,
+  loadClientProfile,
+} from "./expedition-architect-enhanced";
 
 // Strip all pricing fields from an object before sending to the AI
 const PRICE_FIELD_PATTERNS = [
@@ -160,6 +167,40 @@ export async function executeToolCall(
           bookingReference: args.bookingReference as string,
         }));
 
+      // Enhanced Expedition Architect Tools
+      case "check_availability":
+        return JSON.stringify(await checkAvailability(
+          args.serviceType as string,
+          args.serviceId as number,
+          args.startDate as string,
+          args.endDate as string,
+          args.quantity as number | undefined
+        ));
+
+      case "validate_trek_acclimatization":
+        return JSON.stringify(validateAcclimatization(
+          args.itinerary as Array<{ day: number; location: string; overnightAltitude?: number }>
+        ));
+
+      case "validate_permits":
+        return JSON.stringify(await validatePermits(
+          args.destinationRegion as string,
+          args.tripStartDate as string,
+          args.nationality as string | undefined
+        ));
+
+      case "get_upsell_suggestions":
+        // Load client profile if clientId is available in context
+        const clientProfile = args.clientId
+          ? await loadClientProfile(args.clientId as number)
+          : undefined;
+        return JSON.stringify(generateUpsellSuggestions(
+          args.tripType as string,
+          args.destination as string,
+          clientProfile || undefined,
+          args.currentServices as string[] | undefined
+        ));
+
       default:
         return JSON.stringify({
           error: `Unknown tool: ${toolName}`,
@@ -178,6 +219,10 @@ export async function executeToolCall(
             "convert_quote_to_booking",
             "check_supplier_confirmations",
             "get_trip_briefing",
+            "check_availability",
+            "validate_trek_acclimatization",
+            "validate_permits",
+            "get_upsell_suggestions",
           ],
         });
     }

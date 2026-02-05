@@ -18,6 +18,12 @@ import { executeToolCall } from "@/lib/agents/tool-executor";
 import { TOOL_DEFINITIONS } from "@/lib/agents/tool-definitions";
 import { FALLBACK_SYSTEM_PROMPT } from "@/lib/agents/fallback-rate-research";
 import { processConversationForScoring } from "@/lib/lead-intelligence/scoring-engine";
+import {
+  loadClientProfile,
+  loadConversationMemory,
+  saveConversationMessage,
+  buildPersonalizedSystemPrompt,
+} from "@/lib/agents/expedition-architect-enhanced";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
@@ -164,12 +170,44 @@ export async function POST(req: NextRequest) {
           latestUserMessage.content,
           conversationId
         ).catch((err) => console.error("Lead scoring failed:", err));
+
+        // Save user message to conversation memory (non-blocking)
+        saveConversationMessage(clientId, {
+          role: "user",
+          content: latestUserMessage.content,
+        }).catch((err) => console.error("Failed to save message:", err));
       }
     }
 
-    // Build messages array with system prompt
+    // ── Load client profile and personalize system prompt ───────────────────
+    let personalizedPrompt = SYSTEM_PROMPT;
+    if (clientId) {
+      try {
+        const [clientProfile, conversationMemory] = await Promise.all([
+          loadClientProfile(clientId),
+          loadConversationMemory(clientId, conversationId),
+        ]);
+
+        personalizedPrompt = buildPersonalizedSystemPrompt(
+          SYSTEM_PROMPT,
+          clientProfile,
+          conversationMemory
+        );
+
+        console.log(
+          `Loaded profile for client ${clientId}:`,
+          clientProfile?.name || "Unknown",
+          `Score: ${clientProfile?.leadScore?.score || "N/A"}`
+        );
+      } catch (err) {
+        console.error("Failed to load client profile:", err);
+        // Fall back to base prompt
+      }
+    }
+
+    // Build messages array with personalized system prompt
     const apiMessages = [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: personalizedPrompt },
       ...conversationHistory,
       ...messages,
     ];
@@ -287,6 +325,14 @@ export async function POST(req: NextRequest) {
 
       data = await response.json();
       assistantMessage = data.choices[0].message;
+    }
+
+    // Save assistant response to conversation memory (non-blocking)
+    if (clientId && assistantMessage.content) {
+      saveConversationMessage(clientId, {
+        role: "assistant",
+        content: assistantMessage.content,
+      }).catch((err) => console.error("Failed to save assistant message:", err));
     }
 
     // Return final response

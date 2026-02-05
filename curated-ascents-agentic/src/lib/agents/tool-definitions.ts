@@ -444,4 +444,144 @@ export const TOOL_DEFINITIONS = [
       },
     },
   },
+  // Enhanced Expedition Architect Tools
+  {
+    type: "function",
+    function: {
+      name: "check_availability",
+      description: `Check real-time availability for a service on specific dates.
+      Use this before confirming bookings to ensure services are available.
+      Returns availability status and alternatives if not available.`,
+      parameters: {
+        type: "object",
+        properties: {
+          serviceType: {
+            type: "string",
+            enum: [
+              "hotel",
+              "transportation",
+              "guide",
+              "porter",
+              "flight",
+              "helicopter_sharing",
+              "helicopter_charter",
+              "package",
+            ],
+            description: "Type of service to check",
+          },
+          serviceId: {
+            type: "integer",
+            description: "ID of the specific service",
+          },
+          startDate: {
+            type: "string",
+            description: "Start date in YYYY-MM-DD format",
+          },
+          endDate: {
+            type: "string",
+            description: "End date in YYYY-MM-DD format",
+          },
+          quantity: {
+            type: "integer",
+            description: "Number of units needed (e.g., rooms, guides)",
+            default: 1,
+          },
+        },
+        required: ["serviceType", "serviceId", "startDate", "endDate"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "validate_trek_acclimatization",
+      description: `Validate a trek itinerary for proper altitude acclimatization.
+      Use this when planning treks to ensure the schedule follows safe altitude gain guidelines.
+      Returns validation result with issues and recommendations.`,
+      parameters: {
+        type: "object",
+        properties: {
+          itinerary: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                day: {
+                  type: "integer",
+                  description: "Day number of the trek",
+                },
+                location: {
+                  type: "string",
+                  description: "Overnight location name (e.g., Namche Bazaar, Tengboche)",
+                },
+                overnightAltitude: {
+                  type: "integer",
+                  description: "Sleeping altitude in meters (optional if location is known)",
+                },
+              },
+              required: ["day", "location"],
+            },
+            description: "Array of trek days with locations and altitudes",
+          },
+        },
+        required: ["itinerary"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "validate_permits",
+      description: `Validate permit requirements and lead times for a destination.
+      Use this when planning trips to restricted areas like Tibet, Upper Mustang, or Dolpo.
+      Returns required permits and whether they can be obtained in time.`,
+      parameters: {
+        type: "object",
+        properties: {
+          destinationRegion: {
+            type: "string",
+            enum: ["tibet", "everest", "annapurna", "mustang", "dolpo", "manaslu", "bhutan"],
+            description: "The destination region requiring permits",
+          },
+          tripStartDate: {
+            type: "string",
+            description: "Trip start date in YYYY-MM-DD format",
+          },
+          nationality: {
+            type: "string",
+            description: "Traveler's nationality (some permits have nationality restrictions)",
+          },
+        },
+        required: ["destinationRegion", "tripStartDate"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_upsell_suggestions",
+      description: `Get contextual upselling suggestions based on the trip and client preferences.
+      Use this to suggest relevant add-ons and upgrades to enhance the client's experience.
+      Returns prioritized suggestions with descriptions and price ranges.`,
+      parameters: {
+        type: "object",
+        properties: {
+          tripType: {
+            type: "string",
+            description: "Type of trip (e.g., trek, tour, expedition, cultural)",
+          },
+          destination: {
+            type: "string",
+            description: "Primary destination",
+          },
+          currentServices: {
+            type: "array",
+            items: { type: "string" },
+            description: "List of services already included in the trip",
+          },
+        },
+        required: ["tripType", "destination"],
+      },
+    },
+  },
 ];
