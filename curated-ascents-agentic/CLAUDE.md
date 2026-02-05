@@ -60,7 +60,7 @@ Defined in `.env.local`:
 ### Routing
 
 **Public Routes:**
-- `/` — Chat interface (main user-facing page)
+- `/` — Luxury homepage with floating AI chat widget
 - `/payment/success` — Payment confirmation page
 - `/payment/cancelled` — Payment cancellation page
 
@@ -269,19 +269,36 @@ All React components in `src/components/` are client components (`"use client"`)
 - **Risk & Compliance** — Weather alerts, travel advisories, notifications
 - **Supplier Performance** — Response rates, reliability scores, automated follow-up
 
-### 🚧 Phase 4: Growth & Engagement (Planned)
+### ✅ Phase 4.1: Luxury Homepage UI (Complete)
+Premium landing page targeting high-net-worth travelers:
+- **Hero Section** — Full-screen Himalayan imagery with gradient overlay
+- **Featured Experiences** — 6 curated expedition cards with hover effects
+- **Trust Signals** — Animated stat counters (500+ expeditions, 2,500+ travelers, 28+ years, 4.9 rating)
+- **Testimonial Carousel** — Auto-rotating customer quotes with navigation
+- **Destination Highlights** — Bento grid layout (Nepal, Bhutan, Tibet, India)
+- **About Section** — Value propositions with split layout
+- **AI Chat Widget** — Floating expandable chat panel
+- **Responsive Navigation** — Transparent→solid on scroll, mobile hamburger menu
+- **Framer Motion Animations** — Smooth fade, slide, and scale transitions
+- **Google Fonts** — Playfair Display (headlines) + Inter (body)
 
-#### 4.1 Luxury Homepage UI
-Premium landing page with sleek design targeting high-net-worth travelers:
-- **Hero Section** — Full-screen video/image carousel of luxury destinations
-- **Featured Experiences** — Curated expedition showcases
-- **Trust Signals** — Testimonials, press mentions, certifications
-- **Interactive Map** — Destination explorer with hover details
-- **AI Chat Widget** — Floating chat access from any page
-- **Responsive Design** — Mobile-first luxury aesthetic
-- **Performance** — Optimized images, lazy loading, Core Web Vitals
+**Homepage Components:** `src/components/homepage/`
+- `LuxuryHomepage.tsx` — Main orchestrator
+- `Navigation.tsx` — Fixed header with scroll detection
+- `HeroSection.tsx` — Full-viewport hero with CTAs
+- `FeaturedExperiences.tsx` + `ExperienceCard.tsx` — Package grid
+- `TrustSignals.tsx` + `StatCard.tsx` + `TestimonialCarousel.tsx` — Social proof
+- `DestinationHighlights.tsx` + `DestinationCard.tsx` — Destination grid
+- `AboutSection.tsx` — Value propositions
+- `Footer.tsx` — 4-column footer
+- `ChatWidget.tsx` — Floating chat wrapper
 
-#### 4.2 AI-Powered Blog & SEO Engine
+**Static Data:** `src/lib/constants/`
+- `destinations.ts`, `experiences.ts`, `testimonials.ts`, `stats.ts`
+
+**Animations:** `src/lib/animations.ts` — Framer Motion variants
+
+### 🚧 Phase 4.2: AI-Powered Blog & SEO Engine (Planned)
 Autonomous content creation for organic traffic and social media:
 - **AI Blog Writer Agent** — Generates SEO-optimized travel articles
 - **Content Calendar** — Automated weekly/bi-weekly publishing schedule
