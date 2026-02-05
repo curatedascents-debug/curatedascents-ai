@@ -28,6 +28,16 @@ import {
   getSupportedCurrencies,
   BASE_CURRENCY,
 } from "@/lib/currency/currency-service";
+import {
+  calculateDynamicPrice,
+  DEMAND_ADJUSTMENTS,
+  EARLY_BIRD_TIERS,
+  GROUP_DISCOUNT_TIERS,
+  LOYALTY_DISCOUNTS,
+} from "@/lib/pricing/pricing-engine";
+import { db } from "@/db";
+import { pricingRules, seasons } from "@/db/schema";
+import { eq, and, gte, lte, or, isNull } from "drizzle-orm";
 
 // Strip all pricing fields from an object before sending to the AI
 const PRICE_FIELD_PATTERNS = [
@@ -237,6 +247,112 @@ export async function executeToolCall(
           note: "All prices are in USD by default. We can show prices in your preferred currency upon request.",
         });
 
+      // Dynamic Pricing Tools
+      case "get_dynamic_price":
+        const dynamicPriceResult = await calculateDynamicPrice({
+          serviceType: args.serviceType as string,
+          serviceId: args.serviceId as number,
+          basePrice: args.basePrice as number,
+          travelDate: new Date(args.travelDate as string),
+          paxCount: args.paxCount as number | undefined,
+          loyaltyTier: args.loyaltyTier as string | undefined,
+        });
+        return JSON.stringify({
+          originalPrice: dynamicPriceResult.originalPrice,
+          finalPrice: dynamicPriceResult.finalPrice,
+          currency: dynamicPriceResult.currency,
+          savings: dynamicPriceResult.savings,
+          savingsPercent: dynamicPriceResult.savingsPercent,
+          seasonName: dynamicPriceResult.seasonName,
+          appliedDiscounts: dynamicPriceResult.appliedRules.map(r => ({
+            name: r.ruleName,
+            type: r.ruleType,
+            adjustment: r.adjustmentValue > 0 ? `+${r.adjustmentValue}%` : `${r.adjustmentValue}%`,
+          })),
+          note: dynamicPriceResult.savings
+            ? `You save ${formatCurrency(dynamicPriceResult.savings, "USD")} (${dynamicPriceResult.savingsPercent}% off)!`
+            : undefined,
+        });
+
+      case "check_pricing_promotions":
+        const promoDestination = (args.destination as string || "").toLowerCase();
+        const promoServiceType = args.serviceType as string | undefined;
+        const promoMonth = args.travelMonth as string | undefined;
+
+        // Get current month if not specified
+        const monthNames = ["january", "february", "march", "april", "may", "june",
+                          "july", "august", "september", "october", "november", "december"];
+        const targetMonth = promoMonth
+          ? monthNames.indexOf(promoMonth.toLowerCase()) + 1
+          : new Date().getMonth() + 1;
+
+        // Get active pricing rules
+        const activeRules = await db
+          .select()
+          .from(pricingRules)
+          .where(
+            and(
+              eq(pricingRules.isActive, true),
+              promoServiceType && promoServiceType !== "all"
+                ? or(isNull(pricingRules.serviceType), eq(pricingRules.serviceType, promoServiceType))
+                : undefined
+            )
+          )
+          .limit(10);
+
+        // Get current season
+        const currentSeason = await db
+          .select()
+          .from(seasons)
+          .where(
+            and(
+              lte(seasons.startMonth, targetMonth),
+              gte(seasons.endMonth, targetMonth)
+            )
+          )
+          .limit(1);
+
+        // Build response with promotions info
+        const promotions = {
+          destination: args.destination,
+          month: promoMonth || monthNames[targetMonth - 1],
+          seasonInfo: currentSeason[0] ? {
+            name: currentSeason[0].name,
+            priceMultiplier: parseFloat(currentSeason[0].priceMultiplier || "1.00"),
+            isPeak: parseFloat(currentSeason[0].priceMultiplier || "1.00") > 1,
+            note: parseFloat(currentSeason[0].priceMultiplier || "1.00") > 1
+              ? "Peak season - prices may be higher"
+              : parseFloat(currentSeason[0].priceMultiplier || "1.00") < 1
+                ? "Low season - enjoy discounted rates!"
+                : "Regular season pricing",
+          } : null,
+          activePromotions: activeRules.map(r => ({
+            name: r.name,
+            type: r.ruleType,
+            discount: parseFloat(r.adjustmentValue) < 0
+              ? `${Math.abs(parseFloat(r.adjustmentValue))}% off`
+              : null,
+            validUntil: r.validTo,
+          })).filter(p => p.discount),
+          standardDiscounts: {
+            earlyBird: EARLY_BIRD_TIERS.map(t => ({
+              daysAhead: `${t.daysAhead}+ days`,
+              discount: `${t.discount}% off`,
+            })),
+            groupDiscounts: GROUP_DISCOUNT_TIERS.map(t => ({
+              minPax: `${t.minPax}+ travelers`,
+              discount: `${t.discount}% off`,
+            })),
+            loyaltyDiscounts: Object.entries(LOYALTY_DISCOUNTS).map(([tier, discount]) => ({
+              tier: tier.charAt(0).toUpperCase() + tier.slice(1),
+              discount: `${discount}% off`,
+            })),
+          },
+          tip: "Book early (90+ days ahead) to get up to 15% off, or travel with a group of 20+ for maximum savings!",
+        };
+
+        return JSON.stringify(promotions);
+
       default:
         return JSON.stringify({
           error: `Unknown tool: ${toolName}`,
@@ -261,6 +377,8 @@ export async function executeToolCall(
             "get_upsell_suggestions",
             "convert_currency",
             "get_supported_currencies",
+            "get_dynamic_price",
+            "check_pricing_promotions",
           ],
         });
     }

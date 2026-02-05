@@ -624,4 +624,75 @@ export const TOOL_DEFINITIONS = [
       },
     },
   },
+  // Dynamic Pricing Tools
+  {
+    type: "function",
+    function: {
+      name: "get_dynamic_price",
+      description: `Calculate the dynamic price for a service considering all applicable pricing rules.
+      This applies seasonal adjustments, demand-based pricing, early bird discounts, group discounts, and loyalty discounts.
+      Use this when calculating quotes or when clients ask about current pricing.`,
+      parameters: {
+        type: "object",
+        properties: {
+          serviceType: {
+            type: "string",
+            enum: ["hotel", "transportation", "guide", "porter", "flight", "helicopter_sharing", "helicopter_charter", "permit", "package"],
+            description: "Type of service",
+          },
+          serviceId: {
+            type: "integer",
+            description: "ID of the specific service",
+          },
+          basePrice: {
+            type: "number",
+            description: "Base price of the service in USD",
+          },
+          travelDate: {
+            type: "string",
+            description: "Travel date in YYYY-MM-DD format",
+          },
+          paxCount: {
+            type: "integer",
+            description: "Number of travelers (for group discounts)",
+            default: 1,
+          },
+          loyaltyTier: {
+            type: "string",
+            enum: ["bronze", "silver", "gold", "platinum"],
+            description: "Client's loyalty tier (if applicable)",
+          },
+        },
+        required: ["serviceType", "serviceId", "basePrice", "travelDate"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "check_pricing_promotions",
+      description: `Check for any active promotions or special pricing for a destination or service type.
+      Use this when clients ask about deals, discounts, or special offers.
+      Returns information about current seasonal pricing, early bird discounts, and any promotional rules.`,
+      parameters: {
+        type: "object",
+        properties: {
+          destination: {
+            type: "string",
+            description: "Destination to check promotions for (e.g., Everest, Annapurna, Nepal)",
+          },
+          serviceType: {
+            type: "string",
+            enum: ["hotel", "transportation", "guide", "flight", "helicopter", "package", "all"],
+            description: "Service type to check (use 'all' for all services)",
+          },
+          travelMonth: {
+            type: "string",
+            description: "Month of travel (e.g., 'March', 'October')",
+          },
+        },
+        required: ["destination"],
+      },
+    },
+  },
 ];

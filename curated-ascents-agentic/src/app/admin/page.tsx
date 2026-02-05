@@ -13,6 +13,7 @@ import QuotesTab from "@/components/admin/QuotesTab";
 import BookingsTab from "@/components/admin/BookingsTab";
 import ReportsTab from "@/components/admin/ReportsTab";
 import SupplierPortalTab from "@/components/admin/SupplierPortalTab";
+import PricingTab from "@/components/admin/PricingTab";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -84,6 +85,7 @@ export default function AdminDashboard() {
     { key: "quotes" as TabType, label: "Quotes", count: counts.quotes },
     { key: "bookings" as TabType, label: "Bookings", count: counts.bookings },
     { key: "agencies" as TabType, label: "Supplier Portal" },
+    { key: "pricing" as TabType, label: "Pricing" },
     { key: "reports" as TabType, label: "Reports" },
   ];
 
@@ -126,6 +128,7 @@ export default function AdminDashboard() {
         {activeTab === "quotes" && <QuotesTab />}
         {activeTab === "bookings" && <BookingsTab />}
         {activeTab === "agencies" && <SupplierPortalTab />}
+        {activeTab === "pricing" && <PricingTab />}
         {activeTab === "reports" && <ReportsTab />}
       </div>
     </div>
