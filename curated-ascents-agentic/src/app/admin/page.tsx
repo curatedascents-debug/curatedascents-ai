@@ -11,7 +11,7 @@ import HotelsTab from "@/components/admin/HotelsTab";
 import ClientsTab from "@/components/admin/ClientsTab";
 import QuotesTab from "@/components/admin/QuotesTab";
 import BookingsTab from "@/components/admin/BookingsTab";
-import ReportsTab from "@/components/admin/ReportsTab";
+import AdvancedReportsTab from "@/components/admin/AdvancedReportsTab";
 import SupplierPortalTab from "@/components/admin/SupplierPortalTab";
 import PricingTab from "@/components/admin/PricingTab";
 import NurtureTab from "@/components/admin/NurtureTab";
@@ -132,7 +132,7 @@ export default function AdminDashboard() {
         {activeTab === "agencies" && <SupplierPortalTab />}
         {activeTab === "pricing" && <PricingTab />}
         {activeTab === "nurture" && <NurtureTab />}
-        {activeTab === "reports" && <ReportsTab />}
+        {activeTab === "reports" && <AdvancedReportsTab />}
       </div>
     </div>
   );

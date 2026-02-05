@@ -7,11 +7,19 @@ import { sql, eq, gte, and, count, sum } from "drizzle-orm";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    // Get date 90 days ago for trends
-    const ninetyDaysAgo = new Date();
-    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    const { searchParams } = new URL(request.url);
+    const startDateParam = searchParams.get("startDate");
+    const endDateParam = searchParams.get("endDate");
+
+    // Use params or default to 90 days ago
+    const startDate = startDateParam ? new Date(startDateParam) : (() => {
+      const d = new Date();
+      d.setDate(d.getDate() - 90);
+      return d;
+    })();
+    const endDate = endDateParam ? new Date(endDateParam) : new Date();
 
     // === QUOTE METRICS ===
     const quoteStats = await db
