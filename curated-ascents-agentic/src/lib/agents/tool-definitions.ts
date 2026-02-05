@@ -584,4 +584,44 @@ export const TOOL_DEFINITIONS = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "convert_currency",
+      description: `Convert a price from one currency to another using real-time exchange rates.
+      Use this when a client asks for prices in their preferred currency or mentions a different currency.
+      Returns the converted amount with proper formatting.`,
+      parameters: {
+        type: "object",
+        properties: {
+          amount: {
+            type: "number",
+            description: "The amount to convert",
+          },
+          fromCurrency: {
+            type: "string",
+            description: "Source currency code (e.g., USD, EUR)",
+            default: "USD",
+          },
+          toCurrency: {
+            type: "string",
+            description: "Target currency code (e.g., EUR, GBP, AUD)",
+          },
+        },
+        required: ["amount", "toCurrency"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_supported_currencies",
+      description: `Get the list of currencies we support for pricing and payments.
+      Use this when a client asks what currencies they can pay in or see prices in.`,
+      parameters: {
+        type: "object",
+        properties: {},
+      },
+    },
+  },
 ];

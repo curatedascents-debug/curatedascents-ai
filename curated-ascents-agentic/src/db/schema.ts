@@ -186,6 +186,37 @@ export const supplierUsers = pgTable('supplier_users', {
 });
 
 // ============================================
+// CURRENCY & EXCHANGE RATES
+// ============================================
+
+// Supported currencies for the platform
+export const supportedCurrencies = pgTable('supported_currencies', {
+  id: serial('id').primaryKey(),
+  code: text('code').unique().notNull(), // ISO 4217 code (USD, EUR, GBP)
+  name: text('name').notNull(), // "US Dollar", "Euro"
+  symbol: text('symbol').notNull(), // $, €, £
+  locale: text('locale').default('en-US'), // For Intl.NumberFormat
+  decimalPlaces: integer('decimal_places').default(2),
+  isActive: boolean('is_active').default(true),
+  sortOrder: integer('sort_order').default(0),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Exchange rates cache
+export const exchangeRates = pgTable('exchange_rates', {
+  id: serial('id').primaryKey(),
+  fromCurrency: text('from_currency').notNull(), // Base currency (usually USD)
+  toCurrency: text('to_currency').notNull(), // Target currency
+  rate: decimal('rate', { precision: 18, scale: 8 }).notNull(), // 1 USD = X target
+  inverseRate: decimal('inverse_rate', { precision: 18, scale: 8 }), // 1 target = X USD
+  source: text('source'), // API source name
+  fetchedAt: timestamp('fetched_at').defaultNow(), // When rate was fetched
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// ============================================
 // CORE TABLES
 // ============================================
 
@@ -658,6 +689,8 @@ export const clients = pgTable('clients', {
   name: text('name'),
   phone: text('phone'),
   country: text('country'),
+  preferredCurrency: text('preferred_currency').default('USD'),
+  locale: text('locale').default('en-US'),
   preferences: jsonb('preferences'),
   conversationHistory: jsonb('conversation_history'),
   source: text('source'),

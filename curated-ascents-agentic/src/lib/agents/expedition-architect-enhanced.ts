@@ -25,6 +25,9 @@ export interface ClientProfile {
   id: number;
   email: string | null;
   name: string | null;
+  country: string | null;
+  preferredCurrency: string;
+  locale: string;
   preferences: {
     travelStyle?: string;
     interests?: string[];
@@ -125,6 +128,9 @@ export async function loadClientProfile(clientId: number): Promise<ClientProfile
         id: clients.id,
         email: clients.email,
         name: clients.name,
+        country: clients.country,
+        preferredCurrency: clients.preferredCurrency,
+        locale: clients.locale,
         preferences: clients.preferences,
       })
       .from(clients)
@@ -200,6 +206,9 @@ export async function loadClientProfile(clientId: number): Promise<ClientProfile
       id: client.id,
       email: client.email,
       name: client.name,
+      country: client.country,
+      preferredCurrency: client.preferredCurrency || "USD",
+      locale: client.locale || "en-US",
       preferences: {
         travelStyle: prefs?.travelStyle || (client.preferences as any)?.travelStyle,
         interests: prefs?.interests as string[] || [],
@@ -840,6 +849,14 @@ export function buildPersonalizedSystemPrompt(
   if (clientProfile) {
     prompt += `\n\n## CLIENT CONTEXT
 You are speaking with ${clientProfile.name || "a returning client"}.`;
+
+    // Add location and currency context
+    if (clientProfile.country) {
+      prompt += `\n- Location: ${clientProfile.country}`;
+    }
+    if (clientProfile.preferredCurrency && clientProfile.preferredCurrency !== "USD") {
+      prompt += `\n- Preferred Currency: ${clientProfile.preferredCurrency} (use convert_currency tool to show prices in their currency)`;
+    }
 
     // Add preferences
     if (clientProfile.preferences.travelStyle) {

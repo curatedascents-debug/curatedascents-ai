@@ -22,6 +22,12 @@ import {
   generateUpsellSuggestions,
   loadClientProfile,
 } from "./expedition-architect-enhanced";
+import {
+  convertCurrency,
+  formatCurrency,
+  getSupportedCurrencies,
+  BASE_CURRENCY,
+} from "@/lib/currency/currency-service";
 
 // Strip all pricing fields from an object before sending to the AI
 const PRICE_FIELD_PATTERNS = [
@@ -201,6 +207,36 @@ export async function executeToolCall(
           args.currentServices as string[] | undefined
         ));
 
+      // Currency Tools
+      case "convert_currency":
+        const conversionResult = await convertCurrency(
+          args.amount as number,
+          (args.fromCurrency as string) || BASE_CURRENCY,
+          args.toCurrency as string
+        );
+        return JSON.stringify({
+          originalAmount: conversionResult.originalAmount,
+          originalCurrency: conversionResult.originalCurrency,
+          originalFormatted: formatCurrency(conversionResult.originalAmount, conversionResult.originalCurrency),
+          convertedAmount: conversionResult.convertedAmount,
+          targetCurrency: conversionResult.targetCurrency,
+          convertedFormatted: formatCurrency(conversionResult.convertedAmount, conversionResult.targetCurrency),
+          exchangeRate: conversionResult.rate,
+          rateTimestamp: conversionResult.rateTimestamp.toISOString(),
+        });
+
+      case "get_supported_currencies":
+        const currencies = await getSupportedCurrencies();
+        return JSON.stringify({
+          currencies: currencies.map(c => ({
+            code: c.code,
+            name: c.name,
+            symbol: c.symbol,
+          })),
+          baseCurrency: BASE_CURRENCY,
+          note: "All prices are in USD by default. We can show prices in your preferred currency upon request.",
+        });
+
       default:
         return JSON.stringify({
           error: `Unknown tool: ${toolName}`,
@@ -223,6 +259,8 @@ export async function executeToolCall(
             "validate_trek_acclimatization",
             "validate_permits",
             "get_upsell_suggestions",
+            "convert_currency",
+            "get_supported_currencies",
           ],
         });
     }
