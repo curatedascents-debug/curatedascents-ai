@@ -14,6 +14,7 @@ import BookingsTab from "@/components/admin/BookingsTab";
 import ReportsTab from "@/components/admin/ReportsTab";
 import SupplierPortalTab from "@/components/admin/SupplierPortalTab";
 import PricingTab from "@/components/admin/PricingTab";
+import NurtureTab from "@/components/admin/NurtureTab";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -86,6 +87,7 @@ export default function AdminDashboard() {
     { key: "bookings" as TabType, label: "Bookings", count: counts.bookings },
     { key: "agencies" as TabType, label: "Supplier Portal" },
     { key: "pricing" as TabType, label: "Pricing" },
+    { key: "nurture" as TabType, label: "Nurture" },
     { key: "reports" as TabType, label: "Reports" },
   ];
 
@@ -129,6 +131,7 @@ export default function AdminDashboard() {
         {activeTab === "bookings" && <BookingsTab />}
         {activeTab === "agencies" && <SupplierPortalTab />}
         {activeTab === "pricing" && <PricingTab />}
+        {activeTab === "nurture" && <NurtureTab />}
         {activeTab === "reports" && <ReportsTab />}
       </div>
     </div>
