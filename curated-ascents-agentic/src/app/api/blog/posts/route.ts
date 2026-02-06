@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { blogPosts, blogCategories, destinations } from "@/db/schema";
-import { eq, desc, and, sql } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
@@ -14,10 +14,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "12");
     const offset = parseInt(searchParams.get("offset") || "0");
 
-    // Build where clause - only published posts
-    const baseCondition = eq(blogPosts.status, "published");
-
-    // Join with category to filter by slug
+    // Resolve category slug to ID
     let categoryId: number | null = null;
     if (category) {
       const [cat] = await db
@@ -30,16 +27,17 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const destinationId = destination ? parseInt(destination) : null;
+    const destinationIdNum = destination ? parseInt(destination) : null;
 
-    // Build where clause explicitly to avoid and() with single arg
-    const whereClause = categoryId && destinationId
-      ? and(baseCondition, eq(blogPosts.categoryId, categoryId), eq(blogPosts.destinationId, destinationId))
-      : categoryId
-      ? and(baseCondition, eq(blogPosts.categoryId, categoryId))
-      : destinationId
-      ? and(baseCondition, eq(blogPosts.destinationId, destinationId))
-      : baseCondition;
+    // Build raw SQL WHERE fragments to avoid Drizzle and() issues
+    const whereParts: string[] = [`"blog_posts"."status" = 'published'`];
+    if (categoryId) {
+      whereParts.push(`"blog_posts"."category_id" = ${categoryId}`);
+    }
+    if (destinationIdNum) {
+      whereParts.push(`"blog_posts"."destination_id" = ${destinationIdNum}`);
+    }
+    const whereSQL = sql.raw(whereParts.join(" AND "));
 
     // Get posts
     const posts = await db
@@ -64,16 +62,16 @@ export async function GET(request: NextRequest) {
       .from(blogPosts)
       .leftJoin(blogCategories, eq(blogPosts.categoryId, blogCategories.id))
       .leftJoin(destinations, eq(blogPosts.destinationId, destinations.id))
-      .where(whereClause)
+      .where(whereSQL)
       .orderBy(desc(blogPosts.publishedAt))
       .limit(limit)
       .offset(offset);
 
-    // Get total count
-    const [{ count }] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(blogPosts)
-      .where(whereClause);
+    // Get total count using raw SQL to match exactly
+    const countResult = await db.execute(
+      sql.raw(`SELECT count(*)::int as count FROM blog_posts WHERE ${whereParts.join(" AND ")}`)
+    );
+    const total = countResult.rows?.[0]?.count ?? posts.length;
 
     // Get all categories for filter
     const categories = await db
@@ -90,7 +88,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       posts,
-      total: count,
+      total,
       categories,
       limit,
       offset,
