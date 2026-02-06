@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mountain, Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Twitter } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Twitter } from "lucide-react";
+import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 
 const footerLinks = {
@@ -51,7 +52,7 @@ export default function Footer() {
             {/* Brand Column */}
             <motion.div variants={fadeInUp} className="lg:col-span-2">
               <a href="#" className="flex items-center gap-3 mb-6">
-                <Mountain className="w-8 h-8 text-emerald-400" />
+                <CuratedAscentsLogo className="text-emerald-400" size={32} />
                 <span className="text-xl font-serif font-bold text-white">
                   CuratedAscents
                 </span>

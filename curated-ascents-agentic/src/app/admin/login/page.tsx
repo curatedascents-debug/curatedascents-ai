@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { Mountain, Lock, Loader2, AlertCircle } from "lucide-react";
+import { Lock, Loader2, AlertCircle } from "lucide-react";
+import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 
 function LoginForm() {
   const [password, setPassword] = useState("");
@@ -46,7 +47,7 @@ function LoginForm() {
         {/* Logo/Brand */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-500/10 rounded-full mb-4">
-            <Mountain className="w-8 h-8 text-emerald-400" />
+            <CuratedAscentsLogo className="text-emerald-400" size={32} />
           </div>
           <h1 className="text-2xl font-bold text-white">CuratedAscents</h1>
           <p className="text-slate-400 mt-1">Admin Dashboard</p>

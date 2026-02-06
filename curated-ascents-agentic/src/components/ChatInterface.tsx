@@ -2,7 +2,8 @@
 
 import ReactMarkdown from 'react-markdown';
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2, Mountain } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
+import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 
 interface Message {
   role: "user" | "assistant";
@@ -270,7 +271,7 @@ export default function ChatInterface({ isWidget = false }: ChatInterfaceProps) 
       {/* Header */}
       <div className="bg-slate-900/80 backdrop-blur-sm border-b border-slate-700 px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
-          <Mountain className="w-8 h-8 text-emerald-400" />
+          <CuratedAscentsLogo className="text-emerald-400" size={32} />
           <div>
             <h1 className="text-2xl font-bold text-white">CuratedAscents</h1>
             <p className="text-sm text-slate-400">Luxury Adventure Travel</p>

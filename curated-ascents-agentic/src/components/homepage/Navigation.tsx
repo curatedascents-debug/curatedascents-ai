@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mountain, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 import { navSlideIn, mobileMenuVariants, fadeInUp } from "@/lib/animations";
 
 interface NavigationProps {
@@ -60,7 +61,7 @@ export default function Navigation({ onChatOpen }: NavigationProps) {
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
             >
-              <Mountain className="w-8 h-8 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
+              <CuratedAscentsLogo className="text-emerald-400 group-hover:text-emerald-300 transition-colors" size={32} />
               <span className="text-xl font-serif font-bold text-white">
                 CuratedAscents
               </span>
