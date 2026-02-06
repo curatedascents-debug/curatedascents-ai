@@ -14,8 +14,8 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "12");
     const offset = parseInt(searchParams.get("offset") || "0");
 
-    // Build conditions - only published posts
-    const conditions = [eq(blogPosts.status, "published")];
+    // Build where clause - only published posts
+    const baseCondition = eq(blogPosts.status, "published");
 
     // Join with category to filter by slug
     let categoryId: number | null = null;
@@ -27,13 +27,19 @@ export async function GET(request: NextRequest) {
         .limit(1);
       if (cat) {
         categoryId = cat.id;
-        conditions.push(eq(blogPosts.categoryId, categoryId));
       }
     }
 
-    if (destination) {
-      conditions.push(eq(blogPosts.destinationId, parseInt(destination)));
-    }
+    const destinationId = destination ? parseInt(destination) : null;
+
+    // Build where clause explicitly to avoid and() with single arg
+    const whereClause = categoryId && destinationId
+      ? and(baseCondition, eq(blogPosts.categoryId, categoryId), eq(blogPosts.destinationId, destinationId))
+      : categoryId
+      ? and(baseCondition, eq(blogPosts.categoryId, categoryId))
+      : destinationId
+      ? and(baseCondition, eq(blogPosts.destinationId, destinationId))
+      : baseCondition;
 
     // Get posts
     const posts = await db
@@ -58,7 +64,7 @@ export async function GET(request: NextRequest) {
       .from(blogPosts)
       .leftJoin(blogCategories, eq(blogPosts.categoryId, blogCategories.id))
       .leftJoin(destinations, eq(blogPosts.destinationId, destinations.id))
-      .where(and(...conditions))
+      .where(whereClause)
       .orderBy(desc(blogPosts.publishedAt))
       .limit(limit)
       .offset(offset);
@@ -67,7 +73,7 @@ export async function GET(request: NextRequest) {
     const [{ count }] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(blogPosts)
-      .where(and(...conditions));
+      .where(whereClause);
 
     // Get all categories for filter
     const categories = await db
