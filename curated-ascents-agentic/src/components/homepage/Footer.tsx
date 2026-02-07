@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Twitter } from "lucide-react";
 import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
@@ -55,12 +56,12 @@ export default function Footer({ onChatOpen }: FooterProps) {
           >
             {/* Brand Column */}
             <motion.div variants={fadeInUp} className="lg:col-span-2">
-              <a href="/" className="flex items-center gap-3 mb-6">
+              <Link href="/" className="flex items-center gap-3 mb-6">
                 <CuratedAscentsLogo className="text-emerald-400" size={32} />
                 <span className="text-xl font-serif font-bold text-white">
                   CuratedAscents
                 </span>
-              </a>
+              </Link>
               <p className="text-slate-400 mb-6 max-w-sm">
                 Crafting bespoke luxury adventures across the Himalayas since 1996.
                 Where every journey is a masterpiece.
@@ -145,12 +146,12 @@ export default function Footer({ onChatOpen }: FooterProps) {
               <ul className="space-y-3">
                 {supportLinks.map((link) => (
                   <li key={link.label}>
-                    <a
+                    <Link
                       href={link.href}
                       className="text-slate-400 hover:text-emerald-400 transition-colors text-sm"
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -167,15 +168,15 @@ export default function Footer({ onChatOpen }: FooterProps) {
               &copy; {new Date().getFullYear()} CuratedAscents. All rights reserved.
             </p>
             <div className="flex gap-6">
-              <a href="/privacy-policy" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+              <Link href="/privacy-policy" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
                 Privacy Policy
-              </a>
-              <a href="/terms" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+              </Link>
+              <Link href="/terms" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
                 Terms of Service
-              </a>
-              <a href="/privacy-policy#cookies" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+              </Link>
+              <Link href="/privacy-policy#cookies" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
                 Cookies
-              </a>
+              </Link>
             </div>
           </div>
         </div>

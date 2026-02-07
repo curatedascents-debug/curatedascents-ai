@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Mountain, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 import BlogList from "@/components/blog/BlogList";
 
 export default function BlogPageClient() {
@@ -29,7 +30,7 @@ export default function BlogPageClient() {
         <div className="container-luxury px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3 group">
-              <Mountain className="w-8 h-8 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
+              <CuratedAscentsLogo className="text-emerald-400 group-hover:text-emerald-300 transition-colors" size={32} />
               <span className="text-xl font-serif font-bold text-white">
                 CuratedAscents
               </span>
@@ -130,7 +131,7 @@ export default function BlogPageClient() {
         <div className="container-luxury px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <Mountain className="w-6 h-6 text-emerald-400" />
+              <CuratedAscentsLogo className="text-emerald-400" size={24} />
               <span className="text-lg font-serif font-bold text-white">
                 CuratedAscents
               </span>

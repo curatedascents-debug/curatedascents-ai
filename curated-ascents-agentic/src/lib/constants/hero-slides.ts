@@ -6,12 +6,12 @@ export interface HeroSlide {
 
 export const heroSlides: HeroSlide[] = [
   {
-    src: "https://images.unsplash.com/photo-1486911278844-a81c5267e227?w=1920&q=80",
+    src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80",
     alt: "Himalayan mountains at sunrise in Nepal",
     label: "Nepal",
   },
   {
-    src: "https://images.unsplash.com/photo-1553856622-d1b352e24a02?w=1920&q=80",
+    src: "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?w=1920&q=80",
     alt: "Tiger's Nest monastery perched on a cliffside in Bhutan",
     label: "Bhutan",
   },
@@ -26,7 +26,7 @@ export const heroSlides: HeroSlide[] = [
     label: "India",
   },
   {
-    src: "https://images.unsplash.com/photo-1585409677983-0f6c41ca9c3b?w=1920&q=80",
+    src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80",
     alt: "Annapurna mountain range panorama",
     label: "Annapurna",
   },
