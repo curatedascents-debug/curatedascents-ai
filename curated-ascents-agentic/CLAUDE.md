@@ -39,11 +39,6 @@ Defined in `.env.local`:
 - `STRIPE_WEBHOOK_SECRET` — Stripe webhook signature verification
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` — Stripe public key for client-side
 - `CRON_SECRET` — Secret for Vercel cron job authentication
-- `WHATSAPP_PHONE_NUMBER_ID` — WhatsApp Business phone number ID
-- `WHATSAPP_ACCESS_TOKEN` — WhatsApp permanent access token
-- `WHATSAPP_WEBHOOK_VERIFY_TOKEN` — Custom token for webhook verification
-- `WHATSAPP_BUSINESS_ACCOUNT_ID` — WhatsApp Business account ID
-- `WHATSAPP_APP_SECRET` — Meta app secret for webhook signature verification
 
 ## Development Workflow
 
@@ -65,9 +60,7 @@ Defined in `.env.local`:
 ### Routing
 
 **Public Routes:**
-- `/` — Luxury homepage with floating AI chat widget
-- `/blog` — Blog listing page with category filters
-- `/blog/[slug]` — Individual blog post with related articles
+- `/` — Chat interface (main user-facing page)
 - `/payment/success` — Payment confirmation page
 - `/payment/cancelled` — Payment cancellation page
 
@@ -88,7 +81,6 @@ Defined in `.env.local`:
 - `/api/currency/*` — Currency conversion
 - `/api/customer/*` — Customer loyalty & surveys
 - `/api/cron/*` — Scheduled background jobs
-- `/api/whatsapp/*` — WhatsApp Business API integration
 
 ### AI Chat Flow (`/api/chat`)
 
@@ -128,7 +120,6 @@ Defined in `.env.local`:
 - `src/lib/agents/tool-executor.ts` — Dispatches tool calls to the appropriate handler
 - `src/lib/agents/database-tools.ts` — Database query functions for all service types
 - `src/lib/agents/fallback-rate-research.ts` — Estimated market rates when DB has no data
-- `src/lib/agents/chat-processor.ts` — Shared AI chat logic for web and WhatsApp channels
 
 **Pricing & Currency:**
 - `src/lib/pricing/pricing-engine.ts` — Dynamic pricing with seasonal, demand, early bird, group, loyalty rules
@@ -140,14 +131,6 @@ Defined in `.env.local`:
 
 **Email Templates:**
 - `src/components/emails/` — React Email templates for all notifications
-
-**WhatsApp Integration:**
-- `src/lib/whatsapp/whatsapp-client.ts` — Meta Cloud API client
-- `src/lib/whatsapp/message-processor.ts` — Incoming message handler
-- `src/lib/whatsapp/message-sender.ts` — Outbound message sender
-- `src/lib/whatsapp/session-manager.ts` — 24-hour session window logic
-- `src/lib/whatsapp/client-linker.ts` — Phone-to-client linking
-- `src/lib/whatsapp/formatters.ts` — WhatsApp markdown formatting
 
 ### Database Schema (`src/db/schema.ts`)
 
@@ -197,11 +180,6 @@ Defined in `.env.local`:
 - `riskAlerts` — Travel advisories and weather alerts
 - `clientNotifications` — Risk notification tracking
 
-**WhatsApp:**
-- `whatsappConversations` — WhatsApp conversation sessions
-- `whatsappMessages` — Individual message records
-- `whatsappTemplates` — Pre-approved template messages
-
 ### Component Patterns
 
 All React components in `src/components/` are client components (`"use client"`). No global state management — components use local `useState`/`useRef`. Conversation history is sent with every chat request (stateless backend).
@@ -217,7 +195,6 @@ All React components in `src/components/` are client components (`"use client"`)
 - **Pricing** — Dynamic pricing rules, demand metrics, price simulator
 - **Nurture** — Email nurture sequences and enrollments
 - **Competitors** — Competitor rate monitoring and comparison
-- **WhatsApp** — WhatsApp conversations, templates, and analytics
 - **Reports** — Advanced analytics with sub-tabs (Overview, Financial, Suppliers, Leads, Operations)
 
 ### Pricing Rules
@@ -253,8 +230,6 @@ All React components in `src/components/` are client components (`"use client"`)
 | Weekly | `/api/cron/feedback-requests` | Post-trip feedback requests |
 | Monthly | `/api/cron/points-expiry` | Loyalty points expiry warnings |
 | Daily | `/api/cron/invoice-overdue` | Overdue invoice reminders |
-| Daily 6 AM | `/api/cron/blog-publishing` | Publish scheduled blog posts |
-| Daily 7 AM | `/api/cron/social-media-posting` | Social media distribution |
 
 ## User Roles
 
@@ -294,119 +269,41 @@ All React components in `src/components/` are client components (`"use client"`)
 - **Risk & Compliance** — Weather alerts, travel advisories, notifications
 - **Supplier Performance** — Response rates, reliability scores, automated follow-up
 
-### ✅ Phase 4.1: Luxury Homepage UI (Complete)
-Premium landing page targeting high-net-worth travelers:
-- **Hero Section** — Full-screen Himalayan imagery with gradient overlay
-- **Featured Experiences** — 6 curated expedition cards with hover effects
-- **Trust Signals** — Animated stat counters (500+ expeditions, 2,500+ travelers, 28+ years, 4.9 rating)
-- **Testimonial Carousel** — Auto-rotating customer quotes with navigation
-- **Destination Highlights** — Bento grid layout (Nepal, Bhutan, Tibet, India)
-- **About Section** — Value propositions with split layout
-- **AI Chat Widget** — Floating expandable chat panel
-- **Responsive Navigation** — Transparent→solid on scroll, mobile hamburger menu
-- **Framer Motion Animations** — Smooth fade, slide, and scale transitions
-- **Google Fonts** — Playfair Display (headlines) + Inter (body)
+### 🚧 Phase 4: Growth & Engagement (Planned)
 
-**Homepage Components:** `src/components/homepage/`
-- `LuxuryHomepage.tsx` — Main orchestrator
-- `Navigation.tsx` — Fixed header with scroll detection
-- `HeroSection.tsx` — Full-viewport hero with CTAs
-- `FeaturedExperiences.tsx` + `ExperienceCard.tsx` — Package grid
-- `TrustSignals.tsx` + `StatCard.tsx` + `TestimonialCarousel.tsx` — Social proof
-- `DestinationHighlights.tsx` + `DestinationCard.tsx` — Destination grid
-- `AboutSection.tsx` — Value propositions
-- `Footer.tsx` — 4-column footer
-- `ChatWidget.tsx` — Floating chat wrapper
+#### 4.1 Luxury Homepage UI
+Premium landing page with sleek design targeting high-net-worth travelers:
+- **Hero Section** — Full-screen video/image carousel of luxury destinations
+- **Featured Experiences** — Curated expedition showcases
+- **Trust Signals** — Testimonials, press mentions, certifications
+- **Interactive Map** — Destination explorer with hover details
+- **AI Chat Widget** — Floating chat access from any page
+- **Responsive Design** — Mobile-first luxury aesthetic
+- **Performance** — Optimized images, lazy loading, Core Web Vitals
 
-**Static Data:** `src/lib/constants/`
-- `destinations.ts`, `experiences.ts`, `testimonials.ts`, `stats.ts`
-
-**Animations:** `src/lib/animations.ts` — Framer Motion variants
-
-### ✅ Phase 4.2: AI-Powered Blog & SEO Engine (Complete)
+#### 4.2 AI-Powered Blog & SEO Engine
 Autonomous content creation for organic traffic and social media:
-- **AI Blog Writer Agent** — DeepSeek-powered content generation with structured prompts
-- **Content Calendar** — Admin dashboard with scheduling and bulk management
-- **SEO Optimization** — Auto-generated meta tags, keywords, slugs, read time
-- **Social Media Integration** — Platform-specific formatting for Instagram, Facebook, LinkedIn, Twitter/X
+- **AI Blog Writer Agent** — Generates SEO-optimized travel articles
+- **Content Calendar** — Automated weekly/bi-weekly publishing schedule
+- **SEO Optimization** — Meta tags, structured data, keyword targeting
+- **Social Media Integration** — Auto-share to Instagram, Facebook, LinkedIn, Twitter/X
 - **Content Types:**
-  - Destination guides, Travel tips, Packing lists
-  - Cultural insights, Seasonal content, Trip reports
-- **Public Blog** — Responsive blog listing and article pages with markdown rendering
-- **Admin Controls** — Full CRUD, AI generation, category management, analytics
+  - Destination guides (e.g., "Ultimate Guide to Everest Base Camp")
+  - Travel tips (e.g., "What to Pack for a Himalayan Trek")
+  - Seasonal content (e.g., "Best Time to Visit Bhutan")
+  - Trip reports (with client permission)
+  - Cultural insights (e.g., "Understanding Nepali Festivals")
+- **CTA Integration** — Each blog links to relevant packages/chat
+- **Analytics** — Track blog → inquiry → booking conversion
+- **Admin Controls** — Review/edit before publish, topic suggestions
 
-**Blog Components:** `src/components/blog/`
-- `BlogList.tsx` — Category-filtered post grid with pagination
-- `BlogCard.tsx` — Post preview cards with hover effects
-- `BlogPost.tsx` — Full article with markdown, share buttons, related posts
-
-**Admin Components:** `src/components/admin/`
-- `BlogTab.tsx` — Posts, categories, schedule, analytics sub-tabs
-- `BlogPostModal.tsx` — Create/edit with AI generation
-
-**Blog Libraries:** `src/lib/blog/`
-- `blog-writer-agent.ts` — DeepSeek content generation
-- `seo-optimizer.ts` — SEO analysis, keyword suggestions, metadata
-- `social-media-formatter.ts` — Platform-specific post formatting
-
-**Database Tables:** `blogCategories`, `blogPosts`, `blogSocialPosts`
-
-**Cron Jobs:**
-- Daily 6 AM: `/api/cron/blog-publishing` — Publish scheduled posts
-- Daily 7 AM: `/api/cron/social-media-posting` — Social media distribution
-
-### ✅ Phase 5.1: WhatsApp Business API Integration (Complete)
-AI chat via WhatsApp with full tool-calling capabilities:
-- **Webhook Endpoint** — Receives messages and status updates from Meta
-- **Session Management** — 24-hour free-form messaging window tracking
-- **Client Linking** — Auto-link phone numbers to existing clients
-- **Message Formatting** — WhatsApp-specific markdown and chunking (4096 char limit)
-- **Template Messages** — Pre-approved templates for out-of-window messaging
-- **Shared AI Processor** — Same AI logic as web chat with WhatsApp optimizations
-- **Admin Dashboard** — Conversations, templates, and analytics sub-tabs
-
-**WhatsApp Components:** `src/lib/whatsapp/`
-- `whatsapp-client.ts` — Meta Cloud API wrapper
-- `message-processor.ts` — Incoming message orchestration
-- `message-sender.ts` — Outbound message handling
-- `session-manager.ts` — 24-hour window tracking
-- `client-linker.ts` — Phone-to-client matching
-- `formatters.ts` — WhatsApp markdown conversion
-
-**Admin Component:** `src/components/admin/WhatsAppTab.tsx`
-- Conversations sub-tab with real-time messaging
-- Templates sub-tab for template management
-- Analytics sub-tab with engagement metrics
-
-**Database Tables:** `whatsappConversations`, `whatsappMessages`, `whatsappTemplates`
-
-**Template Messages (for Meta approval):**
-- `session_greeting` — Re-engage after 24-hour expiry
-- `quote_ready` — Quote PDF notification
-- `booking_confirmed` — Booking confirmation
-- `payment_reminder` — Payment due reminder
-- `trip_briefing` — Pre-departure briefing
-
-### ✅ Phase 5.2: Multi-Language AI Chat (Complete)
-Prompt-driven multilingual support — no i18n library needed:
-- **Auto Language Detection** — AI detects user's language and responds in kind
-- **Mid-Conversation Switching** — Seamlessly switches when user changes language
-- **Script-Based Locale Storage** — Detects non-Latin scripts (CJK, Devanagari, Arabic, Cyrillic, Thai, etc.) and stores locale on client record
-- **Personalized Language Preference** — Uses `clientContentPreferences.preferredLanguage` in system prompt
-- **WhatsApp Language Support** — Media acknowledgments routed through AI for language-aware responses
-- **Security Preserved** — All pricing/margin rules enforced regardless of language
-- **Tool Calls Stay English** — Only natural-language responses are translated
-
-**Files Modified:**
-- `src/lib/agents/chat-processor.ts` — Language rules in system prompt, `detectLanguageScript()` helper, locale storage
-- `src/lib/agents/expedition-architect-enhanced.ts` — Preferred language in personalized prompt
-- `src/lib/whatsapp/message-processor.ts` — AI-routed media acknowledgments
-
-### 🔮 Phase 6: Future Enhancements
+### 🔮 Phase 5: Future Enhancements
 - **Mobile App** — React Native companion app
+- **WhatsApp Integration** — AI chat via WhatsApp Business API
 - **Video Consultations** — Scheduled video calls with travel experts
 - **AR/VR Previews** — Virtual destination tours
 - **Carbon Offset** — Sustainability tracking and offsets
+- **Multi-language** — AI chat in multiple languages
 
 ## API Endpoints Reference
 
@@ -460,16 +357,6 @@ Prompt-driven multilingual support — no i18n library needed:
 | GET/PUT/DELETE | `/api/admin/competitors/[id]` | Individual rate |
 | GET | `/api/admin/competitors/compare` | Price comparison |
 
-### Blog APIs
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET/POST | `/api/admin/blog/posts` | Blog post management |
-| GET/PUT/DELETE | `/api/admin/blog/posts/[id]` | Individual post CRUD |
-| GET/POST/PUT/DELETE | `/api/admin/blog/categories` | Category management |
-| POST | `/api/admin/blog/generate` | AI content generation |
-| GET | `/api/blog/posts` | Public blog listing |
-| GET | `/api/blog/posts/[slug]` | Public post by slug |
-
 ### Reports APIs
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
@@ -504,14 +391,3 @@ Prompt-driven multilingual support — no i18n library needed:
 | GET | `/api/supplier/auth/me` | Current supplier |
 | GET | `/api/supplier/bookings` | Supplier's bookings |
 | GET/PUT | `/api/supplier/rates` | Supplier's rates |
-
-### WhatsApp APIs
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET | `/api/whatsapp/webhook` | Meta webhook verification |
-| POST | `/api/whatsapp/webhook` | Incoming messages & status |
-| POST | `/api/whatsapp/send` | Send outbound message |
-| GET | `/api/admin/whatsapp/conversations` | List conversations |
-| GET | `/api/admin/whatsapp/conversations/[id]` | Conversation detail |
-| POST | `/api/admin/whatsapp/conversations` | Link conversation to client |
-| GET/POST/PUT/DELETE | `/api/admin/whatsapp/templates` | Template management |
