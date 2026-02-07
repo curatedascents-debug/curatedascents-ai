@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { blogPosts, blogCategories, destinations } from "@/db/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, count } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
@@ -29,15 +29,15 @@ export async function GET(request: NextRequest) {
 
     const destinationIdNum = destination ? parseInt(destination) : null;
 
-    // Build raw SQL WHERE fragments to avoid Drizzle and() issues
-    const whereParts: string[] = [`"blog_posts"."status" = 'published'`];
+    // Build where conditions using Drizzle operators
+    const conditions = [eq(blogPosts.status, 'published')];
     if (categoryId) {
-      whereParts.push(`"blog_posts"."category_id" = ${categoryId}`);
+      conditions.push(eq(blogPosts.categoryId, categoryId));
     }
     if (destinationIdNum) {
-      whereParts.push(`"blog_posts"."destination_id" = ${destinationIdNum}`);
+      conditions.push(eq(blogPosts.destinationId, destinationIdNum));
     }
-    const whereSQL = sql.raw(whereParts.join(" AND "));
+    const whereClause = conditions.length === 1 ? conditions[0] : and(...conditions);
 
     // Get posts
     const posts = await db
@@ -62,16 +62,17 @@ export async function GET(request: NextRequest) {
       .from(blogPosts)
       .leftJoin(blogCategories, eq(blogPosts.categoryId, blogCategories.id))
       .leftJoin(destinations, eq(blogPosts.destinationId, destinations.id))
-      .where(whereSQL)
+      .where(whereClause)
       .orderBy(desc(blogPosts.publishedAt))
       .limit(limit)
       .offset(offset);
 
-    // Get total count using raw SQL to match exactly
-    const countResult = await db.execute(
-      sql.raw(`SELECT count(*)::int as count FROM blog_posts WHERE ${whereParts.join(" AND ")}`)
-    );
-    const total = countResult.rows?.[0]?.count ?? posts.length;
+    // Get total count
+    const [countResult] = await db
+      .select({ total: count() })
+      .from(blogPosts)
+      .where(whereClause);
+    const total = countResult?.total ?? posts.length;
 
     // Get all categories for filter
     const categories = await db
@@ -92,6 +93,8 @@ export async function GET(request: NextRequest) {
       categories,
       limit,
       offset,
+    }, {
+      headers: { 'Cache-Control': 'no-store, max-age=0' },
     });
   } catch (error) {
     console.error("Error fetching blog posts:", error);

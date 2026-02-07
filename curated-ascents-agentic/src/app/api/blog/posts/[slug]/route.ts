@@ -90,6 +90,8 @@ export async function GET(
       success: true,
       post,
       relatedPosts,
+    }, {
+      headers: { 'Cache-Control': 'no-store, max-age=0' },
     });
   } catch (error) {
     console.error("Error fetching blog post:", error);
