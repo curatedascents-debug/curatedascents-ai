@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { eq } from 'drizzle-orm';
 import { db } from '@/db';
 import {
   suppliers,
@@ -303,7 +304,7 @@ export async function GET() {
         excerpt: 'Discover the Thunder Dragon Kingdom — from Tiger\'s Nest to hidden valleys, ancient festivals, and Bhutan\'s unique approach to happiness.',
         content: `# Bhutan: The Last Shangri-La\n\nBhutan is unlike anywhere else on Earth. This tiny Himalayan kingdom measures success not by GDP, but by Gross National Happiness. With a policy of "high value, low impact" tourism, every visit feels exclusive.\n\n## Must-Visit Destinations\n\n### Paro Valley\nHome to the iconic Tiger\'s Nest Monastery (Taktsang), perched impossibly on a cliff at 3,120m. The 2-hour hike through pine forests is rewarded with one of Asia\'s most photographed sights.\n\n### Thimphu\nThe world\'s only capital without traffic lights. Visit the Memorial Chorten, the giant Buddha Dordenma statue, and the weekend market for local crafts.\n\n### Punakha\nThe old winter capital, set at the confluence of two rivers. Punakha Dzong is arguably the most beautiful fortress-monastery in Bhutan.\n\n### Bumthang Valley\nBhutan\'s spiritual heartland. Ancient temples, Swiss-style cheese factories, and stunning hiking trails through alpine meadows.\n\n## Festival Season\n\nBhutanese tshechus (festivals) are living museums of masked dance and spiritual tradition. The Paro and Thimphu tshechus are the most accessible, featuring elaborate mask dances dating back centuries.\n\n## Sustainable Development Fee\n\nBhutan charges a daily Sustainable Development Fee (SDF) of $100/day for international tourists. This funds free healthcare, education, and environmental conservation.\n\n## Our Luxury Bhutan Experiences\n\n- Stay at Amankora lodges across five valleys\n- Private audience with a Buddhist lama\n- Traditional hot stone bath in a farmhouse\n- Helicopter transfer to remote Gangtey Valley`,
         categoryId: catIds[0],
-        featuredImage: 'https://images.unsplash.com/photo-1553856622-d1b352e9a211?w=1200',
+        featuredImage: 'https://images.unsplash.com/photo-1578556881786-851d4b79cb73?w=1200',
         featuredImageAlt: 'Tiger\'s Nest Monastery in Paro, Bhutan',
         contentType: 'destination_guide',
         tags: ['bhutan', 'cultural travel', 'luxury', 'tigers nest', 'festivals'],
@@ -357,8 +358,8 @@ export async function GET() {
         excerpt: 'Bhutan\'s dress codes, mountain weather, and cultural etiquette require thoughtful packing. Our complete guide for the Thunder Dragon Kingdom.',
         content: `# What to Pack for a Luxury Bhutan Trip\n\nBhutan combines mountain hiking with temple visits, hot-stone baths, and fine dining — your suitcase needs to be versatile.\n\n## Essential Clothing\n\n### For Dzong & Temple Visits\n- Long pants or skirts (knees must be covered)\n- Long-sleeve shirts or blouses\n- Modest, smart-casual outfits\n- Shoes that slip on/off easily (you\'ll remove them often)\n\n### For Trekking & Outdoor Activities\n- Comfortable hiking pants\n- Moisture-wicking base layers\n- Light fleece or softshell jacket\n- Waterproof rain jacket\n- Sturdy walking shoes or light hiking boots\n\n### For Evenings at Luxury Lodges\n- Smart casual dinner wear\n- Light sweater or pashmina (lodges can be cool)\n- Comfortable indoor shoes\n\n## Weather Considerations\n\n**Spring (March-May):** Days 15-25°C, nights 5-10°C. Rhododendrons in bloom.\n**Autumn (September-November):** Days 15-22°C, nights 3-8°C. Clearest skies.\n**Winter (December-February):** Days 10-15°C, nights -5 to 5°C. Few tourists.\n\n## Cultural Items\n- Small gifts for monastery visits (incense, fruit)\n- A respectful attitude — Bhutanese take their culture seriously\n- Camera with good zoom (monasteries often restrict interior photography)\n\n## Luxury Lodge Amenities\n\nOur partner lodges (Amankora, COMO Uma) provide:\n- Robes and slippers\n- Premium toiletries\n- Hot water bottles for beds\n- Laundry service (usually returned same day)\n\nThis means you can pack lighter than you think!\n\n## Health & Documents\n- Passport with 6+ months validity\n- Bhutan visa (we arrange this for you)\n- Travel insurance documents\n- Prescription medications\n- Altitude medication if visiting higher valleys`,
         categoryId: catIds[2],
-        featuredImage: 'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=1200',
-        featuredImageAlt: 'Bhutanese dzong with colorful prayer flags',
+        featuredImage: 'https://images.unsplash.com/photo-1608377229419-3b5168b6c3da?w=1200',
+        featuredImageAlt: 'Tiger\'s Nest monastery on cliffside in Bhutan',
         contentType: 'packing_list',
         tags: ['bhutan', 'packing', 'luxury travel', 'cultural dress code'],
         keywords: ['bhutan packing list', 'what to wear in bhutan', 'bhutan dress code temples'],
@@ -384,8 +385,8 @@ export async function GET() {
         excerpt: 'From Bhutan\'s masked dances to Nepal\'s Dashain celebrations — time your visit to experience the Himalaya\'s most spectacular festivals.',
         content: `# Sacred Festivals of the Himalayas You Can Witness\n\nThe Himalayan calendar is rich with festivals that offer travelers an authentic window into living traditions. Here are the most spectacular celebrations you can experience.\n\n## Nepal\n\n### Dashain (September/October)\nNepal\'s biggest festival spans 15 days. Families reunite, elders give blessings with red tika on foreheads, and bamboo swings appear in every village. The energy is infectious.\n\n### Tihar / Deepawali (October/November)\nThe festival of lights. Day 1 honors crows, Day 2 dogs (with flower garlands!), Day 3 features stunning oil lamp displays, and Day 4 celebrates the bond between brothers and sisters.\n\n### Holi (March)\nThe festival of colors. Kathmandu\'s Durbar Square becomes a joyful battlefield of colored powder and water. Wear white — it won\'t stay white for long.\n\n## Bhutan\n\n### Paro Tshechu (March/April)\nThe most famous Bhutanese festival. Three days of sacred mask dances performed by monks in elaborate costumes. The highlight: the unfurling of a giant thangka (religious painting) at dawn.\n\n### Thimphu Tshechu (September/October)\nThe capital\'s biggest celebration draws thousands. Besides mask dances, you\'ll see atsara (clowns) entertaining crowds and locals in their finest kira and gho.\n\n### Black-Necked Crane Festival (November)\nIn Gangtey Valley, locals celebrate the arrival of endangered black-necked cranes from Tibet. School children perform crane dances — utterly charming.\n\n## Tibet\n\n### Saga Dawa (May/June)\nThe holiest month in Tibetan Buddhism, celebrating Buddha\'s birth, enlightenment, and passing. Pilgrims walk the Barkhor circuit around Jokhang Temple thousands of times.\n\n### Shoton Festival (August)\nThe "Yogurt Festival" in Lhasa features a giant thangka unveiling at Drepung Monastery, Tibetan opera performances, and picnics in Norbulingka park.\n\n## Planning Tips\n\n- Book 6-12 months ahead for festival dates — accommodation fills quickly\n- Festival dates follow lunar calendars and shift yearly\n- Our team tracks exact dates and can build your itinerary around them\n- Combine festivals with trekking or cultural tours for the ultimate experience`,
         categoryId: catIds[3],
-        featuredImage: 'https://images.unsplash.com/photo-1609766857041-ed402ea8069a?w=1200',
-        featuredImageAlt: 'Colorful Himalayan festival with masked dancers',
+        featuredImage: 'https://images.unsplash.com/photo-1503641926155-5c17619b79d0?w=1200',
+        featuredImageAlt: 'Prayer flags with snowy Tibetan monastery',
         contentType: 'cultural_insight',
         tags: ['festivals', 'culture', 'nepal', 'bhutan', 'tibet', 'traditions'],
         keywords: ['himalayan festivals', 'bhutan tshechu', 'nepal dashain', 'tibet saga dawa'],
@@ -398,8 +399,8 @@ export async function GET() {
         excerpt: 'Crystal-clear skies, comfortable temperatures, and festival celebrations — here\'s why autumn is Nepal\'s golden season.',
         content: `# Nepal in Autumn: Why October is the Perfect Month\n\nAsk any Nepal veteran when to visit, and the answer is almost always the same: October. Here\'s why.\n\n## The Weather\n\nThe monsoon retreats by late September, leaving behind washed skies of extraordinary clarity. October days are warm (15-25°C in Kathmandu, 5-15°C on treks) with minimal rainfall. The visibility is unmatched — you can see mountain ranges 200km away.\n\n## The Mountains\n\nPost-monsoon air is dust-free and crystal clear. This is when photographers get those iconic shots — Machapuchare reflected in Phewa Lake, the Annapurna range glowing pink at sunrise, Everest\'s plume visible from Namche Bazaar.\n\n## The Festivals\n\nOctober brings Nepal\'s two biggest celebrations:\n\n- **Dashain** (usually October): 15 days of family reunions, blessings, and joy\n- **Tihar** (October/November): The festival of lights, with oil lamps illuminating every home\n\nWitnessing these festivals adds an unforgettable cultural dimension to your trip.\n\n## The Trekking\n\n### Everest Region\nOctober is prime season. Expect 6-8 hours of sunshine daily, stable weather windows, and the Khumbu at its most photogenic.\n\n### Annapurna Region\nThe circuit and sanctuary treks are at their best. Rhododendron forests are green from the monsoon, and the passes are snow-free.\n\n### Off-the-Beaten-Path\nManaslu, Dolpo, and Upper Mustang are accessible and uncrowded compared to the main routes.\n\n## Wildlife\n\nChitwan National Park is excellent in October. The jungle is lush, rivers are manageable for canoe trips, and tiger sightings peak as animals come to water sources.\n\n## What to Expect\n\n- **Crowds:** This is peak season. Book 3-6 months ahead.\n- **Prices:** Higher than off-season, but worth every penny.\n- **Flights:** Lukla flights operate reliably. Domestic flights are consistent.\n\n## Our October Recommendation\n\nCombine a 12-day Everest Base Camp luxury trek with 3 days in Kathmandu during Dashain. It\'s the ultimate Nepal experience.`,
         categoryId: catIds[4],
-        featuredImage: 'https://images.unsplash.com/photo-1516477266410-9e30205d1f3b?w=1200',
-        featuredImageAlt: 'Clear autumn views of Himalayan peaks in Nepal',
+        featuredImage: 'https://images.unsplash.com/photo-1571401835393-8c5f35328320?w=1200',
+        featuredImageAlt: 'Prayer flags with Machapuchare peak in Nepal',
         contentType: 'seasonal',
         tags: ['autumn', 'october', 'nepal', 'best time to visit', 'weather'],
         keywords: ['nepal in october', 'best time to visit nepal', 'nepal autumn trekking season'],
@@ -425,7 +426,7 @@ export async function GET() {
         excerpt: 'Our guide recounts the predawn climb to 5,545m and the life-changing sunrise that reveals the full majesty of Everest.',
         content: `# Sunrise at Kala Patthar: A Moment That Changes Everything\n\n*By Pemba Dorje, Senior Expedition Leader*\n\nAfter 28 years of guiding in the Khumbu, I\'ve stood on Kala Patthar over 200 times. And every single sunrise still takes my breath away.\n\n## The Wake-Up Call\n\n3:30 AM. Gorak Shep. -15°C.\n\nMy headlamp cuts through the frozen darkness as I knock on each client\'s door. "Good morning! Hot tea is ready." The groans are universal — no one wants to leave their sleeping bag at this hour, at this altitude.\n\nBut I know what awaits them.\n\n## The Climb\n\nKala Patthar rises 380m above Gorak Shep. In the dark, with headlamps bobbing like fireflies, we pick our way up the rocky ridge. At 5,400m, every step requires three breaths. Conversation stops. The world shrinks to the circle of your headlamp and the rhythm of your breathing.\n\nI watch my clients carefully. After 12 days of trekking, fatigue is real. But something keeps them moving — the same thing that brought them 10,000 kilometers from home.\n\n## The Moment\n\nAt 5,545m, we stop. The sky is navy blue, fading to purple on the eastern horizon. Stars are still visible overhead.\n\nThen it begins.\n\nThe first light touches the summit of Everest — a sliver of gold on the highest point on Earth. Within minutes, the entire pyramid is blazing orange against the deep blue sky. Nuptse\'s massive wall catches the light next, then Changtse, then the Khumbu Icefall.\n\nI turn to look at my clients. Every single time, I see the same thing: tears.\n\nNot from the cold. Not from exhaustion. From the overwhelming realization that they\'re standing at the top of the world, watching the sun illuminate a peak that humans have dreamed about for centuries.\n\n## Why It Matters\n\nPeople ask me why I keep doing this job after 28 years. This moment is my answer. Watching someone\'s life change in the span of a sunrise — there\'s no better feeling in the world.\n\nThe trek to get here is hard. The altitude hurts. The cold bites. But standing on Kala Patthar as Everest turns gold, every hardship dissolves into pure, overwhelming gratitude.\n\n## Practical Notes\n\n- Depart Gorak Shep between 3:30-4:00 AM\n- Allow 2-2.5 hours for the ascent\n- Dress for extreme cold: down parka, insulated gloves, balaclava\n- Bring spare camera batteries inside your jacket (cold kills batteries)\n- The descent takes about 1 hour back to Gorak Shep for breakfast`,
         categoryId: catIds[5],
-        featuredImage: 'https://images.unsplash.com/photo-1516302752625-fcc3c50ae61f?w=1200',
+        featuredImage: 'https://images.unsplash.com/photo-1504619504099-a8644da0a966?w=1200',
         featuredImageAlt: 'Golden sunrise over Mount Everest from Kala Patthar',
         contentType: 'trip_report',
         tags: ['everest', 'kala patthar', 'sunrise', 'personal story', 'guide story'],
@@ -464,6 +465,41 @@ export async function GET() {
       }
     }
     console.log(`Inserted ${insertedBlogPosts.length} blog posts`);
+
+    // Update existing blog post images (for posts that were skipped because they already exist)
+    const blogImageUpdates: Record<string, { featuredImage: string; featuredImageAlt: string }> = {
+      'sunrise-kala-patthar-everest': {
+        featuredImage: 'https://images.unsplash.com/photo-1504619504099-a8644da0a966?w=1200',
+        featuredImageAlt: 'Golden sunrise over Mount Everest from Kala Patthar',
+      },
+      'what-to-pack-luxury-bhutan-trip': {
+        featuredImage: 'https://images.unsplash.com/photo-1608377229419-3b5168b6c3da?w=1200',
+        featuredImageAlt: "Tiger's Nest monastery on cliffside in Bhutan",
+      },
+      'bhutan-complete-travel-guide': {
+        featuredImage: 'https://images.unsplash.com/photo-1578556881786-851d4b79cb73?w=1200',
+        featuredImageAlt: "Tiger's Nest Monastery in Paro, Bhutan",
+      },
+      'sacred-festivals-himalayas': {
+        featuredImage: 'https://images.unsplash.com/photo-1503641926155-5c17619b79d0?w=1200',
+        featuredImageAlt: 'Prayer flags with snowy Tibetan monastery',
+      },
+      'nepal-autumn-october-best-month': {
+        featuredImage: 'https://images.unsplash.com/photo-1571401835393-8c5f35328320?w=1200',
+        featuredImageAlt: 'Prayer flags with Machapuchare peak in Nepal',
+      },
+    };
+
+    for (const [slug, imageData] of Object.entries(blogImageUpdates)) {
+      try {
+        await db.update(blogPosts)
+          .set(imageData)
+          .where(eq(blogPosts.slug, slug));
+      } catch (err) {
+        console.log(`Failed to update image for "${slug}"`);
+      }
+    }
+    console.log('Updated blog post images for existing posts');
 
     // Summary
     const summary = {

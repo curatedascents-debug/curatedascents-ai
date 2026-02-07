@@ -195,7 +195,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
             transition={{ delay: 0.2 }}
             className="lg:col-span-2"
           >
-            <article className="prose prose-invert prose-lg max-w-none prose-headings:font-serif prose-headings:text-white prose-p:text-slate-300 prose-a:text-emerald-400 prose-strong:text-white prose-blockquote:border-emerald-500 prose-blockquote:text-slate-300">
+            <article className="prose prose-invert prose-lg max-w-none prose-headings:font-serif prose-headings:text-white prose-p:text-slate-300 prose-a:text-emerald-400 prose-strong:text-white prose-blockquote:border-emerald-500 prose-blockquote:text-slate-300 prose-img:rounded-xl prose-hr:border-slate-700 prose-li:text-slate-300 prose-code:text-emerald-400">
               <ReactMarkdown>
                 {post.content}
               </ReactMarkdown>
