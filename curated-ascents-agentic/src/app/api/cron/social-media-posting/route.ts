@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { blogSocialPosts, blogPosts } from "@/db/schema";
 import { eq, and, lte, sql } from "drizzle-orm";
+import { postToSocialMedia } from "@/lib/social/social-media-client";
 
 export const dynamic = "force-dynamic";
 
@@ -16,33 +17,6 @@ function verifyCronSecret(request: NextRequest): boolean {
   }
 
   return authHeader === `Bearer ${cronSecret}`;
-}
-
-/**
- * Placeholder for social media API integration
- * In production, this would call the actual social media APIs:
- * - Instagram Graph API
- * - Facebook Graph API
- * - LinkedIn API
- * - Twitter/X API
- */
-async function postToSocialMedia(
-  platform: string,
-  text: string,
-  imageUrl?: string | null,
-  hashtags?: string[] | null
-): Promise<{ success: boolean; error?: string }> {
-  // TODO: Implement actual social media posting
-  // For now, just log the attempt
-
-  console.log(`[Social Media] Would post to ${platform}:`, {
-    text: text.substring(0, 100) + "...",
-    imageUrl,
-    hashtagCount: hashtags?.length || 0,
-  });
-
-  // Simulate success (in production, this would be the actual API response)
-  return { success: true };
 }
 
 // POST - Post scheduled social media content

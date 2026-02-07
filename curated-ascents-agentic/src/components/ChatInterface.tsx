@@ -12,9 +12,10 @@ interface Message {
 
 interface ChatInterfaceProps {
   isWidget?: boolean;
+  initialMessage?: string;
 }
 
-export default function ChatInterface({ isWidget = false }: ChatInterfaceProps) {
+export default function ChatInterface({ isWidget = false, initialMessage }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -40,6 +41,7 @@ export default function ChatInterface({ isWidget = false }: ChatInterfaceProps) 
   // ─────────────────────────────────────────────────────────────────────────
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const initialMessageSent = useRef(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -49,14 +51,10 @@ export default function ChatInterface({ isWidget = false }: ChatInterfaceProps) 
     scrollToBottom();
   }, [messages]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (text: string) => {
+    if (!text.trim() || isLoading) return;
 
-    const userMessage = input.trim();
-    setInput("");
-
-    const newMessages = [...messages, { role: "user" as const, content: userMessage }];
+    const newMessages = [...messages, { role: "user" as const, content: text.trim() }];
     setMessages(newMessages);
     setIsLoading(true);
 
@@ -94,6 +92,23 @@ export default function ChatInterface({ isWidget = false }: ChatInterfaceProps) 
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Auto-send initial message when provided
+  useEffect(() => {
+    if (initialMessage && !initialMessageSent.current) {
+      initialMessageSent.current = true;
+      sendMessage(initialMessage);
+    }
+  }, [initialMessage]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = input.trim();
+    setInput("");
+    sendMessage(userMessage);
   };
 
   // ── REPLACED: was just setShowEmailPrompt(false) ────────────────────────

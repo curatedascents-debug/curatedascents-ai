@@ -60,6 +60,23 @@ const STATUS_OPTIONS = [
   { value: "archived", label: "Archived" },
 ];
 
+interface AnalyticsData {
+  summary: {
+    totalPosts: number;
+    publishedPosts: number;
+    totalViews: number;
+    avgReadTime: number;
+    aiGenerated: number;
+    manualCreated: number;
+  };
+  postsOverTime: { month: string; count: number }[];
+  viewsOverTime: { month: string; views: number }[];
+  topPosts: { id: number; title: string; viewCount: number; publishedAt: string; contentType: string }[];
+  categoryDistribution: { categoryId: number | null; categoryName: string | null; categoryColor: string | null; count: number }[];
+  contentTypeDistribution: { contentType: string; count: number }[];
+  socialPerformance: { platform: string; total: number; published: number; failed: number; totalImpressions: number; totalClicks: number }[];
+}
+
 export default function BlogTab({ destinations }: BlogTabProps) {
   const [activeSubTab, setActiveSubTab] = useState<"posts" | "categories" | "schedule" | "analytics">("posts");
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -69,6 +86,8 @@ export default function BlogTab({ destinations }: BlogTabProps) {
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<BlogCategory | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState("all");
@@ -80,7 +99,23 @@ export default function BlogTab({ destinations }: BlogTabProps) {
     if (activeSubTab === "posts" || activeSubTab === "schedule") {
       fetchPosts();
     }
+    if (activeSubTab === "analytics") {
+      fetchAnalytics();
+    }
   }, [activeSubTab]);
+
+  const fetchAnalytics = async () => {
+    setAnalyticsLoading(true);
+    try {
+      const res = await fetch("/api/admin/blog/analytics");
+      const data = await res.json();
+      setAnalytics(data);
+    } catch (error) {
+      console.error("Error fetching blog analytics:", error);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -556,111 +591,231 @@ export default function BlogTab({ destinations }: BlogTabProps) {
         <div>
           <h3 className="text-lg font-semibold text-white mb-4">Blog Analytics</h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Top Performing Posts */}
-            <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-slate-300 mb-4">Top Performing Posts</h4>
-              {posts.length === 0 ? (
-                <div className="text-center py-4 text-slate-500 text-sm">No data available</div>
-              ) : (
-                <div className="space-y-3">
-                  {posts
-                    .filter((p) => p.status === "published")
-                    .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
-                    .slice(0, 5)
-                    .map((post, idx) => (
-                      <div
-                        key={post.id}
-                        className="flex items-center justify-between bg-slate-900/50 rounded p-3"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-slate-500 text-sm w-4">{idx + 1}.</span>
-                          <span className="text-white text-sm truncate max-w-[200px]">
-                            {post.title}
+          {analyticsLoading ? (
+            <div className="text-center py-12 text-slate-400">Loading analytics...</div>
+          ) : !analytics ? (
+            <div className="text-center py-12 text-slate-500">No analytics data available</div>
+          ) : (
+            <>
+              {/* Summary Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                {[
+                  { label: "Total Posts", value: analytics.summary.totalPosts, color: "text-white" },
+                  { label: "Published", value: analytics.summary.publishedPosts, color: "text-emerald-400" },
+                  { label: "Total Views", value: analytics.summary.totalViews.toLocaleString(), color: "text-blue-400" },
+                  { label: "Avg Read Time", value: `${analytics.summary.avgReadTime} min`, color: "text-amber-400" },
+                ].map((stat) => (
+                  <div key={stat.label} className="bg-slate-800 border border-slate-700 rounded-lg p-4 text-center">
+                    <div className={`text-2xl font-bold ${stat.color}`}>{stat.value}</div>
+                    <div className="text-xs text-slate-500 mt-1">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Posts Over Time */}
+                <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
+                  <h4 className="text-sm font-semibold text-slate-300 mb-4">Posts Over Time</h4>
+                  {analytics.postsOverTime.length === 0 ? (
+                    <div className="text-center py-4 text-slate-500 text-sm">No data</div>
+                  ) : (
+                    <div className="flex items-end gap-1 h-32">
+                      {analytics.postsOverTime.map((item) => {
+                        const maxCount = Math.max(...analytics.postsOverTime.map((p) => p.count), 1);
+                        const height = Math.max((item.count / maxCount) * 100, 4);
+                        return (
+                          <div key={item.month} className="flex-1 flex flex-col items-center gap-1">
+                            <span className="text-[10px] text-slate-500">{item.count}</span>
+                            <div
+                              className="w-full bg-emerald-500 rounded-t transition-all"
+                              style={{ height: `${height}%` }}
+                              title={`${item.month}: ${item.count} posts`}
+                            />
+                            <span className="text-[9px] text-slate-600 truncate w-full text-center">
+                              {item.month.slice(5)}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Views Over Time */}
+                <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
+                  <h4 className="text-sm font-semibold text-slate-300 mb-4">Views Over Time</h4>
+                  {analytics.viewsOverTime.length === 0 ? (
+                    <div className="text-center py-4 text-slate-500 text-sm">No data</div>
+                  ) : (
+                    <div className="flex items-end gap-1 h-32">
+                      {analytics.viewsOverTime.map((item) => {
+                        const maxViews = Math.max(...analytics.viewsOverTime.map((v) => v.views), 1);
+                        const height = Math.max((item.views / maxViews) * 100, 4);
+                        return (
+                          <div key={item.month} className="flex-1 flex flex-col items-center gap-1">
+                            <span className="text-[10px] text-slate-500">{item.views}</span>
+                            <div
+                              className="w-full bg-blue-500 rounded-t transition-all"
+                              style={{ height: `${height}%` }}
+                              title={`${item.month}: ${item.views} views`}
+                            />
+                            <span className="text-[9px] text-slate-600 truncate w-full text-center">
+                              {item.month.slice(5)}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Top Performing Posts */}
+                <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
+                  <h4 className="text-sm font-semibold text-slate-300 mb-4">Top Performing Posts</h4>
+                  {analytics.topPosts.length === 0 ? (
+                    <div className="text-center py-4 text-slate-500 text-sm">No data available</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {analytics.topPosts.map((post, idx) => (
+                        <div
+                          key={post.id}
+                          className="flex items-center justify-between bg-slate-900/50 rounded p-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="text-slate-500 text-sm w-4">{idx + 1}.</span>
+                            <span className="text-white text-sm truncate max-w-[200px]">
+                              {post.title}
+                            </span>
+                          </div>
+                          <span className="text-blue-400 font-bold text-sm">
+                            {(post.viewCount || 0).toLocaleString()} views
                           </span>
                         </div>
-                        <span className="text-blue-400 font-bold text-sm">
-                          {(post.viewCount || 0).toLocaleString()} views
-                        </span>
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-
-            {/* Posts by Category */}
-            <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-slate-300 mb-4">Posts by Category</h4>
-              {categories.length === 0 ? (
-                <div className="text-center py-4 text-slate-500 text-sm">No data available</div>
-              ) : (
-                <div className="space-y-3">
-                  {categories.map((category) => {
-                    const count = posts.filter((p) => p.categoryId === category.id).length;
-                    const percentage =
-                      posts.length > 0 ? Math.round((count / posts.length) * 100) : 0;
-                    return (
-                      <div key={category.id}>
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-white text-sm">{category.name}</span>
-                          <span className="text-slate-400 text-sm">{count} posts</span>
-                        </div>
-                        <div className="w-full bg-slate-700 rounded-full h-2">
-                          <div
-                            className="h-2 rounded-full transition-all"
-                            style={{
-                              width: `${percentage}%`,
-                              backgroundColor: category.color,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Content Type Distribution */}
-            <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-slate-300 mb-4">Content Type Distribution</h4>
-              <div className="space-y-3">
-                {CONTENT_TYPES.map((type) => {
-                  const count = posts.filter((p) => p.contentType === type.value).length;
-                  return (
-                    <div key={type.value} className="flex items-center justify-between">
-                      <span className="text-white text-sm">{type.label}</span>
-                      <span className="text-slate-400 font-bold">{count}</span>
+                      ))}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
+                  )}
+                </div>
 
-            {/* Publishing Frequency */}
-            <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-slate-300 mb-4">AI vs Manual Content</h4>
-              <div className="flex items-center justify-center h-32">
-                <div className="text-center">
-                  <div className="flex items-center gap-8">
-                    <div>
-                      <div className="text-3xl font-bold text-purple-400">
-                        {posts.filter((p) => p.isAutoGenerated).length}
-                      </div>
-                      <div className="text-xs text-slate-500">AI Generated</div>
+                {/* Category Distribution */}
+                <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
+                  <h4 className="text-sm font-semibold text-slate-300 mb-4">Posts by Category</h4>
+                  {analytics.categoryDistribution.length === 0 ? (
+                    <div className="text-center py-4 text-slate-500 text-sm">No data available</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {analytics.categoryDistribution.map((cat, idx) => {
+                        const total = analytics.categoryDistribution.reduce((s, c) => s + c.count, 0) || 1;
+                        const pct = Math.round((cat.count / total) * 100);
+                        return (
+                          <div key={cat.categoryId ?? idx}>
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-white text-sm">{cat.categoryName || "Uncategorized"}</span>
+                              <span className="text-slate-400 text-sm">{cat.count} posts</span>
+                            </div>
+                            <div className="w-full bg-slate-700 rounded-full h-2">
+                              <div
+                                className="h-2 rounded-full transition-all"
+                                style={{
+                                  width: `${pct}%`,
+                                  backgroundColor: cat.categoryColor || "#3b82f6",
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                    <div className="text-slate-600 text-2xl">/</div>
-                    <div>
-                      <div className="text-3xl font-bold text-cyan-400">
-                        {posts.filter((p) => !p.isAutoGenerated).length}
+                  )}
+                </div>
+
+                {/* Content Type Distribution */}
+                <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
+                  <h4 className="text-sm font-semibold text-slate-300 mb-4">Content Type Distribution</h4>
+                  <div className="space-y-3">
+                    {CONTENT_TYPES.map((type) => {
+                      const found = analytics.contentTypeDistribution.find((d) => d.contentType === type.value);
+                      const count = found?.count || 0;
+                      const maxCount = Math.max(...analytics.contentTypeDistribution.map((d) => d.count), 1);
+                      const pct = Math.round((count / maxCount) * 100);
+                      return (
+                        <div key={type.value}>
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-white text-sm">{type.label}</span>
+                            <span className="text-slate-400 font-bold text-sm">{count}</span>
+                          </div>
+                          <div className="w-full bg-slate-700 rounded-full h-1.5">
+                            <div
+                              className="h-1.5 rounded-full bg-cyan-500 transition-all"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* AI vs Manual Content */}
+                <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
+                  <h4 className="text-sm font-semibold text-slate-300 mb-4">AI vs Manual Content</h4>
+                  <div className="flex items-center justify-center h-32">
+                    <div className="text-center">
+                      <div className="flex items-center gap-8">
+                        <div>
+                          <div className="text-3xl font-bold text-purple-400">
+                            {analytics.summary.aiGenerated}
+                          </div>
+                          <div className="text-xs text-slate-500">AI Generated</div>
+                        </div>
+                        <div className="text-slate-600 text-2xl">/</div>
+                        <div>
+                          <div className="text-3xl font-bold text-cyan-400">
+                            {analytics.summary.manualCreated}
+                          </div>
+                          <div className="text-xs text-slate-500">Manual</div>
+                        </div>
                       </div>
-                      <div className="text-xs text-slate-500">Manual</div>
                     </div>
                   </div>
                 </div>
+
+                {/* Social Media Performance */}
+                <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 md:col-span-2">
+                  <h4 className="text-sm font-semibold text-slate-300 mb-4">Social Media Performance</h4>
+                  {analytics.socialPerformance.length === 0 ? (
+                    <div className="text-center py-4 text-slate-500 text-sm">No social media data available</div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-slate-700">
+                            <th className="text-left text-slate-400 pb-2 font-medium">Platform</th>
+                            <th className="text-right text-slate-400 pb-2 font-medium">Total</th>
+                            <th className="text-right text-slate-400 pb-2 font-medium">Published</th>
+                            <th className="text-right text-slate-400 pb-2 font-medium">Failed</th>
+                            <th className="text-right text-slate-400 pb-2 font-medium">Impressions</th>
+                            <th className="text-right text-slate-400 pb-2 font-medium">Clicks</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {analytics.socialPerformance.map((sp) => (
+                            <tr key={sp.platform} className="border-b border-slate-700/50">
+                              <td className="py-2 text-white capitalize">{sp.platform}</td>
+                              <td className="py-2 text-right text-slate-300">{sp.total}</td>
+                              <td className="py-2 text-right text-emerald-400">{sp.published}</td>
+                              <td className="py-2 text-right text-red-400">{sp.failed}</td>
+                              <td className="py-2 text-right text-slate-300">{sp.totalImpressions.toLocaleString()}</td>
+                              <td className="py-2 text-right text-blue-400">{sp.totalClicks.toLocaleString()}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       )}
 

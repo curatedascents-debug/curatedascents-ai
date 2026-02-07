@@ -15,12 +15,16 @@ import LazySection from "./LazySection";
 
 export default function LuxuryHomepage() {
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [initialMessage, setInitialMessage] = useState<string | undefined>();
 
   const handleChatToggle = () => {
     setIsChatOpen(!isChatOpen);
   };
 
-  const handleChatOpen = () => {
+  const handleChatOpen = (message?: string) => {
+    if (message) {
+      setInitialMessage(message);
+    }
     setIsChatOpen(true);
   };
 
@@ -66,10 +70,10 @@ export default function LuxuryHomepage() {
       </main>
 
       {/* Footer */}
-      <Footer />
+      <Footer onChatOpen={handleChatOpen} />
 
       {/* Floating Chat Widget */}
-      <ChatWidget isOpen={isChatOpen} onToggle={handleChatToggle} />
+      <ChatWidget isOpen={isChatOpen} onToggle={handleChatToggle} initialMessage={initialMessage} />
     </div>
   );
 }

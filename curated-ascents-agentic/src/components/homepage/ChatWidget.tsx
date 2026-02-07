@@ -9,9 +9,10 @@ import ChatInterface from "@/components/ChatInterface";
 interface ChatWidgetProps {
   isOpen: boolean;
   onToggle: () => void;
+  initialMessage?: string;
 }
 
-export default function ChatWidget({ isOpen, onToggle }: ChatWidgetProps) {
+export default function ChatWidget({ isOpen, onToggle, initialMessage }: ChatWidgetProps) {
   const [isMinimized, setIsMinimized] = useState(false);
 
   // Close on escape key
@@ -119,7 +120,7 @@ export default function ChatWidget({ isOpen, onToggle }: ChatWidgetProps) {
               {/* Chat Content */}
               {!isMinimized && (
                 <div className="h-[calc(100%-52px)]">
-                  <ChatInterface isWidget />
+                  <ChatInterface isWidget initialMessage={initialMessage} />
                 </div>
               )}
             </motion.div>

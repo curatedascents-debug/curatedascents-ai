@@ -8,7 +8,7 @@ import TestimonialCarousel from "./TestimonialCarousel";
 
 export default function TrustSignals() {
   return (
-    <section className="section-padding bg-slate-950">
+    <section id="testimonials" className="section-padding bg-slate-950">
       <div className="container-luxury">
         {/* Stats Section */}
         <motion.div

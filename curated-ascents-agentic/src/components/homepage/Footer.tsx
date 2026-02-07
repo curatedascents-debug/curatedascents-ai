@@ -4,39 +4,43 @@ import { motion } from "framer-motion";
 import { Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Twitter } from "lucide-react";
 import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
+import { socialLinks } from "@/lib/constants/social-links";
 
-const footerLinks = {
-  experiences: [
-    { label: "Everest Region", href: "#" },
-    { label: "Annapurna Circuit", href: "#" },
-    { label: "Bhutan Tours", href: "#" },
-    { label: "Tibet Expeditions", href: "#" },
-    { label: "Wildlife Safaris", href: "#" },
-  ],
-  company: [
-    { label: "About Us", href: "#about" },
-    { label: "Our Team", href: "#" },
-    { label: "Testimonials", href: "#" },
-    { label: "Careers", href: "#" },
-    { label: "Press", href: "#" },
-  ],
-  support: [
-    { label: "Contact Us", href: "#" },
-    { label: "FAQs", href: "#" },
-    { label: "Travel Insurance", href: "#" },
-    { label: "Visa Information", href: "#" },
-    { label: "Terms & Conditions", href: "#" },
-  ],
-};
+interface FooterProps {
+  onChatOpen?: (message?: string) => void;
+}
 
-const socialLinks = [
-  { icon: Instagram, href: "#", label: "Instagram" },
-  { icon: Facebook, href: "#", label: "Facebook" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-  { icon: Twitter, href: "#", label: "Twitter" },
+const experienceLinks = [
+  { label: "Everest Region", message: "Tell me about Everest Region trips" },
+  { label: "Annapurna Circuit", message: "Tell me about Annapurna Circuit treks" },
+  { label: "Bhutan Tours", message: "Tell me about luxury Bhutan tours" },
+  { label: "Tibet Expeditions", message: "Tell me about Tibet expeditions" },
+  { label: "Wildlife Safaris", message: "Tell me about wildlife safari experiences in India" },
 ];
 
-export default function Footer() {
+const companyLinks = [
+  { label: "About Us", href: "#about" },
+  { label: "Testimonials", href: "#testimonials" },
+  { label: "Press", href: "#press" },
+  { label: "Careers", href: "mailto:careers@curatedascents.com" },
+];
+
+const supportLinks = [
+  { label: "Contact Us", href: "/contact" },
+  { label: "FAQs", href: "/faq" },
+  { label: "Travel Insurance", href: "/faq#travel-insurance" },
+  { label: "Visa Information", href: "/faq#visa-information" },
+  { label: "Terms & Conditions", href: "/terms" },
+];
+
+const socialIconLinks = [
+  { icon: Instagram, href: socialLinks.instagram, label: "Instagram" },
+  { icon: Facebook, href: socialLinks.facebook, label: "Facebook" },
+  { icon: Linkedin, href: socialLinks.linkedin, label: "LinkedIn" },
+  { icon: Twitter, href: socialLinks.twitter, label: "Twitter" },
+];
+
+export default function Footer({ onChatOpen }: FooterProps) {
   return (
     <footer className="bg-slate-950 border-t border-slate-800">
       {/* Main Footer */}
@@ -51,7 +55,7 @@ export default function Footer() {
           >
             {/* Brand Column */}
             <motion.div variants={fadeInUp} className="lg:col-span-2">
-              <a href="#" className="flex items-center gap-3 mb-6">
+              <a href="/" className="flex items-center gap-3 mb-6">
                 <CuratedAscentsLogo className="text-emerald-400" size={32} />
                 <span className="text-xl font-serif font-bold text-white">
                   CuratedAscents
@@ -86,10 +90,12 @@ export default function Footer() {
 
               {/* Social Links */}
               <div className="flex gap-4 mt-6">
-                {socialLinks.map((social) => (
+                {socialIconLinks.map((social) => (
                   <a
                     key={social.label}
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full border border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-400 hover:border-emerald-400 transition-colors"
                     aria-label={social.label}
                   >
@@ -103,14 +109,14 @@ export default function Footer() {
             <motion.div variants={fadeInUp}>
               <h3 className="text-white font-medium mb-4">Experiences</h3>
               <ul className="space-y-3">
-                {footerLinks.experiences.map((link) => (
+                {experienceLinks.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-slate-400 hover:text-emerald-400 transition-colors text-sm"
+                    <button
+                      onClick={() => onChatOpen?.(link.message)}
+                      className="text-slate-400 hover:text-emerald-400 transition-colors text-sm text-left"
                     >
                       {link.label}
-                    </a>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -120,7 +126,7 @@ export default function Footer() {
             <motion.div variants={fadeInUp}>
               <h3 className="text-white font-medium mb-4">Company</h3>
               <ul className="space-y-3">
-                {footerLinks.company.map((link) => (
+                {companyLinks.map((link) => (
                   <li key={link.label}>
                     <a
                       href={link.href}
@@ -137,7 +143,7 @@ export default function Footer() {
             <motion.div variants={fadeInUp}>
               <h3 className="text-white font-medium mb-4">Support</h3>
               <ul className="space-y-3">
-                {footerLinks.support.map((link) => (
+                {supportLinks.map((link) => (
                   <li key={link.label}>
                     <a
                       href={link.href}
@@ -161,13 +167,13 @@ export default function Footer() {
               &copy; {new Date().getFullYear()} CuratedAscents. All rights reserved.
             </p>
             <div className="flex gap-6">
-              <a href="#" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+              <a href="/privacy-policy" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
                 Privacy Policy
               </a>
-              <a href="#" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+              <a href="/terms" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
                 Terms of Service
               </a>
-              <a href="#" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+              <a href="/privacy-policy#cookies" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
                 Cookies
               </a>
             </div>

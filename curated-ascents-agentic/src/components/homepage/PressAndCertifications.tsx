@@ -14,7 +14,7 @@ const iconMap: Record<Certification["icon"], React.ComponentType<{ className?: s
 
 export default function PressAndCertifications() {
   return (
-    <section className="section-padding bg-slate-900 overflow-hidden">
+    <section id="press" className="section-padding bg-slate-900 overflow-hidden">
       <div className="container-luxury">
         {/* Press Mentions */}
         <motion.div
