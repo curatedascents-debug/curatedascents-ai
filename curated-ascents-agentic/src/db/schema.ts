@@ -700,6 +700,31 @@ export const clients = pgTable('clients', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
+// ============================================
+// CUSTOMER AUTH TABLES
+// ============================================
+
+export const customerVerificationCodes = pgTable('customer_verification_codes', {
+  id: serial('id').primaryKey(),
+  clientId: integer('client_id').references(() => clients.id),
+  email: text('email').notNull(),
+  code: text('code').notNull(), // SHA-256 hashed
+  expiresAt: timestamp('expires_at').notNull(),
+  usedAt: timestamp('used_at'),
+  attempts: integer('attempts').default(0),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const customerSessions = pgTable('customer_sessions', {
+  id: serial('id').primaryKey(),
+  clientId: integer('client_id').references(() => clients.id).notNull(),
+  tokenHash: text('token_hash').notNull(),
+  deviceInfo: text('device_info'),
+  lastActiveAt: timestamp('last_active_at').defaultNow(),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
 export const quotes = pgTable('quotes', {
   id: serial('id').primaryKey(),
   agencyId: integer('agency_id').references(() => agencies.id),

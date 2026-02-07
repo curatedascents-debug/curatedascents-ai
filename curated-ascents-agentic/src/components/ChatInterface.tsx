@@ -13,9 +13,12 @@ interface Message {
 interface ChatInterfaceProps {
   isWidget?: boolean;
   initialMessage?: string;
+  portalMode?: boolean;
+  clientId?: number;
+  clientEmail?: string;
 }
 
-export default function ChatInterface({ isWidget = false, initialMessage }: ChatInterfaceProps) {
+export default function ChatInterface({ isWidget = false, initialMessage, portalMode = false, clientId: portalClientId, clientEmail: portalClientEmail }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -26,7 +29,7 @@ export default function ChatInterface({ isWidget = false, initialMessage }: Chat
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [clientEmail, setClientEmail] = useState("");
+  const [clientEmail, setClientEmail] = useState(portalClientEmail || "");
   const [clientName, setClientName] = useState("");
   const [showEmailPrompt, setShowEmailPrompt] = useState(false);
 
@@ -36,7 +39,7 @@ export default function ChatInterface({ isWidget = false, initialMessage }: Chat
   // ─────────────────────────────────────────────────────────────────────────
 
   // ── Lead scoring integration ─────────────────────────────────────────────
-  const [clientId, setClientId] = useState<number | null>(null);
+  const [clientId, setClientId] = useState<number | null>(portalClientId ?? null);
   const [conversationId] = useState(() => `conv_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`);
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -77,7 +80,7 @@ export default function ChatInterface({ isWidget = false, initialMessage }: Chat
 
       setMessages([...newMessages, { role: "assistant", content: data.message }]);
 
-      if (!clientEmail && newMessages.length >= 4) {
+      if (!portalMode && !clientEmail && newMessages.length >= 4) {
         setShowEmailPrompt(true);
       }
     } catch (error) {

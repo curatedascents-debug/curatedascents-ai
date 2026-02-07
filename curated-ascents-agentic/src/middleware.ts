@@ -5,9 +5,15 @@ import { jwtVerify } from "jose";
 const ADMIN_COOKIE_NAME = "admin_session";
 const AGENCY_COOKIE_NAME = "agency_session";
 const SUPPLIER_COOKIE_NAME = "supplier_session";
+const CUSTOMER_COOKIE_NAME = "customer_session";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Handle customer portal routes (both pages and API)
+  if (pathname.startsWith("/portal") || pathname.startsWith("/api/portal")) {
+    return handleCustomerRoutes(request, pathname);
+  }
 
   // Handle supplier routes (both pages and API)
   if (pathname.startsWith("/supplier") || pathname.startsWith("/api/supplier")) {
@@ -25,6 +31,98 @@ export async function middleware(request: NextRequest) {
   }
 
   return NextResponse.next();
+}
+
+async function handleCustomerRoutes(
+  request: NextRequest,
+  pathname: string
+): Promise<NextResponse> {
+  const isApiRoute = pathname.startsWith("/api/portal");
+
+  // Allow login page and auth API routes without authentication
+  if (pathname === "/portal/login" || pathname.startsWith("/api/portal/auth")) {
+    // If on login page and already logged in, redirect to portal
+    if (pathname === "/portal/login") {
+      const sessionCookie = request.cookies.get(CUSTOMER_COOKIE_NAME);
+      if (sessionCookie?.value) {
+        const session = await verifyCustomerToken(sessionCookie.value);
+        if (session) {
+          return NextResponse.redirect(new URL("/portal", request.url));
+        }
+      }
+    }
+    return NextResponse.next();
+  }
+
+  // Protect all other /portal/* and /api/portal/* routes
+  const sessionCookie = request.cookies.get(CUSTOMER_COOKIE_NAME);
+
+  if (!sessionCookie?.value) {
+    if (isApiRoute) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+    const loginUrl = new URL("/portal/login", request.url);
+    loginUrl.searchParams.set("from", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Verify the JWT token
+  const session = await verifyCustomerToken(sessionCookie.value);
+  if (!session) {
+    if (isApiRoute) {
+      return NextResponse.json(
+        { error: "Invalid session" },
+        { status: 401 }
+      );
+    }
+    const loginUrl = new URL("/portal/login", request.url);
+    loginUrl.searchParams.set("from", pathname);
+    const response = NextResponse.redirect(loginUrl);
+    response.cookies.delete(CUSTOMER_COOKIE_NAME);
+    return response;
+  }
+
+  // Inject session info into request headers
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-customer-id", String(session.clientId));
+  requestHeaders.set("x-customer-email", session.email);
+  requestHeaders.set("x-customer-name", session.name);
+
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+}
+
+async function verifyCustomerToken(
+  token: string
+): Promise<{
+  clientId: number;
+  email: string;
+  name: string;
+} | null> {
+  try {
+    const secret = process.env.CUSTOMER_JWT_SECRET || process.env.ADMIN_SESSION_SECRET;
+    if (!secret || secret.length < 16) {
+      console.error("CUSTOMER_JWT_SECRET not configured properly");
+      return null;
+    }
+
+    const secretKey = new TextEncoder().encode(secret);
+    const { payload } = await jwtVerify(token, secretKey);
+
+    return {
+      clientId: payload.clientId as number,
+      email: payload.email as string,
+      name: (payload.name as string) || "",
+    };
+  } catch {
+    return null;
+  }
 }
 
 async function handleSupplierRoutes(
@@ -291,5 +389,5 @@ function generateAdminToken(password: string): string {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/agency/:path*", "/api/agency/:path*", "/supplier/:path*", "/api/supplier/:path*"],
+  matcher: ["/admin/:path*", "/agency/:path*", "/api/agency/:path*", "/supplier/:path*", "/api/supplier/:path*", "/portal/:path*", "/api/portal/:path*"],
 };
