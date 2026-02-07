@@ -11,13 +11,13 @@ export const heroSlides: HeroSlide[] = [
     label: "Nepal",
   },
   {
-    src: "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?w=1920&q=80",
+    src: "https://images.unsplash.com/photo-1578556881786-851d4b79cb73?w=1920&q=80",
     alt: "Tiger's Nest monastery perched on a cliffside in Bhutan",
     label: "Bhutan",
   },
   {
-    src: "https://images.unsplash.com/photo-1503641926155-5c17619b79d0?w=1920&q=80",
-    alt: "Vast Tibetan plateau under dramatic skies",
+    src: "https://images.unsplash.com/photo-1741257091145-69d62cdf819a?w=1920&q=80",
+    alt: "Potala Palace towering above the mountain in Lhasa, Tibet",
     label: "Tibet",
   },
   {
