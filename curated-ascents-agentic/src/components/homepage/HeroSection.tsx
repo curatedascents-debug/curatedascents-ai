@@ -1,15 +1,30 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import { fadeInUp, fadeIn, staggerContainer } from "@/lib/animations";
+import { heroSlides } from "@/lib/constants/hero-slides";
 
 interface HeroSectionProps {
   onChatOpen: () => void;
 }
 
 export default function HeroSection({ onChatOpen }: HeroSectionProps) {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const goToSlide = useCallback((index: number) => {
+    setCurrentSlide(index);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 7000);
+    return () => clearInterval(timer);
+  }, [currentSlide]);
+
   const scrollToExperiences = () => {
     const element = document.querySelector("#experiences");
     if (element) {
@@ -19,18 +34,31 @@ export default function HeroSection({ onChatOpen }: HeroSectionProps) {
 
   return (
     <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
+      {/* Background Images with Crossfade */}
       <div className="absolute inset-0">
-        <Image
-          src="https://images.unsplash.com/photo-1486911278844-a81c5267e227?w=1920&q=80"
-          alt="Himalayan mountains at sunrise"
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-slate-900/50 to-slate-900" />
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={heroSlides[currentSlide].src}
+              alt={heroSlides[currentSlide].alt}
+              fill
+              priority={currentSlide === 0}
+              loading={currentSlide === 0 ? undefined : "eager"}
+              className="object-cover"
+              sizes="100vw"
+            />
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Gradient Overlay (stable, outside AnimatePresence) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-slate-900/50 to-slate-900 z-[1]" />
       </div>
 
       {/* Content */}
@@ -80,13 +108,29 @@ export default function HeroSection({ onChatOpen }: HeroSectionProps) {
         </motion.div>
       </motion.div>
 
+      {/* Dot Indicators */}
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
+        {heroSlides.map((slide, index) => (
+          <button
+            key={slide.label}
+            onClick={() => goToSlide(index)}
+            aria-label={`Go to ${slide.label}`}
+            className={`transition-all duration-300 rounded-full ${
+              index === currentSlide
+                ? "w-8 h-3 bg-emerald-500"
+                : "w-3 h-3 bg-white/30 hover:bg-white/50"
+            }`}
+          />
+        ))}
+      </div>
+
       {/* Scroll Indicator */}
       <motion.div
         variants={fadeIn}
         initial="hidden"
         animate="visible"
         transition={{ delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
       >
         <button
           onClick={scrollToExperiences}

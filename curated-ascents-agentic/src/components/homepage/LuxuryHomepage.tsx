@@ -5,10 +5,13 @@ import Navigation from "./Navigation";
 import HeroSection from "./HeroSection";
 import FeaturedExperiences from "./FeaturedExperiences";
 import TrustSignals from "./TrustSignals";
+import PressAndCertifications from "./PressAndCertifications";
 import DestinationHighlights from "./DestinationHighlights";
+import InteractiveMap from "./InteractiveMap";
 import AboutSection from "./AboutSection";
 import Footer from "./Footer";
 import ChatWidget from "./ChatWidget";
+import LazySection from "./LazySection";
 
 export default function LuxuryHomepage() {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -32,16 +35,34 @@ export default function LuxuryHomepage() {
         <HeroSection onChatOpen={handleChatOpen} />
 
         {/* Featured Experiences */}
-        <FeaturedExperiences onChatOpen={handleChatOpen} />
+        <LazySection rootMargin="300px">
+          <FeaturedExperiences onChatOpen={handleChatOpen} />
+        </LazySection>
 
         {/* Trust Signals & Testimonials */}
-        <TrustSignals />
+        <LazySection>
+          <TrustSignals />
+        </LazySection>
+
+        {/* Press & Certifications */}
+        <LazySection>
+          <PressAndCertifications />
+        </LazySection>
 
         {/* Destination Highlights */}
-        <DestinationHighlights onChatOpen={handleChatOpen} />
+        <LazySection>
+          <DestinationHighlights onChatOpen={handleChatOpen} />
+        </LazySection>
+
+        {/* Interactive Map */}
+        <LazySection>
+          <InteractiveMap onChatOpen={handleChatOpen} />
+        </LazySection>
 
         {/* About Section */}
-        <AboutSection onChatOpen={handleChatOpen} />
+        <LazySection>
+          <AboutSection onChatOpen={handleChatOpen} />
+        </LazySection>
       </main>
 
       {/* Footer */}

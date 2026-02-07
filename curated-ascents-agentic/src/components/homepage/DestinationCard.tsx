@@ -34,6 +34,7 @@ export default function DestinationCard({
             src={destination.image}
             alt={destination.name}
             fill
+            loading="lazy"
             className="object-cover"
             sizes={featured ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 100vw, 33vw"}
           />

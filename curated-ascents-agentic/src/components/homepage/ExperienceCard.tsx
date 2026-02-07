@@ -34,6 +34,7 @@ export default function ExperienceCard({ experience, onSelect }: ExperienceCardP
             src={experience.image}
             alt={experience.name}
             fill
+            loading="lazy"
             className="object-cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />

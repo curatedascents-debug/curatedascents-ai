@@ -50,6 +50,7 @@ export default function AboutSection({ onChatOpen }: AboutSectionProps) {
                 src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80"
                 alt="Trekkers on a mountain trail"
                 fill
+                loading="lazy"
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
