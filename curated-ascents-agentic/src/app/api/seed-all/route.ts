@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
 import { db } from '@/db';
 import {
   suppliers,
@@ -458,48 +457,19 @@ export async function GET() {
           authorName: 'CuratedAscents Team',
           metaTitle: post.title,
           metaDescription: post.excerpt,
+        }).onConflictDoUpdate({
+          target: blogPosts.slug,
+          set: {
+            featuredImage: post.featuredImage,
+            featuredImageAlt: post.featuredImageAlt,
+          },
         }).returning({ id: blogPosts.id });
         insertedBlogPosts.push(inserted);
       } catch (err) {
-        console.log(`Skipped blog post "${post.slug}" (may already exist)`);
+        console.log(`Failed to upsert blog post "${post.slug}": ${err}`);
       }
     }
-    console.log(`Inserted ${insertedBlogPosts.length} blog posts`);
-
-    // Update existing blog post images (for posts that were skipped because they already exist)
-    const blogImageUpdates: Record<string, { featuredImage: string; featuredImageAlt: string }> = {
-      'sunrise-kala-patthar-everest': {
-        featuredImage: 'https://images.unsplash.com/photo-1504619504099-a8644da0a966?w=1200',
-        featuredImageAlt: 'Golden sunrise over Mount Everest from Kala Patthar',
-      },
-      'what-to-pack-luxury-bhutan-trip': {
-        featuredImage: 'https://images.unsplash.com/photo-1608377229419-3b5168b6c3da?w=1200',
-        featuredImageAlt: "Tiger's Nest monastery on cliffside in Bhutan",
-      },
-      'bhutan-complete-travel-guide': {
-        featuredImage: 'https://images.unsplash.com/photo-1578556881786-851d4b79cb73?w=1200',
-        featuredImageAlt: "Tiger's Nest Monastery in Paro, Bhutan",
-      },
-      'sacred-festivals-himalayas': {
-        featuredImage: 'https://images.unsplash.com/photo-1503641926155-5c17619b79d0?w=1200',
-        featuredImageAlt: 'Prayer flags with snowy Tibetan monastery',
-      },
-      'nepal-autumn-october-best-month': {
-        featuredImage: 'https://images.unsplash.com/photo-1571401835393-8c5f35328320?w=1200',
-        featuredImageAlt: 'Prayer flags with Machapuchare peak in Nepal',
-      },
-    };
-
-    for (const [slug, imageData] of Object.entries(blogImageUpdates)) {
-      try {
-        await db.update(blogPosts)
-          .set(imageData)
-          .where(eq(blogPosts.slug, slug));
-      } catch (err) {
-        console.log(`Failed to update image for "${slug}"`);
-      }
-    }
-    console.log('Updated blog post images for existing posts');
+    console.log(`Upserted ${insertedBlogPosts.length} blog posts`);
 
     // Summary
     const summary = {
