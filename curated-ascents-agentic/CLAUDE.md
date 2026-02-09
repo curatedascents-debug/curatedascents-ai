@@ -39,6 +39,7 @@ Defined in `.env.local`:
 - `STRIPE_WEBHOOK_SECRET` — Stripe webhook signature verification
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` — Stripe public key for client-side
 - `CRON_SECRET` — Secret for Vercel cron job authentication
+- `CUSTOMER_JWT_SECRET` — Secret for customer portal JWT sessions (fallback: `ADMIN_SESSION_SECRET`)
 
 ## Development Workflow
 
@@ -49,9 +50,20 @@ Defined in `.env.local`:
 5. Push branch, open PR, review, merge to `main`
 6. Vercel auto-deploys `main` to production
 
+## Vercel Deployment
+
+- **Git root:** Parent directory (`curatedascents-ai/`)
+- **App code:** Subdirectory (`curated-ascents-agentic/`)
+- **Vercel project:** `curated-ascents-agentic` with Root Directory = `curated-ascents-agentic`
+- **Deploy from git root:** `cd /path/to/curatedascents-ai && npx vercel --prod`
+- **Force deploy (bypass build cache):** Add `--force` flag
+- **Production URL:** `https://curated-ascents-agentic.vercel.app`
+- **Env vars:** Configured in Vercel dashboard (same `DATABASE_URL` as local `.env.local`)
+- Do NOT deploy from the subdirectory — it fails with "Root Directory not found"
+
 ## Architecture
 
-**Stack:** Next.js 14 (App Router), React 19, TypeScript, Tailwind CSS 4, Drizzle ORM, Neon PostgreSQL
+**Stack:** Next.js 14 (App Router), React 19, TypeScript, Tailwind CSS 4 + @tailwindcss/typography, Drizzle ORM, Neon PostgreSQL
 
 **Deployment:** Vercel (serverless, auto-deploy from GitHub `main` branch)
 
@@ -60,7 +72,13 @@ Defined in `.env.local`:
 ### Routing
 
 **Public Routes:**
-- `/` — Chat interface (main user-facing page)
+- `/` — Luxury homepage with AI chat widget
+- `/blog` — Blog listing page (SEO-optimized travel content)
+- `/blog/[slug]` — Individual blog post with ReactMarkdown + Tailwind prose
+- `/faq` — Frequently asked questions
+- `/contact` — Contact page
+- `/privacy-policy` — Privacy policy
+- `/terms` — Terms of service
 - `/payment/success` — Payment confirmation page
 - `/payment/cancelled` — Payment cancellation page
 
@@ -72,11 +90,23 @@ Defined in `.env.local`:
 - `/supplier/login` — Supplier login page
 - `/supplier/dashboard` — Supplier self-service portal
 
+**Customer Portal:**
+- `/portal/login` — Email-based passwordless auth
+- `/portal` — Customer dashboard
+- `/portal/trips` — Trip history and details
+- `/portal/quotes` — Quote management
+- `/portal/loyalty` — Loyalty points and tier status
+- `/portal/chat` — AI chat (portal mode, skips email prompt)
+- `/portal/currency` — Currency converter
+- `/portal/settings` — Profile settings
+
 **API Routes:**
 - `/api/chat` — Core AI chat endpoint with tool execution loop
 - `/api/personalize` — Captures user email/name into `clients` table
 - `/api/admin/*` — Admin CRUD endpoints
+- `/api/blog/*` — Blog post listing and individual post endpoints
 - `/api/supplier/*` — Supplier portal endpoints
+- `/api/portal/*` — Customer portal endpoints (dashboard, bookings, quotes, loyalty, profile, auth)
 - `/api/payments/*` — Stripe payment processing
 - `/api/currency/*` — Currency conversion
 - `/api/customer/*` — Customer loyalty & surveys
@@ -130,11 +160,24 @@ Defined in `.env.local`:
 - `src/lib/nurture/nurture-engine.ts` — Email nurture sequence automation
 
 **Email Templates:**
-- `src/components/emails/` — React Email templates for all notifications
+- `src/lib/email/templates/` — React Email templates for all notifications
+- `src/lib/email/send-email.ts` — Email sending via Resend
+
+**Blog & Content:**
+- `src/lib/blog/blog-writer-agent.ts` — AI blog post generation
+- `src/lib/social/social-media-client.ts` — Social media auto-sharing (Facebook, Instagram, LinkedIn, Twitter/X)
+- `src/components/blog/` — BlogList, BlogCard, BlogPost components
+
+**Customer Auth:**
+- `src/lib/auth/customer-auth.ts` — Email verification + JWT sessions via `jose`
 
 ### Database Schema (`src/db/schema.ts`)
 
-50+ tables managed by Drizzle ORM. Key groupings:
+50+ tables managed by Drizzle ORM.
+
+**CRITICAL: Never use `sql.raw()` for WHERE clauses.** Neon's HTTP driver caches query results by SQL text. Raw SQL generates identical strings on every request, returning stale cached data even after DB updates. Always use Drizzle operators (`eq()`, `and()`, `desc()`, `count()`) which produce parameterized queries that bypass Neon's cache.
+
+Key groupings:
 
 **Service Tables (10 types):**
 - `hotels` + `hotelRoomRates` — Accommodation with room-level pricing
@@ -175,6 +218,15 @@ Defined in `.env.local`:
 - `supplierPerformance` — Supplier performance metrics
 - `agencies` — White-label agency portal
 - `agencyUsers` — Agency user accounts
+
+**Blog & Content:**
+- `blogPosts` — Blog articles with SEO metadata, featured images, tags
+- `blogCategories` — Blog category taxonomy
+- `blogSocialPosts` — Social media cross-posting tracking
+
+**Customer Portal:**
+- `customerVerificationCodes` — Email verification codes (SHA-256 hashed)
+- `customerSessions` — JWT session tracking
 
 **Risk & Compliance:**
 - `riskAlerts` — Travel advisories and weather alerts
@@ -269,41 +321,43 @@ All React components in `src/components/` are client components (`"use client"`)
 - **Risk & Compliance** — Weather alerts, travel advisories, notifications
 - **Supplier Performance** — Response rates, reliability scores, automated follow-up
 
-### 🚧 Phase 4: Growth & Engagement (Planned)
-
-#### 4.1 Luxury Homepage UI
-Premium landing page with sleek design targeting high-net-worth travelers:
-- **Hero Section** — Full-screen video/image carousel of luxury destinations
+### ✅ Phase 4.1: Luxury Homepage UI (Complete)
+- **Hero Section** — Full-screen image carousel of luxury destinations
 - **Featured Experiences** — Curated expedition showcases
-- **Trust Signals** — Testimonials, press mentions, certifications
+- **Trust Signals** — Testimonials (`#testimonials`), press mentions, certifications (`#press`)
 - **Interactive Map** — Destination explorer with hover details
 - **AI Chat Widget** — Floating chat access from any page
 - **Responsive Design** — Mobile-first luxury aesthetic
 - **Performance** — Optimized images, lazy loading, Core Web Vitals
 
-#### 4.2 AI-Powered Blog & SEO Engine
-Autonomous content creation for organic traffic and social media:
-- **AI Blog Writer Agent** — Generates SEO-optimized travel articles
-- **Content Calendar** — Automated weekly/bi-weekly publishing schedule
+### ✅ Phase 4.2: AI-Powered Blog & SEO Engine (Complete)
+- **AI Blog Writer Agent** — Generates SEO-optimized travel articles via DeepSeek
+- **Content Calendar** — Automated weekly publishing (Monday 4AM UTC cron)
 - **SEO Optimization** — Meta tags, structured data, keyword targeting
 - **Social Media Integration** — Auto-share to Instagram, Facebook, LinkedIn, Twitter/X
-- **Content Types:**
-  - Destination guides (e.g., "Ultimate Guide to Everest Base Camp")
-  - Travel tips (e.g., "What to Pack for a Himalayan Trek")
-  - Seasonal content (e.g., "Best Time to Visit Bhutan")
-  - Trip reports (with client permission)
-  - Cultural insights (e.g., "Understanding Nepali Festivals")
+- **Blog Typography** — `@tailwindcss/typography` with `prose` classes for rich markdown rendering
+- **Content Types:** Destination guides, travel tips, seasonal content, trip reports, cultural insights
 - **CTA Integration** — Each blog links to relevant packages/chat
-- **Analytics** — Track blog → inquiry → booking conversion
-- **Admin Controls** — Review/edit before publish, topic suggestions
+- **Analytics** — Blog analytics API at `/api/admin/blog/analytics`
+- **Static Pages** — `/faq`, `/contact`, `/privacy-policy`, `/terms` using `StaticPageLayout`
+- **Seed** — `/api/seed-all` uses upsert (`onConflictDoUpdate` on slug) for reliable re-seeding
 
-### 🔮 Phase 5: Future Enhancements
-- **Mobile App** — React Native companion app
+### ✅ Phase 5: PWA & Customer Portal (Complete)
+- **PWA Support** — `manifest.json`, `sw.js`, install prompt, offline page
+- **Customer Auth** — Email verification codes (SHA-256), JWT sessions via `jose`, cookie `customer_session`
+- **Customer Portal** — `/portal/*` pages (dashboard, trips, quotes, loyalty, chat, currency, settings)
+- **Portal APIs** — `/api/portal/*` (dashboard, bookings, quotes, loyalty, profile, auth)
+- **Security** — Portal APIs strip `costPrice`/`margin` fields from responses
+- **Middleware** — `handleCustomerRoutes()` injects `x-customer-id/email/name` headers
+
+### 🔮 Phase 6: Future Enhancements
 - **WhatsApp Integration** — AI chat via WhatsApp Business API
 - **Video Consultations** — Scheduled video calls with travel experts
 - **AR/VR Previews** — Virtual destination tours
 - **Carbon Offset** — Sustainability tracking and offsets
 - **Multi-language** — AI chat in multiple languages
+- **Blog Enhancements** — Syntax highlighting, image galleries, table of contents for long posts
+- **Performance** — Audit blog image loading (currently raw Unsplash URLs — consider next/image optimization)
 
 ## API Endpoints Reference
 
@@ -312,7 +366,7 @@ Autonomous content creation for organic traffic and social media:
 |--------|----------|---------|
 | POST | `/api/chat` | AI chat with tool execution |
 | POST | `/api/personalize` | Save client email/name |
-| GET | `/api/seed` | Database seeding |
+| GET | `/api/seed-all` | Database seeding (upsert) |
 
 ### Admin APIs
 | Method | Endpoint | Purpose |
@@ -382,6 +436,25 @@ Autonomous content creation for organic traffic and social media:
 |--------|----------|---------|
 | GET/POST | `/api/customer/loyalty` | Loyalty account |
 | POST | `/api/customer/surveys/[id]` | Submit survey |
+
+### Blog APIs
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/api/blog/posts` | List published blog posts (with category/destination filters) |
+| GET | `/api/blog/posts/[slug]` | Get single blog post by slug |
+| GET | `/api/admin/blog/analytics` | Blog analytics dashboard |
+
+### Customer Portal APIs
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/api/portal/auth/send-code` | Send email verification code |
+| POST | `/api/portal/auth/verify-code` | Verify code and create session |
+| POST | `/api/portal/auth/logout` | End customer session |
+| GET | `/api/portal/dashboard` | Customer dashboard data |
+| GET | `/api/portal/bookings` | Customer's bookings |
+| GET | `/api/portal/quotes` | Customer's quotes |
+| GET | `/api/portal/loyalty` | Loyalty account and transactions |
+| GET/PUT | `/api/portal/profile` | Customer profile management |
 
 ### Supplier Portal APIs
 | Method | Endpoint | Purpose |
