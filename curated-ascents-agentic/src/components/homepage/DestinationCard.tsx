@@ -10,12 +10,16 @@ interface DestinationCardProps {
   destination: Destination;
   featured?: boolean;
   onSelect: () => void;
+  imageOverride?: string;
+  altOverride?: string;
 }
 
 export default function DestinationCard({
   destination,
   featured = false,
   onSelect,
+  imageOverride,
+  altOverride,
 }: DestinationCardProps) {
   return (
     <motion.div
@@ -31,8 +35,8 @@ export default function DestinationCard({
       <div className={`relative ${featured ? "h-full min-h-[500px]" : "h-64"}`}>
         <motion.div variants={imageZoom} className="h-full w-full">
           <Image
-            src={destination.image}
-            alt={destination.name}
+            src={imageOverride || destination.image}
+            alt={altOverride || destination.name}
             fill
             loading="lazy"
             className="object-cover"

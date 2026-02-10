@@ -9,9 +9,11 @@ import { cardHover, imageZoom } from "@/lib/animations";
 interface ExperienceCardProps {
   experience: Experience;
   onSelect: () => void;
+  imageOverride?: string;
+  altOverride?: string;
 }
 
-export default function ExperienceCard({ experience, onSelect }: ExperienceCardProps) {
+export default function ExperienceCard({ experience, onSelect, imageOverride, altOverride }: ExperienceCardProps) {
   const difficultyColor = {
     Easy: "text-emerald-400",
     Moderate: "text-yellow-400",
@@ -31,8 +33,8 @@ export default function ExperienceCard({ experience, onSelect }: ExperienceCardP
       <div className="relative h-56 overflow-hidden">
         <motion.div variants={imageZoom} className="h-full w-full">
           <Image
-            src={experience.image}
-            alt={experience.name}
+            src={imageOverride || experience.image}
+            alt={altOverride || experience.name}
             fill
             loading="lazy"
             className="object-cover"

@@ -40,6 +40,12 @@ Defined in `.env.local`:
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` — Stripe public key for client-side
 - `CRON_SECRET` — Secret for Vercel cron job authentication
 - `CUSTOMER_JWT_SECRET` — Secret for customer portal JWT sessions (fallback: `ADMIN_SESSION_SECRET`)
+- `AGENCY_JWT_SECRET` — Secret for agency portal JWT sessions (fallback: `ADMIN_SESSION_SECRET`)
+- `R2_ACCOUNT_ID` — Cloudflare R2 account ID (for media library storage)
+- `R2_ACCESS_KEY_ID` — Cloudflare R2 access key
+- `R2_SECRET_ACCESS_KEY` — Cloudflare R2 secret key
+- `R2_BUCKET_NAME` — Cloudflare R2 bucket name (default: `curated-ascents-media`)
+- `R2_PUBLIC_URL` — Cloudflare R2 public CDN URL (e.g. `https://media.curatedascents.com`)
 
 ## Development Workflow
 
@@ -90,6 +96,10 @@ Defined in `.env.local`:
 - `/supplier/login` — Supplier login page
 - `/supplier/dashboard` — Supplier self-service portal
 
+**Agency Portal:**
+- `/agency/login` — Agency user login (email/password with bcryptjs)
+- `/agency/dashboard` — Agency dashboard with Clients/Quotes/Bookings/Reports/AI Chat tabs
+
 **Customer Portal:**
 - `/portal/login` — Email-based passwordless auth
 - `/portal` — Customer dashboard
@@ -110,6 +120,9 @@ Defined in `.env.local`:
 - `/api/payments/*` — Stripe payment processing
 - `/api/currency/*` — Currency conversion
 - `/api/customer/*` — Customer loyalty & surveys
+- `/api/agency/*` — Agency portal endpoints (auth, chat)
+- `/api/media/*` — Public media endpoints (homepage images)
+- `/api/admin/media/*` — Admin media library CRUD, upload, bulk ops, collections, stats
 - `/api/cron/*` — Scheduled background jobs
 
 ### AI Chat Flow (`/api/chat`)
@@ -142,6 +155,7 @@ Defined in `.env.local`:
 | `get_supported_currencies` | List available currencies | User asks about currencies |
 | `get_dynamic_price` | Calculate dynamic price with discounts | Check current pricing |
 | `check_pricing_promotions` | Check active promotions | User asks about deals |
+| `search_photos` | Search media library for destination photos | User asks for photos/images |
 
 ### Key Modules
 
@@ -167,6 +181,14 @@ Defined in `.env.local`:
 - `src/lib/blog/blog-writer-agent.ts` — AI blog post generation
 - `src/lib/social/social-media-client.ts` — Social media auto-sharing (Facebook, Instagram, LinkedIn, Twitter/X)
 - `src/components/blog/` — BlogList, BlogCard, BlogPost components
+
+**Media Library:**
+- `src/lib/media/r2-client.ts` — Cloudflare R2 upload/delete, image processing (WebP conversion, thumbnails via `sharp`)
+- `src/lib/media/media-service.ts` — Full CRUD, search, AI photo search, blog image lookup, bulk ops, collections, stats
+
+**Agency Chat:**
+- `src/lib/agents/agency-chat-processor.ts` — B2B chat with 20% margin pricing, per-service price visibility, agencyId tracking
+- `src/lib/auth/agency-auth.ts` — Agency JWT sessions via `jose` (uses `bcryptjs` for Vercel compatibility)
 
 **Customer Auth:**
 - `src/lib/auth/customer-auth.ts` — Email verification + JWT sessions via `jose`
@@ -228,6 +250,11 @@ Key groupings:
 - `customerVerificationCodes` — Email verification codes (SHA-256 hashed)
 - `customerSessions` — JWT session tracking
 
+**Media Library:**
+- `mediaLibrary` — Image records with CDN URLs, thumbnails, country/destination/category, JSONB tags, usage tracking (7 indexes including GIN on tags)
+- `mediaCollections` — Named image collections (e.g. "Nepal Landscapes")
+- `mediaCollectionItems` — Junction table linking media to collections
+
 **Risk & Compliance:**
 - `riskAlerts` — Travel advisories and weather alerts
 - `clientNotifications` — Risk notification tracking
@@ -247,12 +274,16 @@ All React components in `src/components/` are client components (`"use client"`)
 - **Pricing** — Dynamic pricing rules, demand metrics, price simulator
 - **Nurture** — Email nurture sequences and enrollments
 - **Competitors** — Competitor rate monitoring and comparison
+- **Blog** — AI blog post generation, content management
+- **WhatsApp** — WhatsApp Business integration
+- **Media** — Media library with upload, search, edit, bulk operations, collections, stats (3 sub-tabs: Library, Collections, Stats)
 - **Reports** — Advanced analytics with sub-tabs (Overview, Financial, Suppliers, Leads, Operations)
 
 ### Pricing Rules
 
 - Sell price formula: `Sell = Cost * (1 + Margin%)`
 - Default margin: 50% for standard clients
+- Agency margin: 20% (configurable per-agency via `agencyMarginOverrides` table)
 - MICE groups (20+ pax): 35% margin
 - Nepal-specific: 13% VAT + 10% service charge
 
@@ -290,6 +321,7 @@ All React components in `src/components/` are client components (`"use client"`)
 | End Customer | AI Chat, quote viewing, payment, loyalty dashboard |
 | Travel Agent | AI Chat, admin dashboard, PDF export |
 | Platform Admin | Full admin dashboard, all settings |
+| Agency | Agency dashboard, B2B AI chat (20% margin pricing), client management |
 | Supplier | Supplier portal, rate management, booking confirmations |
 
 ## Feature Status & Roadmap
@@ -350,6 +382,25 @@ All React components in `src/components/` are client components (`"use client"`)
 - **Security** — Portal APIs strip `costPrice`/`margin` fields from responses
 - **Middleware** — `handleCustomerRoutes()` injects `x-customer-id/email/name` headers
 
+### ✅ Phase 5.1: Agency AI Chat (Complete)
+- **Agency Chat Processor** — Separate B2B chat with agency-specific system prompt
+- **20% Margin Pricing** — Agency quotes use cost × 1.20 (vs 50% client-facing), configurable per-agency via `agencyMarginOverrides`
+- **Per-Service Pricing** — Agencies see itemized per-service prices (stripped from client chat)
+- **Agency Dashboard Chat Tab** — "AI Chat" tab in agency dashboard using `/api/agency/chat`
+- **Agency ID Tracking** — Quotes/bookings created via agency chat are tagged with `agencyId`
+- **bcryptjs** — Replaced native `bcrypt` with pure-JS `bcryptjs` for Vercel serverless compatibility
+
+### ✅ Phase 5.2: Media Library & AI Photo Integration (Complete)
+- **Cloudflare R2 Storage** — S3-compatible object storage with WebP conversion (quality 85, max 2400px) and 400px thumbnail generation via `sharp`
+- **Media Library Schema** — `mediaLibrary`, `mediaCollections`, `mediaCollectionItems` tables with GIN index on JSONB tags, composite indexes on (country, destination, category)
+- **Media Service** — Full CRUD, search with pagination/sorting, AI photo search for chat tool, blog featured image lookup, bulk operations, collection management, usage tracking, stats
+- **Admin Media Tab** — Library grid with upload/search/edit/bulk actions, Collections sub-tab, Stats sub-tab with breakdowns
+- **AI Auto-Tag** — DeepSeek-powered image analysis generates tags, description, alt text, category, destination, country, season
+- **AI Chat Tool** — `search_photos` tool lets the AI find and share destination photos during conversations
+- **Blog Integration** — `generateBlogPost()` automatically searches media library for matching featured images; auto-content cron saves them
+- **Homepage Integration** — `/api/media/homepage` serves categorized images; all homepage components (Hero, Experiences, Destinations, About) use media library images with Unsplash fallbacks
+- **Admin API Routes** — 8 endpoints: list/search, upload, single CRUD, bulk operations, auto-tag, stats, collections CRUD
+
 ### 🔮 Phase 6: Future Enhancements
 - **WhatsApp Integration** — AI chat via WhatsApp Business API
 - **Video Consultations** — Scheduled video calls with travel experts
@@ -357,7 +408,6 @@ All React components in `src/components/` are client components (`"use client"`)
 - **Carbon Offset** — Sustainability tracking and offsets
 - **Multi-language** — AI chat in multiple languages
 - **Blog Enhancements** — Syntax highlighting, image galleries, table of contents for long posts
-- **Performance** — Audit blog image loading (currently raw Unsplash URLs — consider next/image optimization)
 
 ## API Endpoints Reference
 
@@ -455,6 +505,26 @@ All React components in `src/components/` are client components (`"use client"`)
 | GET | `/api/portal/quotes` | Customer's quotes |
 | GET | `/api/portal/loyalty` | Loyalty account and transactions |
 | GET/PUT | `/api/portal/profile` | Customer profile management |
+
+### Agency Portal APIs
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/api/agency/auth/login` | Agency user login |
+| POST | `/api/agency/auth/logout` | Agency logout |
+| POST | `/api/agency/chat` | Agency B2B AI chat (20% margin) |
+
+### Media Library APIs
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/api/media/homepage` | Public homepage images from media library |
+| GET/POST | `/api/admin/media` | List/search media, create metadata record |
+| POST | `/api/admin/media/upload` | Multipart file upload with R2 processing |
+| GET/PUT/DELETE | `/api/admin/media/[id]` | Single media CRUD (soft/hard delete) |
+| POST | `/api/admin/media/bulk` | Bulk tag/categorize/delete/collection ops |
+| POST | `/api/admin/media/auto-tag` | AI auto-tagging via DeepSeek |
+| GET | `/api/admin/media/stats` | Media library statistics |
+| GET/POST | `/api/admin/media/collections` | List/create collections |
+| GET/PUT/DELETE | `/api/admin/media/collections/[id]` | Single collection CRUD |
 
 ### Supplier Portal APIs
 | Method | Endpoint | Purpose |

@@ -1,14 +1,15 @@
-import { 
-  pgTable, 
-  serial, 
-  text, 
-  timestamp, 
-  decimal, 
-  integer, 
+import {
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  decimal,
+  integer,
   boolean,
   jsonb,
   date,
-  pgEnum
+  pgEnum,
+  index,
 } from 'drizzle-orm/pg-core';
 
 // ============================================
@@ -3182,4 +3183,87 @@ export const whatsappTemplates = pgTable('whatsapp_templates', {
 
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// ============================================
+// MEDIA LIBRARY
+// ============================================
+
+export const mediaLibrary = pgTable('media_library', {
+  id: serial('id').primaryKey(),
+  publicId: text('public_id').unique().notNull().$defaultFn(() => crypto.randomUUID()),
+
+  // File info
+  filename: text('filename').notNull(),
+  cdnUrl: text('cdn_url').notNull(),
+  thumbnailUrl: text('thumbnail_url'),
+  blurHash: text('blur_hash'),
+
+  // Location metadata
+  country: text('country').notNull(),        // 'nepal', 'india', 'tibet', 'bhutan'
+  destination: text('destination'),           // e.g., 'Kathmandu', 'Everest Region'
+  destinationId: integer('destination_id').references(() => destinations.id),
+
+  // Categorization
+  category: text('category').notNull(),      // 'landscape', 'hotel', 'trek', etc.
+  subcategory: text('subcategory'),
+  tags: jsonb('tags').$type<string[]>().default([]),
+
+  // Descriptive metadata
+  title: text('title'),
+  description: text('description'),
+  altText: text('alt_text'),
+
+  // Contextual metadata
+  season: text('season'),                    // 'spring', 'summer', 'monsoon', 'autumn', 'winter', 'all'
+  serviceType: text('service_type'),         // links to service types: 'hotel', 'transportation', 'trek', etc.
+  hotelId: integer('hotel_id').references(() => hotels.id),
+  packageId: integer('package_id').references(() => packages.id),
+
+  // Technical metadata
+  width: integer('width'),
+  height: integer('height'),
+  fileSize: integer('file_size'),
+  mimeType: text('mime_type'),
+
+  // Attribution
+  photographer: text('photographer'),
+  source: text('source').default('original'),   // 'original', 'stock', 'client', 'partner', 'ai_generated'
+  license: text('license'),
+
+  // Status & usage
+  featured: boolean('featured').default(false),
+  active: boolean('active').default(true),
+  usageCount: integer('usage_count').default(0),
+  lastUsedAt: timestamp('last_used_at'),
+  sortOrder: integer('sort_order').default(0),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => [
+  index('media_country_idx').on(table.country),
+  index('media_destination_idx').on(table.destination),
+  index('media_category_idx').on(table.category),
+  index('media_season_idx').on(table.season),
+  index('media_featured_idx').on(table.featured),
+  index('media_active_idx').on(table.active),
+  index('media_country_dest_cat_idx').on(table.country, table.destination, table.category),
+]);
+
+export const mediaCollections = pgTable('media_collections', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+  coverImageId: integer('cover_image_id').references(() => mediaLibrary.id),
+  country: text('country'),
+  active: boolean('active').default(true),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const mediaCollectionItems = pgTable('media_collection_items', {
+  id: serial('id').primaryKey(),
+  collectionId: integer('collection_id').references(() => mediaCollections.id).notNull(),
+  mediaId: integer('media_id').references(() => mediaLibrary.id).notNull(),
+  sortOrder: integer('sort_order').default(0),
 });

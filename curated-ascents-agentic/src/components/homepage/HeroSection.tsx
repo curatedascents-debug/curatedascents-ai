@@ -6,12 +6,14 @@ import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import { fadeInUp, fadeIn, staggerContainer } from "@/lib/animations";
 import { heroSlides } from "@/lib/constants/hero-slides";
+import type { HomepageMediaImage } from "./LuxuryHomepage";
 
 interface HeroSectionProps {
   onChatOpen: () => void;
+  mediaOverrides?: Record<string, HomepageMediaImage | null>;
 }
 
-export default function HeroSection({ onChatOpen }: HeroSectionProps) {
+export default function HeroSection({ onChatOpen, mediaOverrides }: HeroSectionProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const goToSlide = useCallback((index: number) => {
@@ -46,8 +48,8 @@ export default function HeroSection({ onChatOpen }: HeroSectionProps) {
             className="absolute inset-0"
           >
             <Image
-              src={heroSlides[currentSlide].src}
-              alt={heroSlides[currentSlide].alt}
+              src={mediaOverrides?.[heroSlides[currentSlide].label]?.cdnUrl || heroSlides[currentSlide].src}
+              alt={mediaOverrides?.[heroSlides[currentSlide].label]?.alt || heroSlides[currentSlide].alt}
               fill
               priority={currentSlide === 0}
               loading={currentSlide === 0 ? undefined : "eager"}

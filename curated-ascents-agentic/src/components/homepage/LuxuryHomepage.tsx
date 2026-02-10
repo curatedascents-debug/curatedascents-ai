@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navigation from "./Navigation";
 import HeroSection from "./HeroSection";
 import FeaturedExperiences from "./FeaturedExperiences";
@@ -13,9 +13,25 @@ import Footer from "./Footer";
 import ChatWidget from "./ChatWidget";
 import LazySection from "./LazySection";
 
+export interface HomepageMediaImage {
+  cdnUrl: string;
+  alt: string;
+  country: string;
+  destination: string | null;
+  category: string;
+}
+
+export interface HomepageMedia {
+  heroSlides: Record<string, HomepageMediaImage | null>;
+  experiences: Record<string, HomepageMediaImage | null>;
+  destinations: Record<string, HomepageMediaImage | null>;
+  about: HomepageMediaImage | null;
+}
+
 export default function LuxuryHomepage() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [initialMessage, setInitialMessage] = useState<string | undefined>();
+  const [media, setMedia] = useState<HomepageMedia | null>(null);
 
   const handleChatToggle = () => {
     setIsChatOpen(!isChatOpen);
@@ -28,6 +44,14 @@ export default function LuxuryHomepage() {
     setIsChatOpen(true);
   };
 
+  // Fetch media library images for homepage (non-blocking)
+  useEffect(() => {
+    fetch("/api/media/homepage")
+      .then((r) => r.json())
+      .then((data) => setMedia(data))
+      .catch(() => {}); // Silently fail — components use hardcoded fallbacks
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-900">
       {/* Navigation */}
@@ -36,11 +60,11 @@ export default function LuxuryHomepage() {
       {/* Main Content */}
       <main>
         {/* Hero Section */}
-        <HeroSection onChatOpen={handleChatOpen} />
+        <HeroSection onChatOpen={handleChatOpen} mediaOverrides={media?.heroSlides} />
 
         {/* Featured Experiences */}
         <LazySection rootMargin="300px">
-          <FeaturedExperiences onChatOpen={handleChatOpen} />
+          <FeaturedExperiences onChatOpen={handleChatOpen} mediaOverrides={media?.experiences} />
         </LazySection>
 
         {/* Trust Signals & Testimonials */}
@@ -55,7 +79,7 @@ export default function LuxuryHomepage() {
 
         {/* Destination Highlights */}
         <LazySection>
-          <DestinationHighlights onChatOpen={handleChatOpen} />
+          <DestinationHighlights onChatOpen={handleChatOpen} mediaOverrides={media?.destinations} />
         </LazySection>
 
         {/* Interactive Map */}
@@ -65,7 +89,7 @@ export default function LuxuryHomepage() {
 
         {/* About Section */}
         <LazySection>
-          <AboutSection onChatOpen={handleChatOpen} />
+          <AboutSection onChatOpen={handleChatOpen} mediaOverride={media?.about} />
         </LazySection>
       </main>
 

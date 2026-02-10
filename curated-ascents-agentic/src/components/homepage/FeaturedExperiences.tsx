@@ -4,12 +4,14 @@ import { motion } from "framer-motion";
 import { staggerContainer, fadeInUp } from "@/lib/animations";
 import { experiences } from "@/lib/constants/experiences";
 import ExperienceCard from "./ExperienceCard";
+import type { HomepageMediaImage } from "./LuxuryHomepage";
 
 interface FeaturedExperiencesProps {
   onChatOpen: () => void;
+  mediaOverrides?: Record<string, HomepageMediaImage | null>;
 }
 
-export default function FeaturedExperiences({ onChatOpen }: FeaturedExperiencesProps) {
+export default function FeaturedExperiences({ onChatOpen, mediaOverrides }: FeaturedExperiencesProps) {
   return (
     <section id="experiences" className="section-padding bg-slate-900">
       <div className="container-luxury">
@@ -55,6 +57,8 @@ export default function FeaturedExperiences({ onChatOpen }: FeaturedExperiencesP
               <ExperienceCard
                 experience={experience}
                 onSelect={onChatOpen}
+                imageOverride={mediaOverrides?.[experience.id]?.cdnUrl}
+                altOverride={mediaOverrides?.[experience.id]?.alt}
               />
             </motion.div>
           ))}

@@ -695,4 +695,83 @@ export const TOOL_DEFINITIONS = [
       },
     },
   },
+
+  // Media Library Tool
+  {
+    type: "function",
+    function: {
+      name: "search_photos",
+      description:
+        "Search the CuratedAscents media library for destination photos. Use this whenever you need images for blog posts, itineraries, trip proposals, or visual content. Returns CDN URLs and metadata for matching photos.",
+      parameters: {
+        type: "object",
+        properties: {
+          country: {
+            type: "string",
+            enum: ["nepal", "india", "tibet", "bhutan"],
+            description: "Filter by country",
+          },
+          destination: {
+            type: "string",
+            description:
+              "Filter by destination name (e.g., 'Kathmandu', 'Rajasthan', 'Paro Valley', 'Everest Region', 'Kerala', 'Ladakh', 'Lhasa')",
+          },
+          category: {
+            type: "string",
+            enum: [
+              "landscape",
+              "hotel",
+              "trek",
+              "culture",
+              "food",
+              "wildlife",
+              "temple",
+              "adventure",
+              "wellness",
+              "people",
+              "aerial",
+              "luxury",
+              "heritage",
+            ],
+            description: "Filter by photo category",
+          },
+          tags: {
+            type: "array",
+            items: { type: "string" },
+            description:
+              "Filter by tags (e.g., ['sunrise', 'mountain', 'luxury']). Photos matching ANY of the tags will be returned.",
+          },
+          season: {
+            type: "string",
+            enum: [
+              "spring",
+              "summer",
+              "monsoon",
+              "autumn",
+              "winter",
+              "all",
+            ],
+            description:
+              "Filter by season — use this to match photos to the trip's travel season",
+          },
+          serviceType: {
+            type: "string",
+            description:
+              "Filter by service type (hotel, trek, helicopter, etc.)",
+          },
+          featured: {
+            type: "boolean",
+            description:
+              "If true, return only featured/hero-quality photos",
+          },
+          limit: {
+            type: "number",
+            description:
+              "Maximum number of photos to return (default: 5, max: 20)",
+          },
+        },
+        required: [],
+      },
+    },
+  },
 ];

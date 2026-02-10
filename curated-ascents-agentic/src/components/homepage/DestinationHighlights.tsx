@@ -4,12 +4,14 @@ import { motion } from "framer-motion";
 import { staggerContainer, fadeInUp } from "@/lib/animations";
 import { destinations } from "@/lib/constants/destinations";
 import DestinationCard from "./DestinationCard";
+import type { HomepageMediaImage } from "./LuxuryHomepage";
 
 interface DestinationHighlightsProps {
   onChatOpen: () => void;
+  mediaOverrides?: Record<string, HomepageMediaImage | null>;
 }
 
-export default function DestinationHighlights({ onChatOpen }: DestinationHighlightsProps) {
+export default function DestinationHighlights({ onChatOpen, mediaOverrides }: DestinationHighlightsProps) {
   // Nepal is featured (first), others are standard
   const featuredDestination = destinations.find((d) => d.featured);
   const otherDestinations = destinations.filter((d) => !d.featured);
@@ -61,6 +63,8 @@ export default function DestinationHighlights({ onChatOpen }: DestinationHighlig
                 destination={featuredDestination}
                 featured
                 onSelect={onChatOpen}
+                imageOverride={mediaOverrides?.[featuredDestination.id]?.cdnUrl}
+                altOverride={mediaOverrides?.[featuredDestination.id]?.alt}
               />
             </motion.div>
           )}
@@ -71,6 +75,8 @@ export default function DestinationHighlights({ onChatOpen }: DestinationHighlig
               <DestinationCard
                 destination={destination}
                 onSelect={onChatOpen}
+                imageOverride={mediaOverrides?.[destination.id]?.cdnUrl}
+                altOverride={mediaOverrides?.[destination.id]?.alt}
               />
             </motion.div>
           ))}

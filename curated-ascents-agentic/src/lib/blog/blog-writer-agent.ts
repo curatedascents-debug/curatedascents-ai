@@ -36,6 +36,8 @@ export interface BlogPostDraft {
   readTimeMinutes: number;
   seoScore: number;
   suggestedSlug: string;
+  featuredImage?: string;
+  featuredImageAlt?: string;
 }
 
 const CONTENT_TYPE_CONFIG: Record<
@@ -308,7 +310,26 @@ export async function generateBlogPost(
     throw new Error("No content generated");
   }
 
-  return parseAIResponse(aiContent, request);
+  const draft = parseAIResponse(aiContent, request);
+
+  // Try to find a featured image from the media library
+  try {
+    const { findBlogFeaturedImage } = await import("@/lib/media/media-service");
+    const image = await findBlogFeaturedImage({
+      destination: request.destination,
+      country: request.destination, // destination name may match country
+      contentType: request.contentType,
+    });
+    if (image) {
+      draft.featuredImage = image.cdnUrl;
+      draft.featuredImageAlt = image.altText;
+    }
+  } catch (err) {
+    // Media library lookup is non-critical — continue without image
+    console.warn("Media library image lookup failed:", err);
+  }
+
+  return draft;
 }
 
 /**

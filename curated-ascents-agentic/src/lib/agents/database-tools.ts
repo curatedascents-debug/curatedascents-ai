@@ -1090,3 +1090,39 @@ export async function getTripBriefing(params: { bookingReference: string }) {
     return { error: 'Failed to get trip briefing' };
   }
 }
+
+// ============================================
+// MEDIA LIBRARY TOOL
+// ============================================
+
+// Tool 12: Search photos from the media library
+export async function searchPhotos(params: {
+  country?: string;
+  destination?: string;
+  category?: string;
+  tags?: string[];
+  season?: string;
+  serviceType?: string;
+  featured?: boolean;
+  limit?: number;
+}) {
+  try {
+    const { searchPhotosForAI } = await import('@/lib/media/media-service');
+    const results = await searchPhotosForAI(params);
+
+    if (results.length === 0) {
+      return {
+        photos: [],
+        message: 'No photos found matching the criteria. Try broader filters or different tags.',
+      };
+    }
+
+    return {
+      photos: results,
+      count: results.length,
+    };
+  } catch (error) {
+    console.error('Error searching photos:', error);
+    return { error: 'Photo search failed', photos: [] };
+  }
+}

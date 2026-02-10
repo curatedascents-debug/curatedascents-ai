@@ -5,8 +5,11 @@ import Image from "next/image";
 import { Shield, Heart, Sparkles, Users } from "lucide-react";
 import { staggerContainer, fadeInUp, fadeInLeft, fadeInRight } from "@/lib/animations";
 
+import type { HomepageMediaImage } from "./LuxuryHomepage";
+
 interface AboutSectionProps {
   onChatOpen: () => void;
+  mediaOverride?: HomepageMediaImage | null;
 }
 
 const valueProps = [
@@ -32,7 +35,7 @@ const valueProps = [
   },
 ];
 
-export default function AboutSection({ onChatOpen }: AboutSectionProps) {
+export default function AboutSection({ onChatOpen, mediaOverride }: AboutSectionProps) {
   return (
     <section id="about" className="section-padding bg-slate-950 overflow-hidden">
       <div className="container-luxury">
@@ -47,8 +50,8 @@ export default function AboutSection({ onChatOpen }: AboutSectionProps) {
           >
             <div className="relative h-[400px] lg:h-[600px] rounded-2xl overflow-hidden">
               <Image
-                src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80"
-                alt="Trekkers on a mountain trail"
+                src={mediaOverride?.cdnUrl || "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80"}
+                alt={mediaOverride?.alt || "Trekkers on a mountain trail"}
                 fill
                 loading="lazy"
                 className="object-cover"

@@ -18,6 +18,7 @@ import NurtureTab from "@/components/admin/NurtureTab";
 import CompetitorTab from "@/components/admin/CompetitorTab";
 import BlogTab from "@/components/admin/BlogTab";
 import WhatsAppTab from "@/components/admin/WhatsAppTab";
+import MediaTab from "@/components/admin/MediaTab";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -94,6 +95,7 @@ export default function AdminDashboard() {
     { key: "competitors" as TabType, label: "Competitors" },
     { key: "blog" as TabType, label: "Blog" },
     { key: "whatsapp" as TabType, label: "WhatsApp" },
+    { key: "media" as TabType, label: "Media" },
     { key: "reports" as TabType, label: "Reports" },
   ];
 
@@ -141,6 +143,7 @@ export default function AdminDashboard() {
         {activeTab === "competitors" && <CompetitorTab />}
         {activeTab === "blog" && <BlogTab destinations={destinations} />}
         {activeTab === "whatsapp" && <WhatsAppTab />}
+        {activeTab === "media" && <MediaTab />}
         {activeTab === "reports" && <AdvancedReportsTab />}
       </div>
     </div>

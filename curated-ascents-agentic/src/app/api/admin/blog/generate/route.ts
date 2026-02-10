@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case "generate": {
-        // Full blog post generation
+        // Full blog post generation (includes media library image lookup)
         const draft = await generateBlogPost({
           topic,
           contentType: contentType as BlogContentType,
@@ -45,6 +45,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           draft,
+          featuredImage: draft.featuredImage || null,
+          featuredImageAlt: draft.featuredImageAlt || null,
         });
       }
 

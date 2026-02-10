@@ -13,6 +13,7 @@ import {
   convertQuoteToBooking,
   checkSupplierConfirmations,
   getTripBriefing,
+  searchPhotos,
 } from "./database-tools";
 import { researchExternalRates } from "./fallback-rate-research";
 import {
@@ -353,6 +354,19 @@ export async function executeToolCall(
 
         return JSON.stringify(promotions);
 
+      // Media Library Tool
+      case "search_photos":
+        return JSON.stringify(await searchPhotos({
+          country: args.country as string | undefined,
+          destination: args.destination as string | undefined,
+          category: args.category as string | undefined,
+          tags: args.tags as string[] | undefined,
+          season: args.season as string | undefined,
+          serviceType: args.serviceType as string | undefined,
+          featured: args.featured as boolean | undefined,
+          limit: args.limit as number | undefined,
+        }));
+
       default:
         return JSON.stringify({
           error: `Unknown tool: ${toolName}`,
@@ -379,6 +393,7 @@ export async function executeToolCall(
             "get_supported_currencies",
             "get_dynamic_price",
             "check_pricing_promotions",
+            "search_photos",
           ],
         });
     }
