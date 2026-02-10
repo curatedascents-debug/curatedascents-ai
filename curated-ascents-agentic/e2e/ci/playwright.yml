@@ -1,0 +1,69 @@
+name: Playwright E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD || 'test-admin-password' }}
+      ADMIN_SESSION_SECRET: ${{ secrets.ADMIN_SESSION_SECRET || 'test-session-secret-for-e2e-testing' }}
+      AGENCY_JWT_SECRET: ${{ secrets.AGENCY_JWT_SECRET || 'test-agency-jwt-secret-for-e2e-testing-32chars' }}
+      SUPPLIER_JWT_SECRET: ${{ secrets.SUPPLIER_JWT_SECRET || 'test-supplier-jwt-secret-for-e2e-tests-32chars' }}
+      CUSTOMER_JWT_SECRET: ${{ secrets.CUSTOMER_JWT_SECRET || 'test-customer-jwt-secret-for-e2e-32chars' }}
+      DEEPSEEK_API_KEY: sk-test-dummy-key
+      RESEND_API_KEY: re_test_dummy_key
+      STRIPE_SECRET_KEY: sk_test_dummy_key
+      STRIPE_WEBHOOK_SECRET: whsec_test_dummy
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      CI: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: curated-ascents-agentic/package-lock.json
+
+      - name: Install dependencies
+        working-directory: curated-ascents-agentic
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: curated-ascents-agentic
+        run: npx playwright install --with-deps chromium
+
+      - name: Build application
+        working-directory: curated-ascents-agentic
+        run: npm run build
+
+      - name: Run Playwright tests
+        working-directory: curated-ascents-agentic
+        run: npx playwright test --config=e2e/playwright.config.ts --project=chromium
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: curated-ascents-agentic/playwright-report/
+          retention-days: 7
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: curated-ascents-agentic/test-results/
+          retention-days: 7

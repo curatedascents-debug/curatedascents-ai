@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "node --loader ts-node/esm src/db/seed.ts"
+    "seed": "node --loader ts-node/esm src/db/seed.ts",
+    "test:e2e": "npx playwright test --config=e2e/playwright.config.ts",
+    "test:e2e:ui": "npx playwright test --config=e2e/playwright.config.ts --ui",
+    "test:e2e:chromium": "npx playwright test --config=e2e/playwright.config.ts --project=chromium"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.986.0",
@@ -36,6 +39,7 @@
     "stripe": "^20.3.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.19.30",
     "@types/react": "^18",
