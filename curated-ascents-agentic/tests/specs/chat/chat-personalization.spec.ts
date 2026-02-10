@@ -3,7 +3,7 @@ import { ChatWidget } from '../../page-objects/ChatWidget';
 import { mockChatSequence } from '../../mocks/chat-responses';
 import { mockPersonalize } from '../../mocks/external-services';
 
-test.describe('Chat Personalization / Email Capture', () => {
+test.describe('Chat Personalization / Email Capture @regression @ai-tools', () => {
   test('email capture modal appears after multiple messages', async ({ page }) => {
     // The modal appears after 4+ messages
     await mockChatSequence(page, ['greeting', 'destinationInfo', 'hotelSearch', 'quoteCalculation', 'bookingConfirmation']);

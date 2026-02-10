@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Portal Quotes', () => {
+test.describe('Portal Quotes @portal @booking', () => {
   test('redirects to login when not authenticated', async ({ page }) => {
     await page.context().clearCookies();
     await page.goto(ROUTES.portalQuotes);

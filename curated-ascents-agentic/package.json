@@ -12,7 +12,16 @@
     "test:ui": "npx playwright test --config=tests/playwright.config.ts --ui",
     "test:chromium": "npx playwright test --config=tests/playwright.config.ts --project=chromium",
     "test:staging": "TEST_ENV=staging npx playwright test --config=tests/playwright.config.ts --project=chromium",
-    "test:production": "TEST_ENV=production npx playwright test --config=tests/playwright.config.ts --project=chromium"
+    "test:production": "TEST_ENV=production npx playwright test --config=tests/playwright.config.ts --project=chromium",
+    "test:smoke": "npx playwright test --config=tests/playwright.config.ts --grep @smoke",
+    "test:regression": "npx playwright test --config=tests/playwright.config.ts --grep @regression",
+    "test:ai-tools": "npx playwright test --config=tests/playwright.config.ts --grep @ai-tools",
+    "test:booking": "npx playwright test --config=tests/playwright.config.ts --grep @booking",
+    "test:admin": "npx playwright test --config=tests/playwright.config.ts --grep @admin",
+    "test:portal": "npx playwright test --config=tests/playwright.config.ts --grep @portal",
+    "test:agency": "npx playwright test --config=tests/playwright.config.ts --grep @agency",
+    "test:auth": "npx playwright test --config=tests/playwright.config.ts --grep @auth",
+    "test:api": "npx playwright test --config=tests/playwright.config.ts --grep @api"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.986.0",
@@ -41,6 +50,7 @@
     "stripe": "^20.3.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.3.0",
     "@playwright/test": "^1.58.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.19.30",

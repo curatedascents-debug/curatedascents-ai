@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { SupplierLoginPage } from '../../page-objects/SupplierLoginPage';
 import { TEST_SUPPLIER_USER, ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Supplier Authentication', () => {
+test.describe('Supplier Authentication @smoke @auth', () => {
   let loginPage: SupplierLoginPage;
 
   test.beforeEach(async ({ page }) => {

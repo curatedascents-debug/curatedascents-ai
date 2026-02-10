@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { API_ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Payment API', () => {
+test.describe('Payment API @api @booking', () => {
   test('POST /api/payments/checkout requires booking data', async ({ request, baseURL }) => {
     const response = await request.post(`${baseURL}${API_ROUTES.paymentsCheckout}`, {
       data: {},

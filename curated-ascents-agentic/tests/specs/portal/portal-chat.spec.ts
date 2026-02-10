@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { mockChatEndpoint } from '../../mocks/chat-responses';
 import { ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Portal Chat', () => {
+test.describe('Portal Chat @portal @ai-tools', () => {
   test('redirects to login when not authenticated', async ({ page }) => {
     await page.context().clearCookies();
     await page.goto(ROUTES.portalChat);

@@ -1,7 +1,7 @@
 import { test, expect } from '../../fixtures/auth.fixture';
 import { AdminDashboardPage } from '../../page-objects/AdminDashboardPage';
 
-test.describe('Admin Management Journey', () => {
+test.describe('Admin Management Journey @regression @admin', () => {
   test('admin reviews all tabs sequentially', async ({ adminPage }) => {
     const dashboard = new AdminDashboardPage(adminPage);
     await dashboard.goto();

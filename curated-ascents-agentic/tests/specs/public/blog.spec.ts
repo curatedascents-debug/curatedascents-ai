@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { BlogPage, BlogPostPage } from '../../page-objects/BlogPage';
 
-test.describe('Blog', () => {
+test.describe('Blog @smoke @regression', () => {
   test.describe('Blog Listing', () => {
     let blogPage: BlogPage;
 

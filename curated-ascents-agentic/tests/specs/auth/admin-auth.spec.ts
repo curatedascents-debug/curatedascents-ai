@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { AdminLoginPage } from '../../page-objects/AdminLoginPage';
 import { TEST_ADMIN, ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Admin Authentication', () => {
+test.describe('Admin Authentication @smoke @auth', () => {
   let loginPage: AdminLoginPage;
 
   test.beforeEach(async ({ page }) => {

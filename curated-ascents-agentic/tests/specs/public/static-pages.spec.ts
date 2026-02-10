@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { StaticPages } from '../../page-objects/StaticPages';
 
-test.describe('Static Pages', () => {
+test.describe('Static Pages @smoke', () => {
   let staticPages: StaticPages;
 
   test.beforeEach(async ({ page }) => {

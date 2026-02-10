@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { mockAgencyChatEndpoint } from '../../mocks/chat-responses';
 import { ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Agency Chat', () => {
+test.describe('Agency Chat @agency @ai-tools', () => {
   test('agency chat tab exists in dashboard', async ({ page }) => {
     await page.goto(ROUTES.agencyDashboard);
     const url = page.url();

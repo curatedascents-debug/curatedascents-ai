@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { API_ROUTES, TEST_ADMIN } from '../../fixtures/test-data.fixture';
 import { generateAdminToken } from '../../fixtures/auth.fixture';
 
-test.describe('Admin API', () => {
+test.describe('Admin API @api @admin', () => {
   const adminCookie = () => {
     const token = generateAdminToken(
       TEST_ADMIN.password,

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { API_ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Blog API', () => {
+test.describe('Blog API @api @smoke', () => {
   test('GET /api/blog/posts returns post list', async ({ request, baseURL }) => {
     const response = await request.get(`${baseURL}${API_ROUTES.blogPosts}`);
     expect(response.status()).toBe(200);

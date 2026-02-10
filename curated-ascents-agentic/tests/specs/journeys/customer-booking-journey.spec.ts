@@ -5,7 +5,7 @@ import { mockChatSequence } from '../../mocks/chat-responses';
 import { mockStripeCheckout, mockStripePaymentStatus } from '../../mocks/stripe-mock';
 import { mockPersonalize } from '../../mocks/external-services';
 
-test.describe('Customer Booking Journey', () => {
+test.describe('Customer Booking Journey @regression @booking', () => {
   test('complete journey: homepage → chat → quote → booking', async ({ page }) => {
     // Setup mocks
     await mockChatSequence(page, ['greeting', 'hotelSearch', 'quoteCalculation', 'bookingConfirmation']);

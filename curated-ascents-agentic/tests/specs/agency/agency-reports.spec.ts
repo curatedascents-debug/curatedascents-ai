@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Agency Reports', () => {
+test.describe('Agency Reports @agency @regression', () => {
   test('reports tab exists in agency dashboard', async ({ page }) => {
     await page.goto(ROUTES.agencyDashboard);
     const url = page.url();

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { mockCurrencyRates, mockCurrencyConvert } from '../../mocks/external-services';
 import { ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Portal Currency', () => {
+test.describe('Portal Currency @portal @regression', () => {
   test('redirects to login when not authenticated', async ({ page }) => {
     await page.context().clearCookies();
     await page.goto(ROUTES.portalCurrency);

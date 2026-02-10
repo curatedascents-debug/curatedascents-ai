@@ -3,7 +3,7 @@ import { PortalLoginPage } from '../../page-objects/PortalLoginPage';
 import { mockSendVerificationCode } from '../../mocks/external-services';
 import { TEST_CUSTOMER, ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Customer Portal Authentication', () => {
+test.describe('Customer Portal Authentication @smoke @auth @portal', () => {
   let loginPage: PortalLoginPage;
 
   test.beforeEach(async ({ page }) => {

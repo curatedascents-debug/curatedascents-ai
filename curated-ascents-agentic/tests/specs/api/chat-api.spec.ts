@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { API_ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Chat API', () => {
+test.describe('Chat API @api @ai-tools', () => {
   test('POST /api/chat accepts messages', async ({ request, baseURL }) => {
     const response = await request.post(`${baseURL}${API_ROUTES.chat}`, {
       data: {

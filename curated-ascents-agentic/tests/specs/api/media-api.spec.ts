@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { API_ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Media API', () => {
+test.describe('Media API @api @admin', () => {
   test('GET /api/media/homepage returns media data', async ({ request, baseURL }) => {
     const response = await request.get(`${baseURL}${API_ROUTES.mediaHomepage}`);
     expect([200, 500]).toContain(response.status());

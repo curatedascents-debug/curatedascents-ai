@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { AgencyLoginPage } from '../../page-objects/AgencyLoginPage';
 import { TEST_AGENCY_USER, ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Agency Authentication', () => {
+test.describe('Agency Authentication @smoke @auth @agency', () => {
   let loginPage: AgencyLoginPage;
 
   test.beforeEach(async ({ page }) => {

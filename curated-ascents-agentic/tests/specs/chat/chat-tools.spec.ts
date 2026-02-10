@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { ChatWidget } from '../../page-objects/ChatWidget';
 import { mockChatEndpoint } from '../../mocks/chat-responses';
 
-test.describe('Chat Tool Responses', () => {
+test.describe('Chat Tool Responses @regression @ai-tools', () => {
   test('hotel search response contains hotel names', async ({ page }) => {
     await mockChatEndpoint(page, 'hotelSearch');
     await page.goto('/');

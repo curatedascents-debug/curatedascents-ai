@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { SupplierLoginPage } from '../../page-objects/SupplierLoginPage';
 import { ROUTES, TEST_SUPPLIER_USER } from '../../fixtures/test-data.fixture';
 
-test.describe('Supplier Confirmation Journey', () => {
+test.describe('Supplier Confirmation Journey @regression @supplier @booking', () => {
   test('supplier can access login page', async ({ page }) => {
     const loginPage = new SupplierLoginPage(page);
     await loginPage.goto();

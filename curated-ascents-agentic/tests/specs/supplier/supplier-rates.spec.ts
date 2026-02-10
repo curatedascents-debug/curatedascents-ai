@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Supplier Rates', () => {
+test.describe('Supplier Rates @supplier @regression', () => {
   test('rates tab shows rate list when authenticated', async ({ page }) => {
     await page.goto(ROUTES.supplierDashboard);
     const url = page.url();

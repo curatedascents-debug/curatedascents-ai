@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { API_ROUTES } from '../../fixtures/test-data.fixture';
 
-test.describe('Portal API', () => {
+test.describe('Portal API @api @portal', () => {
   test('POST /api/portal/auth/send-code requires email', async ({ request, baseURL }) => {
     const response = await request.post(`${baseURL}${API_ROUTES.portalSendCode}`, {
       data: {},

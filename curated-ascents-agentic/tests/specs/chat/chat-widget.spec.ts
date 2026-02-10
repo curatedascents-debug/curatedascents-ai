@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { ChatWidget } from '../../page-objects/ChatWidget';
 import { mockChatEndpoint } from '../../mocks/chat-responses';
 
-test.describe('Chat Widget', () => {
+test.describe('Chat Widget @smoke @ai-tools', () => {
   test.beforeEach(async ({ page }) => {
     await mockChatEndpoint(page, 'greeting');
     await page.goto('/');

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('SEO & Meta Tags', () => {
+test.describe('SEO & Meta Tags @smoke @regression', () => {
   test('homepage has title tag', async ({ page }) => {
     await page.goto('/');
     const title = await page.title();

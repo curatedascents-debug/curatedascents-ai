@@ -3,7 +3,7 @@ import { AgencyLoginPage } from '../../page-objects/AgencyLoginPage';
 import { mockAgencyChatEndpoint } from '../../mocks/chat-responses';
 import { ROUTES, TEST_AGENCY_USER } from '../../fixtures/test-data.fixture';
 
-test.describe('Agency Booking Journey', () => {
+test.describe('Agency Booking Journey @regression @agency @booking', () => {
   test('agency user can access login page', async ({ page }) => {
     const loginPage = new AgencyLoginPage(page);
     await loginPage.goto();

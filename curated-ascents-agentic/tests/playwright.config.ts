@@ -35,8 +35,15 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 4 : undefined,
   reporter: process.env.CI
-    ? [['html', { open: 'never' }], ['github']]
-    : [['html', { open: 'on-failure' }]],
+    ? [
+        ['html', { open: 'never' }],
+        ['github'],
+        ['./reporters/summary-reporter.ts', { outputFile: 'test-summary.json' }],
+      ]
+    : [
+        ['html', { open: 'on-failure' }],
+        ['./reporters/summary-reporter.ts', { outputFile: 'test-summary.json' }],
+      ],
   timeout: 30_000,
   expect: { timeout: 10_000 },
 

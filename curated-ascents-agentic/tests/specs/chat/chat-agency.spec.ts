@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { mockAgencyChatEndpoint } from '../../mocks/chat-responses';
 
-test.describe('Agency Chat', () => {
+test.describe('Agency Chat @agency @ai-tools', () => {
   test('agency chat page uses /api/agency/chat endpoint', async ({ page }) => {
     let interceptedAgencyChat = false;
     await page.route('**/api/agency/chat', async (route) => {

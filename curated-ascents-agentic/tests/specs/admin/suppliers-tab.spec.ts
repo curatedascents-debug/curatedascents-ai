@@ -1,7 +1,7 @@
 import { test, expect } from '../../fixtures/auth.fixture';
 import { AdminDashboardPage } from '../../page-objects/AdminDashboardPage';
 
-test.describe('Admin Suppliers Tab', () => {
+test.describe('Admin Suppliers Tab @admin @regression', () => {
   let dashboard: AdminDashboardPage;
 
   test.beforeEach(async ({ adminPage }) => {
