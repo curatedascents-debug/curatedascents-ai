@@ -14,8 +14,16 @@ export async function GET() {
       .limit(1);
 
     if (existingAgency) {
+      // Ensure agency is active (may have been seeded before status was set)
+      if (existingAgency.status !== "active") {
+        await db
+          .update(agencies)
+          .set({ status: "active" })
+          .where(eq(agencies.id, existingAgency.id));
+      }
       return NextResponse.json({
         message: "Test agency already exists",
+        status: "active",
         credentials: {
           agency: existingAgency.name,
           loginUrl: "/agency/login",
