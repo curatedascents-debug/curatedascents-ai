@@ -58,5 +58,5 @@ export function uniqueEmail(prefix = 'e2e'): string {
 
 /** Take a named screenshot for debugging */
 export async function debugScreenshot(page: Page, name: string) {
-  await page.screenshot({ path: `e2e/screenshots/${name}.png`, fullPage: true });
+  await page.screenshot({ path: `tests/screenshots/${name}.png`, fullPage: true });
 }
