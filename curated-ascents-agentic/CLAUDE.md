@@ -24,7 +24,34 @@ npx drizzle-kit push       # Push schema directly (skip migrations)
 npx drizzle-kit studio     # Visual DB browser
 ```
 
-No test runner is configured. There are no unit or integration tests.
+### E2E Testing (Playwright)
+
+```bash
+npm test                    # Run all tests (all browsers)
+npm run test:chromium       # Run tests in Chromium only
+npm run test:ui             # Open Playwright UI mode
+npm run test:smoke          # Run @smoke tagged tests only
+npm run test:regression     # Run @regression tagged tests only
+npm run test:admin          # Run @admin tagged tests only
+npm run test:portal         # Run @portal tagged tests only
+npm run test:agency         # Run @agency tagged tests only
+npm run test:auth           # Run @auth tagged tests only
+npm run test:api            # Run @api tagged tests only
+npm run test:ai-tools       # Run @ai-tools tagged tests only
+npm run test:booking        # Run @booking tagged tests only
+npm run test:staging        # Run tests against staging URL
+npm run test:production     # Run smoke tests against production URL
+```
+
+**Test suite:** 223 tests across 47 spec files, 9 categories, 100% pass rate. Config at `tests/playwright.config.ts`.
+
+**Important notes:**
+- Tests live in `tests/` directory (excluded from `tsconfig.json` so build is unaffected)
+- Tests require `npm run dev` running on localhost:3000 (Playwright starts it automatically via `webServer` config)
+- Uses system Chrome (`channel: 'chrome'`) instead of bundled Chromium for macOS 11 compatibility
+- Chat tests mock `/api/chat` via `page.route()` — the mock must return `{ message, role }` (NOT `{ response }`) to match the real API format
+- Email capture modal triggers after 2nd user message (`newMessages.length >= 4`); tests that send 3+ messages must dismiss it
+- Admin API endpoints (`/api/admin/*`) have NO inline auth checks — middleware only protects page routes (`/admin/*`)
 
 ## Environment Variables
 
@@ -52,9 +79,10 @@ Defined in `.env.local`:
 1. Pull latest from `main` branch
 2. Create feature branch: `git checkout -b feature/[name]`
 3. Develop locally: `npm run dev` at localhost:3000
-4. Validate build: `npm run build` (zero TypeScript errors required)
-5. Push branch, open PR, review, merge to `main`
-6. Vercel auto-deploys `main` to production
+4. Run E2E tests: `npm run test:chromium` (223 tests, requires dev server running)
+5. Validate build: `npm run build` (zero TypeScript errors required)
+6. Push branch, open PR, review, merge to `main`
+7. Vercel auto-deploys `main` to production
 
 ## Vercel Deployment
 
@@ -279,6 +307,55 @@ All React components in `src/components/` are client components (`"use client"`)
 - **Media** — Media library with upload, search, edit, bulk operations, collections, stats (3 sub-tabs: Library, Collections, Stats)
 - **Reports** — Advanced analytics with sub-tabs (Overview, Financial, Suppliers, Leads, Operations)
 
+### E2E Test Architecture (`tests/`)
+
+```
+tests/
+├── playwright.config.ts              # Multi-env config (local/staging/production)
+├── tsconfig.json                      # Test-only TS config with @/* path alias
+├── .env.test                          # Local test env vars (DATABASE_URL, JWT secrets, dummy API keys)
+├── global-setup.ts                    # Database seeding (Drizzle direct → HTTP fallback)
+├── global-teardown.ts                 # Test data cleanup
+├── fixtures/
+│   ├── auth.fixture.ts                # 5 auth contexts: guest, admin, agency, supplier, portal (JWT via jose)
+│   ├── base.fixture.ts                # Extends auth with common helpers
+│   └── test-data.fixture.ts           # Constants: routes, API routes, timeouts, test users
+├── factories/
+│   └── test-data.factory.ts           # Faker-based data generators
+├── helpers/
+│   ├── db.helpers.ts                  # Drizzle seed/query helpers (dynamic imports for ESM compat)
+│   ├── api.helpers.ts                 # API request helpers
+│   ├── assertions.helpers.ts          # Custom assertions (toast, API response, DB record)
+│   ├── ui.helpers.ts                  # UI interaction helpers
+│   └── selectors.ts                   # Shared CSS/aria selectors
+├── mocks/
+│   ├── chat-responses.ts             # page.route() mock for /api/chat (returns { message, role })
+│   ├── stripe-mock.ts                # Stripe checkout/payment status mocks
+│   └── external-services.ts          # Currency, personalize, media mocks
+├── msw/                               # Server-side mocking (for Next.js process)
+│   ├── server.ts                      # MSW setupServer
+│   └── handlers/                      # DeepSeek, R2, Stripe, Resend handlers
+├── page-objects/                      # 20 Page Object Models
+│   ├── ChatWidget.ts                  # Chat: open via [aria-label="Open chat"], messages via .markdown-content
+│   ├── AdminDashboardPage.ts          # Admin: switchTab via .first(), expectLoaded with 15s timeout
+│   ├── HomePage.ts, BlogPage.ts, PortalDashboardPage.ts, ...
+├── reporters/
+│   └── summary-reporter.ts           # Custom reporter → test-summary.json
+├── specs/                             # 47 spec files across 9 categories
+│   ├── admin/ (11), agency/ (3), api/ (7), auth/ (4), chat/ (5)
+│   ├── journeys/ (4), portal/ (7), public/ (4), supplier/ (2)
+└── ci/
+    └── playwright.yml                 # GitHub Actions CI config
+```
+
+**Key testing patterns:**
+- Auth fixtures generate JWTs programmatically — no server needed for agency/supplier/portal auth
+- Admin auth uses hash-based token matching `src/middleware.ts` algorithm
+- Chat mocks intercept at browser level via `page.route('**/api/chat', ...)` — must return `{ message: "...", role: "assistant" }`
+- Email capture modal blocks chat input after 2nd user message — tests must dismiss it via `chatWidget.skipEmailCapture()` before sending more
+- Use `waitForLoadState('networkidle')` after navigation for reliable page load detection
+- Use `.first()` with `getByRole('button', { name: /regex/ })` to avoid strict mode violations when multiple buttons match
+
 ### Pricing Rules
 
 - Sell price formula: `Sell = Cost * (1 + Margin%)`
@@ -400,6 +477,33 @@ All React components in `src/components/` are client components (`"use client"`)
 - **Blog Integration** — `generateBlogPost()` automatically searches media library for matching featured images; auto-content cron saves them
 - **Homepage Integration** — `/api/media/homepage` serves categorized images; all homepage components (Hero, Experiences, Destinations, About) use media library images with Unsplash fallbacks
 - **Admin API Routes** — 8 endpoints: list/search, upload, single CRUD, bulk operations, auto-tag, stats, collections CRUD
+
+### ✅ Phase 5.3: E2E Test Suite (Complete)
+- **Playwright E2E Tests** — 223 tests across 47 spec files, 9 categories, 100% pass rate
+- **Multi-Environment Config** — `TEST_ENV` selects local/staging/production; each loads own `.env.*` file
+- **Auth Fixtures** — Programmatic JWT generation via `jose` for admin, agency, supplier, portal, and guest contexts (no login API calls needed)
+- **Page Object Models (20)** — HomePage, BlogPage, ChatWidget, AdminDashboardPage, PortalDashboardPage, SupplierLoginPage, AgencyDashboardPage, and 13 more
+- **Browser-Level Mocks** — `page.route()` intercepts for `/api/chat`, Stripe, currency, email (since DeepSeek runs server-side, mock at API response level)
+- **MSW (Mock Service Worker)** — Server-side mocking infrastructure for DeepSeek, R2, Stripe, Resend via `src/instrumentation.ts` (`ENABLE_MSW=true`)
+- **Database Seeding** — Drizzle ORM direct seeding in `global-setup.ts` with HTTP `/api/seed-all` fallback
+- **Test Tags** — `@smoke`, `@regression`, `@admin`, `@portal`, `@agency`, `@auth`, `@api`, `@ai-tools`, `@booking`, `@supplier`
+- **Custom Reporter** — `tests/reporters/summary-reporter.ts` outputs features, coverage gaps, failures to `test-summary.json`
+- **Data Factory** — `tests/factories/test-data.factory.ts` using `@faker-js/faker` for realistic test data generation
+- **CI Config** — `tests/ci/playwright.yml` for GitHub Actions with staging job
+
+**Test Categories:**
+
+| Category | Specs | Tests | What's Tested |
+|----------|-------|-------|---------------|
+| api | 7 | 53 | Admin CRUD, blog, chat, media, payment, portal APIs |
+| admin | 11 | 50 | All admin dashboard tabs (rates, hotels, suppliers, clients, quotes, bookings, blog, media, pricing, nurture, reports) |
+| public | 4 | 30 | Homepage, blog, static pages, SEO |
+| portal | 7 | 22 | Customer portal pages (dashboard, trips, quotes, loyalty, chat, currency, settings) |
+| auth | 4 | 21 | Admin, agency, supplier, portal authentication flows |
+| chat | 5 | 19 | Chat widget, conversation flow, tool responses, personalization/email capture, agency chat |
+| journeys | 4 | 12 | End-to-end user journeys (customer booking, admin management, agency booking, supplier confirmation) |
+| agency | 3 | 9 | Agency dashboard, chat, reports |
+| supplier | 2 | 7 | Supplier dashboard, rates |
 
 ### 🔮 Phase 6: Future Enhancements
 - **WhatsApp Integration** — AI chat via WhatsApp Business API
