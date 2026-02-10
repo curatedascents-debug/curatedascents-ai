@@ -16,15 +16,25 @@ interface ChatInterfaceProps {
   portalMode?: boolean;
   clientId?: number;
   clientEmail?: string;
+  apiEndpoint?: string;
+  agencyMode?: boolean;
 }
 
-export default function ChatInterface({ isWidget = false, initialMessage, portalMode = false, clientId: portalClientId, clientEmail: portalClientEmail }: ChatInterfaceProps) {
+export default function ChatInterface({ isWidget = false, initialMessage, portalMode = false, clientId: portalClientId, clientEmail: portalClientEmail, apiEndpoint = "/api/chat", agencyMode = false }: ChatInterfaceProps) {
+  const getWelcomeMessage = () => {
+    if (agencyMode) {
+      return "Welcome, partner! I'm your Expedition Architect for agency bookings. I can search our inventory, provide itemized agency pricing, and build quotes for your clients. What are you looking to book today?";
+    }
+    if (isWidget) {
+      return "Hello! I'm your Expedition Architect. How can I help you plan your perfect Himalayan adventure today?";
+    }
+    return "Welcome to CuratedAscents! I'm your Expedition Architect. I specialize in crafting bespoke luxury adventures across Nepal, Tibet, Bhutan, and India. Whether you're dreaming of trekking to Everest Base Camp, finding peace in a Bhutanese monastery, or tracking tigers in Ranthambore, I'm here to design your perfect journey. What kind of adventure speaks to you?";
+  };
+
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: isWidget
-        ? "Hello! I'm your Expedition Architect. How can I help you plan your perfect Himalayan adventure today?"
-        : "Welcome to CuratedAscents! I'm your Expedition Architect. I specialize in crafting bespoke luxury adventures across Nepal, Tibet, Bhutan, and India. Whether you're dreaming of trekking to Everest Base Camp, finding peace in a Bhutanese monastery, or tracking tigers in Ranthambore, I'm here to design your perfect journey. What kind of adventure speaks to you?",
+      content: getWelcomeMessage(),
     },
   ]);
   const [input, setInput] = useState("");
@@ -62,7 +72,7 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -80,7 +90,7 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
 
       setMessages([...newMessages, { role: "assistant", content: data.message }]);
 
-      if (!portalMode && !clientEmail && newMessages.length >= 4) {
+      if (!portalMode && !agencyMode && !clientEmail && newMessages.length >= 4) {
         setShowEmailPrompt(true);
       }
     } catch (error) {

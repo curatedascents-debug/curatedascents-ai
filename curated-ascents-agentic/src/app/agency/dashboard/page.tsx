@@ -10,13 +10,15 @@ import {
   LogOut,
   Loader2,
   BarChart3,
+  MessageSquare,
 } from "lucide-react";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import ClientsTab from "@/components/admin/ClientsTab";
 import QuotesTab from "@/components/admin/QuotesTab";
 import BookingsTab from "@/components/admin/BookingsTab";
+import ChatInterface from "@/components/ChatInterface";
 
-type TabType = "clients" | "quotes" | "bookings" | "reports";
+type TabType = "clients" | "quotes" | "bookings" | "reports" | "chat";
 
 interface AgencyUser {
   id: number;
@@ -82,6 +84,7 @@ export default function AgencyDashboard() {
     { id: "quotes", label: "Quotes", icon: <FileText className="w-4 h-4" /> },
     { id: "bookings", label: "Bookings", icon: <Calendar className="w-4 h-4" /> },
     { id: "reports", label: "Reports", icon: <BarChart3 className="w-4 h-4" /> },
+    { id: "chat", label: "AI Chat", icon: <MessageSquare className="w-4 h-4" /> },
   ];
 
   if (loading) {
@@ -182,6 +185,15 @@ export default function AgencyDashboard() {
             <p className="text-slate-400">
               Analytics and reporting features will be available in a future update.
             </p>
+          </div>
+        )}
+        {activeTab === "chat" && (
+          <div className="bg-slate-800 rounded-lg overflow-hidden" style={{ height: "calc(100vh - 200px)" }}>
+            <ChatInterface
+              apiEndpoint="/api/agency/chat"
+              agencyMode={true}
+              isWidget={true}
+            />
           </div>
         )}
       </main>
