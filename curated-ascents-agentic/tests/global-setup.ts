@@ -1,6 +1,7 @@
 import { type FullConfig } from '@playwright/test';
 import dotenv from 'dotenv';
 import path from 'path';
+import { seedTestDatabase } from './helpers/db.helpers';
 
 /**
  * Global setup runs once before all tests.
@@ -21,7 +22,6 @@ async function globalSetup(config: FullConfig) {
   if (testEnv !== 'production' && process.env.SEED_DB !== 'false') {
     try {
       console.log('[Global Setup] Seeding database via Drizzle ORM...');
-      const { seedTestDatabase } = await import('./helpers/db.helpers');
       await seedTestDatabase();
       console.log('[Global Setup] Database seeded successfully');
     } catch (error) {

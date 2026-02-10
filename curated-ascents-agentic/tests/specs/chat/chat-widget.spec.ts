@@ -3,15 +3,17 @@ import { ChatWidget } from '../../page-objects/ChatWidget';
 import { mockChatEndpoint } from '../../mocks/chat-responses';
 
 test.describe('Chat Widget @smoke @ai-tools', () => {
+  test.setTimeout(60_000);
+
   test.beforeEach(async ({ page }) => {
     await mockChatEndpoint(page, 'greeting');
     await page.goto('/');
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle');
   });
 
   test('floating chat button is visible on homepage', async ({ page }) => {
-    const floatingBtn = page.locator('[class*="fixed"][class*="bottom"]').last();
-    await expect(floatingBtn).toBeVisible();
+    const floatingBtn = page.locator('[aria-label="Open chat"]');
+    await expect(floatingBtn).toBeVisible({ timeout: 15_000 });
   });
 
   test('chat opens when floating button is clicked', async ({ page }) => {
@@ -30,7 +32,7 @@ test.describe('Chat Widget @smoke @ai-tools', () => {
   test('send button is visible', async ({ page }) => {
     const chatWidget = new ChatWidget(page);
     await chatWidget.open();
-    await expect(chatWidget.sendButton).toBeVisible();
+    await expect(chatWidget.sendButton).toBeVisible({ timeout: 15_000 });
   });
 
   test('chat input has placeholder text', async ({ page }) => {

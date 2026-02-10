@@ -1,4 +1,5 @@
 import { type FullConfig } from '@playwright/test';
+import { cleanupTestData } from './helpers/db.helpers';
 
 /**
  * Global teardown runs once after all tests.
@@ -11,7 +12,6 @@ async function globalTeardown(_config: FullConfig) {
   // Only clean up for local environment to avoid touching shared data
   if (testEnv === 'local' && process.env.CLEANUP_DB !== 'false') {
     try {
-      const { cleanupTestData } = await import('./helpers/db.helpers');
       await cleanupTestData();
     } catch (error) {
       console.warn('[Global Teardown] Cleanup failed:', error);

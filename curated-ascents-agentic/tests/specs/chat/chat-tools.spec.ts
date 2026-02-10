@@ -3,9 +3,12 @@ import { ChatWidget } from '../../page-objects/ChatWidget';
 import { mockChatEndpoint } from '../../mocks/chat-responses';
 
 test.describe('Chat Tool Responses @regression @ai-tools', () => {
+  test.setTimeout(60_000);
+
   test('hotel search response contains hotel names', async ({ page }) => {
     await mockChatEndpoint(page, 'hotelSearch');
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     const chatWidget = new ChatWidget(page);
     await chatWidget.open();
     await chatWidget.sendMessage('Find me luxury hotels in Kathmandu');
@@ -18,6 +21,7 @@ test.describe('Chat Tool Responses @regression @ai-tools', () => {
   test('quote calculation response contains pricing', async ({ page }) => {
     await mockChatEndpoint(page, 'quoteCalculation');
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     const chatWidget = new ChatWidget(page);
     await chatWidget.open();
     await chatWidget.sendMessage('Give me a quote for Nepal trek');
@@ -30,6 +34,7 @@ test.describe('Chat Tool Responses @regression @ai-tools', () => {
   test('destination info lists countries', async ({ page }) => {
     await mockChatEndpoint(page, 'destinationInfo');
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     const chatWidget = new ChatWidget(page);
     await chatWidget.open();
     await chatWidget.sendMessage('Where do you operate?');
@@ -42,6 +47,7 @@ test.describe('Chat Tool Responses @regression @ai-tools', () => {
   test('photo search response contains images', async ({ page }) => {
     await mockChatEndpoint(page, 'photoSearch');
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     const chatWidget = new ChatWidget(page);
     await chatWidget.open();
     await chatWidget.sendMessage('Show me photos of Nepal');

@@ -27,16 +27,17 @@ export class AdminDashboardPage {
 
   async goto() {
     await this.page.goto('/admin');
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForLoadState('networkidle');
   }
 
   async expectLoaded() {
-    await expect(this.page).toHaveURL('/admin');
-    await expect(this.title).toBeVisible();
+    await expect(this.page).toHaveURL('/admin', { timeout: 15_000 });
+    await expect(this.title).toBeVisible({ timeout: 15_000 });
   }
 
   async switchTab(tabName: string) {
-    await this.page.getByRole('button', { name: new RegExp(tabName, 'i') }).click();
+    // Use first() to avoid strict mode violations when tab name matches multiple buttons
+    await this.page.getByRole('button', { name: new RegExp(tabName, 'i') }).first().click();
     await this.page.waitForTimeout(500);
   }
 

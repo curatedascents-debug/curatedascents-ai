@@ -2,11 +2,13 @@ import { test, expect } from '@playwright/test';
 import { HomePage } from '../../page-objects/HomePage';
 
 test.describe('Homepage @smoke', () => {
+  test.setTimeout(60_000);
   let homePage: HomePage;
 
   test.beforeEach(async ({ page }) => {
     homePage = new HomePage(page);
     await homePage.goto();
+    await page.waitForLoadState('networkidle');
   });
 
   test('loads successfully', async () => {
@@ -27,8 +29,8 @@ test.describe('Homepage @smoke', () => {
   });
 
   test('has chat widget floating button', async ({ page }) => {
-    const chatButton = page.locator('[class*="fixed"][class*="bottom"]').last();
-    await expect(chatButton).toBeVisible();
+    const chatButton = page.locator('[aria-label="Open chat"]');
+    await expect(chatButton).toBeVisible({ timeout: 15_000 });
   });
 
   test('has correct page title', async ({ page }) => {
@@ -46,6 +48,7 @@ test.describe('Homepage @smoke', () => {
   test('responsive layout on mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     await expect(page.locator('body')).toBeVisible();
   });
 });

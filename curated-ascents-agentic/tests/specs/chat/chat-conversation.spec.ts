@@ -3,9 +3,12 @@ import { ChatWidget } from '../../page-objects/ChatWidget';
 import { mockChatEndpoint, mockChatSequence, mockChatError } from '../../mocks/chat-responses';
 
 test.describe('Chat Conversation @regression @ai-tools', () => {
+  test.setTimeout(60_000);
+
   test('sends message and receives response', async ({ page }) => {
     await mockChatEndpoint(page, 'greeting');
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     const chatWidget = new ChatWidget(page);
     await chatWidget.open();
     await chatWidget.sendMessage('Hello!');
@@ -18,6 +21,7 @@ test.describe('Chat Conversation @regression @ai-tools', () => {
   test('displays user message in chat', async ({ page }) => {
     await mockChatEndpoint(page, 'greeting');
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     const chatWidget = new ChatWidget(page);
     await chatWidget.open();
     await chatWidget.sendMessage('Tell me about Nepal');
@@ -30,6 +34,7 @@ test.describe('Chat Conversation @regression @ai-tools', () => {
   test('displays assistant response', async ({ page }) => {
     await mockChatEndpoint(page, 'destinationInfo');
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     const chatWidget = new ChatWidget(page);
     await chatWidget.open();
     await chatWidget.sendMessage('What destinations do you cover?');
@@ -42,6 +47,7 @@ test.describe('Chat Conversation @regression @ai-tools', () => {
   test('handles sequential messages', async ({ page }) => {
     await mockChatSequence(page, ['greeting', 'hotelSearch']);
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     const chatWidget = new ChatWidget(page);
     await chatWidget.open();
 
@@ -58,6 +64,7 @@ test.describe('Chat Conversation @regression @ai-tools', () => {
   test('handles API error gracefully', async ({ page }) => {
     await mockChatError(page, 500);
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     const chatWidget = new ChatWidget(page);
     await chatWidget.open();
     await chatWidget.sendMessage('Hello');

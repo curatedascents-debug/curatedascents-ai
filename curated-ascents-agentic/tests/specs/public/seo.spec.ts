@@ -30,6 +30,7 @@ test.describe('SEO & Meta Tags @smoke @regression', () => {
   });
 
   test('static pages have title tags', async ({ page }) => {
+    test.setTimeout(60_000); // 4 page navigations need more time
     const pages = ['/faq', '/contact', '/privacy-policy', '/terms'];
     for (const pagePath of pages) {
       await page.goto(pagePath);

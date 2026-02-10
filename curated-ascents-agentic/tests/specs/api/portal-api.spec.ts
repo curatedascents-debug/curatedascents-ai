@@ -21,7 +21,8 @@ test.describe('Portal API @api @portal', () => {
     const response = await request.post(`${baseURL}${API_ROUTES.portalVerifyCode}`, {
       data: { email: 'test@example.com', code: '000000' },
     });
-    expect([400, 401, 500]).toContain(response.status());
+    // 400 = invalid code/no pending code, 401 = unauthorized, 429 = too many attempts, 500 = server error
+    expect([400, 401, 429, 500]).toContain(response.status());
   });
 
   test('GET /api/portal/dashboard requires authentication', async ({ request, baseURL }) => {

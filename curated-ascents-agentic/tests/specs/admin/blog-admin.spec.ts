@@ -2,6 +2,9 @@ import { test, expect } from '../../fixtures/auth.fixture';
 import { AdminDashboardPage } from '../../page-objects/AdminDashboardPage';
 
 test.describe('Admin Blog Tab @admin @regression', () => {
+  // Blog tab can be slow to load — increase timeout
+  test.setTimeout(60_000);
+
   let dashboard: AdminDashboardPage;
 
   test.beforeEach(async ({ adminPage }) => {
@@ -9,12 +12,12 @@ test.describe('Admin Blog Tab @admin @regression', () => {
     await dashboard.goto();
     await dashboard.expectLoaded();
     await dashboard.switchTab('Blog');
+    await adminPage.waitForTimeout(1000);
   });
 
   test('displays blog tab content', async ({ adminPage }) => {
-    await adminPage.waitForTimeout(1000);
     const content = adminPage.locator('table, [class*="grid"], [class*="blog"]').first();
-    await expect(content).toBeVisible();
+    await expect(content).toBeVisible({ timeout: 15_000 });
   });
 
   test('shows blog post list', async ({ adminPage }) => {

@@ -17,47 +17,64 @@ export class ChatWidget {
   constructor(page: Page) {
     this.page = page;
     this.container = page.locator('[class*="chat"], [class*="Chat"]').first();
-    this.messageInput = page.locator('textarea, input[placeholder*="message"], input[placeholder*="adventure"]').first();
+    this.messageInput = page.locator('input[placeholder*="message"], input[placeholder*="adventure"], textarea').first();
     this.sendButton = page.locator('button[type="submit"]').first();
     this.messages = page.locator('[class*="message"], [class*="bg-emerald-600"], [class*="bg-slate-800"][class*="border-slate-700"]');
-    this.userMessages = page.locator('[class*="bg-emerald-600"]');
-    this.assistantMessages = page.locator('[class*="bg-slate-800"][class*="border"]');
-    this.loadingIndicator = page.locator('[class*="animate-"]').first();
+    this.userMessages = page.locator('div[class*="bg-emerald-600"][class*="rounded"]');
+    this.assistantMessages = page.locator('div[class*="bg-slate-800"][class*="border"]:has(.markdown-content)');
+    this.loadingIndicator = page.locator('[class*="animate-spin"]').first();
     this.emailInput = page.locator('input[placeholder="Your email"]');
     this.nameInput = page.locator('input[placeholder="Your name"]');
-    this.skipButton = page.getByText('Skip for now');
+    this.skipButton = page.getByText(/skip/i);
     this.continueButton = page.getByRole('button', { name: /continue/i });
   }
 
   async open() {
-    // Click the floating chat button if it exists
-    const floatingBtn = this.page.locator('[class*="fixed"][class*="bottom-"][class*="right-"] button, [class*="fixed"][class*="bottom"] [class*="cursor-pointer"]').first();
-    if (await floatingBtn.isVisible()) {
+    // Use aria-label which is the most reliable selector for the floating button
+    const floatingBtn = this.page.locator('[aria-label="Open chat"]');
+    try {
+      await floatingBtn.waitFor({ state: 'visible', timeout: 15_000 });
       await floatingBtn.click();
-      await this.page.waitForTimeout(500);
+      // Wait for the chat panel to appear
+      await this.messageInput.waitFor({ state: 'visible', timeout: 10_000 });
+    } catch {
+      // Fallback: try broader selectors
+      const fallbackBtn = this.page.locator('button[class*="fixed"][class*="bottom"]').first();
+      if (await fallbackBtn.isVisible()) {
+        await fallbackBtn.click();
+        await this.page.waitForTimeout(1000);
+      }
     }
   }
 
   async close() {
-    const closeBtn = this.page.locator('[class*="chat"] button:has(svg)').first();
+    const closeBtn = this.page.locator('[aria-label="Close chat"]');
     if (await closeBtn.isVisible()) {
       await closeBtn.click();
     }
   }
 
   async sendMessage(text: string) {
+    await this.messageInput.waitFor({ state: 'visible', timeout: 10_000 });
     await this.messageInput.fill(text);
     await this.sendButton.click();
   }
 
   async waitForResponse(timeout = 20_000) {
-    // Wait for loading to appear then disappear, or new assistant message
-    await this.page.waitForTimeout(500);
+    // Brief pause for the fetch to start and isLoading to become true
+    await this.page.waitForTimeout(300);
     try {
+      // Wait for spinner to appear (it may appear only briefly with fast mocks)
+      await this.page.locator('[class*="animate-spin"]')
+        .waitFor({ state: 'visible', timeout: 2_000 })
+        .catch(() => {});
+      // Wait for spinner to disappear (response received and rendered)
       await this.page.waitForFunction(
-        () => !document.querySelector('[class*="animate-pulse"], [class*="animate-bounce"]'),
+        () => !document.querySelector('[class*="animate-spin"]'),
         { timeout }
       );
+      // Small buffer for DOM update after state change
+      await this.page.waitForTimeout(200);
     } catch {
       // timeout is acceptable — response may have already arrived
     }
@@ -88,7 +105,7 @@ export class ChatWidget {
   }
 
   async expectInputVisible() {
-    await expect(this.messageInput).toBeVisible();
+    await expect(this.messageInput).toBeVisible({ timeout: 15_000 });
   }
 
   async expectEmailPromptVisible() {
