@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #059669;
-  --color-secondary: #1e293b;
-  --color-accent: #6ee7b7;
-  --color-primary-rgb: 5, 150, 105;
-  --color-secondary-rgb: 30, 41, 59;
-  --color-accent-rgb: 110, 231, 183;
+  --color-luxury-navy: #0F1B2D;
+  --color-luxury-gold: #C9A96E;
+  --color-luxury-cream: #F5F0EB;
+  --color-luxury-charcoal: #2A2A2A;
+  --color-luxury-mist: #E8E2DA;
+  --color-luxury-white: #FAFAF8;
 }
 
 html, body {
@@ -22,7 +22,7 @@ html, body {
 }
 
 body {
-  background: #0f172a;
+  background: var(--color-luxury-navy);
   color: #f1f5f9;
 }
 
@@ -37,14 +37,14 @@ html {
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #6ee7b7 0%, #059669 100%);
+  background: linear-gradient(135deg, #C9A96E 0%, #E8D5B5 50%, #C9A96E 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-gradient-gold {
-  background: linear-gradient(135deg, #D4AF37 0%, #F4E4BC 50%, #D4AF37 100%);
+  background: linear-gradient(135deg, #C9A96E 0%, #E8D5B5 50%, #C9A96E 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -62,7 +62,7 @@ html {
 
 /* Glass effect */
 .glass {
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 27, 45, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -91,15 +91,15 @@ html {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.4) 50%, transparent 100%);
+  background: linear-gradient(to top, rgba(15, 27, 45, 0.9) 0%, rgba(15, 27, 45, 0.4) 50%, transparent 100%);
   pointer-events: none;
 }
 
-/* Button styles */
+/* Button styles — Luxury */
 .btn-primary {
-  @apply px-8 py-4 bg-emerald-600 text-white font-medium rounded-full
-         hover:bg-emerald-500 transition-all duration-300
-         hover:shadow-lg hover:shadow-emerald-500/25;
+  @apply px-8 py-4 bg-luxury-gold text-luxury-navy font-medium rounded-full
+         hover:bg-luxury-gold/90 transition-all duration-300
+         hover:shadow-lg hover:shadow-luxury-gold/25;
 }
 
 .btn-secondary {
@@ -109,6 +109,14 @@ html {
 
 .btn-ghost {
   @apply px-6 py-3 text-white/80 hover:text-white transition-colors duration-300;
+}
+
+/* Section divider — gold line */
+.section-divider {
+  @apply mx-auto;
+  width: 100px;
+  height: 1px;
+  background: rgba(201, 169, 110, 0.3);
 }
 
 /* Animated underline for links */
@@ -122,8 +130,8 @@ html {
   bottom: -2px;
   left: 0;
   width: 0;
-  height: 2px;
-  background: #6ee7b7;
+  height: 1px;
+  background: #C9A96E;
   transition: width 0.3s ease;
 }
 
@@ -165,7 +173,7 @@ html {
 
 .markdown-content strong {
   font-weight: 600;
-  color: #6ee7b7;
+  color: #C9A96E;
 }
 
 .markdown-content em {
@@ -197,7 +205,7 @@ html {
   background-color: #0f172a;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
-  color: #6ee7b7;
+  color: #C9A96E;
   font-family: 'Courier New', monospace;
 }
 
@@ -239,9 +247,24 @@ html {
 .delay-700 { animation-delay: 700ms; }
 .delay-800 { animation-delay: 800ms; }
 
+/* SSR scroll animations (progressive enhancement) */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition-delay: calc(var(--stagger-index, 0) * 150ms + 200ms);
+}
+[data-animate][data-animate-direction="left"] {
+  transform: translateX(-2rem);
+}
+[data-animate="visible"] {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
 /* Focus styles */
 .focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900;
+  @apply focus:outline-none focus:ring-2 focus:ring-luxury-gold focus:ring-offset-2 focus:ring-offset-luxury-navy;
 }
 
 /* Marquee animation for press logos */
@@ -265,5 +288,11 @@ html {
 
   .animate-marquee {
     animation: none;
+  }
+
+  [data-animate] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 }

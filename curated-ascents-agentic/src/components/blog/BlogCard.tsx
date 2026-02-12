@@ -36,7 +36,7 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden hover:border-emerald-500/30 transition-all duration-300"
+      className="group bg-white/5 border border-luxury-gold/10 rounded-2xl overflow-hidden hover:border-luxury-gold/30 transition-all duration-300"
     >
       <Link href={`/blog/${post.slug}`}>
         {/* Image */}
@@ -48,14 +48,14 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps) {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-700 flex items-center justify-center">
-              <span className="text-slate-500 text-sm">No Image</span>
+            <div className="w-full h-full bg-gradient-to-br from-luxury-navy to-luxury-charcoal flex items-center justify-center">
+              <span className="text-white/20 text-sm">No Image</span>
             </div>
           )}
 
           {/* Category Badge */}
           {post.categoryName && (
-            <span className="absolute top-4 left-4 px-3 py-1 bg-emerald-500/90 text-white text-xs font-medium rounded-full">
+            <span className="absolute top-4 left-4 px-3 py-1 bg-luxury-gold/90 text-luxury-navy text-xs font-medium rounded-full">
               {post.categoryName}
             </span>
           )}
@@ -63,18 +63,18 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps) {
 
         {/* Content */}
         <div className="p-6">
-          <h3 className="text-xl font-serif font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors line-clamp-2">
+          <h3 className="text-xl font-serif font-bold text-white mb-2 group-hover:text-luxury-gold transition-colors line-clamp-2">
             {post.title}
           </h3>
 
           {post.excerpt && (
-            <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+            <p className="text-white/50 text-sm mb-4 line-clamp-2">
               {post.excerpt}
             </p>
           )}
 
           {/* Meta */}
-          <div className="flex items-center gap-4 text-xs text-slate-500">
+          <div className="flex items-center gap-4 text-xs text-white/30">
             {formattedDate && (
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
@@ -90,7 +90,7 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps) {
           </div>
 
           {/* Read More */}
-          <div className="mt-4 flex items-center text-emerald-400 text-sm font-medium group-hover:text-emerald-300">
+          <div className="mt-4 flex items-center text-luxury-gold text-sm font-medium group-hover:text-luxury-gold/80">
             Read Article
             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </div>

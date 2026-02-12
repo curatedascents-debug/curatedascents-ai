@@ -28,7 +28,7 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
     if (isWidget) {
       return "Hello! I'm your Expedition Architect. How can I help you plan your perfect Himalayan adventure today?";
     }
-    return "Welcome to CuratedAscents! I'm your Expedition Architect. I specialize in crafting bespoke luxury adventures across Nepal, Tibet, Bhutan, and India. Whether you're dreaming of trekking to Everest Base Camp, finding peace in a Bhutanese monastery, or tracking tigers in Ranthambore, I'm here to design your perfect journey. What kind of adventure speaks to you?";
+    return "Welcome to CuratedAscents. I'm your private Expedition Architect with deep expertise across Nepal, Bhutan, Tibet, and India. Whether you're dreaming of a Himalayan trek, a palace stay in Rajasthan, or a spiritual journey through Bhutan — tell me what inspires you, and I'll design something extraordinary.";
   };
 
   const [messages, setMessages] = useState<Message[]>([

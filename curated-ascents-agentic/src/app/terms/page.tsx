@@ -46,6 +46,13 @@ export default function TermsPage() {
             <li>All prices are quoted in USD unless otherwise specified</li>
           </ul>
 
+          <h3 className="text-white font-medium text-sm mt-4 mb-2">Accepted Payment Methods</h3>
+          <ul>
+            <li><strong>Credit / Debit Card:</strong> Visa, MasterCard, and American Express via our secure Stripe payment gateway</li>
+            <li><strong>Bank Transfer (SWIFT):</strong> International wire transfers accepted. SWIFT details are provided on your invoice. Please allow 3-5 business days for processing.</li>
+            <li><strong>Cash on Arrival:</strong> The remaining balance (after deposit) may be paid in cash (USD) upon arrival at the start of your trip. This option must be arranged in advance at the time of booking.</li>
+          </ul>
+
           <h3 className="text-white font-medium text-sm mt-4 mb-2">Price Adjustments</h3>
           <p>
             Quoted prices are valid for 14 days from the date of the quote. Prices may be subject to
@@ -151,9 +158,9 @@ export default function TermsPage() {
 
         <Section title="11. Governing Law">
           <p>
-            These Terms of Service are governed by the laws of Nepal. Any disputes arising from
+            These Terms of Service are governed by the laws of the State of Indiana, USA. Any disputes arising from
             these terms or our services shall be subject to the exclusive jurisdiction of the
-            courts of Kathmandu, Nepal. We encourage resolution through discussion before
+            courts of Hamilton County, Indiana. We encourage resolution through discussion before
             pursuing legal action.
           </p>
         </Section>
@@ -164,8 +171,8 @@ export default function TermsPage() {
           </p>
           <ul>
             <li>Email: <a href="mailto:hello@curatedascents.com" className="text-emerald-400 hover:text-emerald-300">hello@curatedascents.com</a></li>
-            <li>Phone: <a href="tel:+9771234567890" className="text-emerald-400 hover:text-emerald-300">+977 1 234 567 890</a></li>
-            <li>Address: CuratedAscents, Thamel, Kathmandu, Nepal 44600</li>
+            <li>Phone: <a href="tel:+17155054964" className="text-emerald-400 hover:text-emerald-300">+1-715-505-4964</a></li>
+            <li>Address: CuratedAscents, 4498 Voyageur Way, Carmel, IN 46074, USA</li>
           </ul>
         </Section>
       </div>

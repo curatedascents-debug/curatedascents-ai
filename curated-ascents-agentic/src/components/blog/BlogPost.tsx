@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Calendar, Clock, ArrowLeft, Share2, Facebook, Twitter, Linkedin } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 
 interface Post {
   id: number;
@@ -49,10 +50,19 @@ export default function BlogPost({ slug }: BlogPostProps) {
   const [relatedPosts, setRelatedPosts] = useState<RelatedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     fetchPost();
   }, [slug]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const fetchPost = async () => {
     try {
@@ -82,15 +92,15 @@ export default function BlogPost({ slug }: BlogPostProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 pt-24">
+      <div className="min-h-screen bg-luxury-navy pt-24">
         <div className="container-luxury px-4 sm:px-6 lg:px-8 animate-pulse">
-          <div className="h-8 bg-slate-800 rounded w-1/4 mb-4" />
-          <div className="h-12 bg-slate-800 rounded w-3/4 mb-8" />
-          <div className="aspect-video bg-slate-800 rounded-2xl mb-8" />
+          <div className="h-8 bg-white/5 rounded w-1/4 mb-4" />
+          <div className="h-12 bg-white/5 rounded w-3/4 mb-8" />
+          <div className="aspect-video bg-white/5 rounded-2xl mb-8" />
           <div className="space-y-4">
-            <div className="h-4 bg-slate-800 rounded" />
-            <div className="h-4 bg-slate-800 rounded" />
-            <div className="h-4 bg-slate-800 rounded w-3/4" />
+            <div className="h-4 bg-white/5 rounded" />
+            <div className="h-4 bg-white/5 rounded" />
+            <div className="h-4 bg-white/5 rounded w-3/4" />
           </div>
         </div>
       </div>
@@ -99,13 +109,13 @@ export default function BlogPost({ slug }: BlogPostProps) {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-slate-950 pt-24 flex items-center justify-center">
+      <div className="min-h-screen bg-luxury-navy pt-24 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-3xl font-serif font-bold text-white mb-4">Post Not Found</h1>
-          <p className="text-slate-400 mb-8">{error || "The requested blog post could not be found."}</p>
+          <p className="text-white/50 mb-8">{error || "The requested blog post could not be found."}</p>
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300"
+            className="inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Blog
@@ -124,7 +134,46 @@ export default function BlogPost({ slug }: BlogPostProps) {
     : null;
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-luxury-navy">
+      {/* Navigation */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          isScrolled
+            ? "bg-luxury-navy/95 backdrop-blur-md border-b border-luxury-gold/10 py-4"
+            : "bg-transparent py-6"
+        }`}
+      >
+        <div className="container-luxury px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-3 group">
+              <CuratedAscentsLogo className="text-luxury-gold group-hover:text-luxury-gold/80 transition-colors" size={32} />
+              <span className="text-xl font-serif font-bold text-white">
+                CuratedAscents
+              </span>
+            </Link>
+
+            <nav className="hidden md:flex items-center gap-8">
+              <Link href="/#signature-journeys" className="text-white/70 hover:text-white transition-colors link-underline">
+                Journeys
+              </Link>
+              <Link href="/blog" className="text-white/70 hover:text-white transition-colors link-underline">
+                Blog
+              </Link>
+              <Link href="/#about" className="text-white/70 hover:text-white transition-colors link-underline">
+                About
+              </Link>
+            </nav>
+
+            <Link
+              href="/"
+              className="hidden md:inline-block px-6 py-2.5 bg-luxury-gold text-luxury-navy text-sm font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300"
+            >
+              Plan Your Journey
+            </Link>
+          </div>
+        </div>
+      </header>
+
       {/* Hero */}
       <div className="relative h-[60vh] min-h-[400px]">
         {post.featuredImage && (
@@ -134,7 +183,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
             className="absolute inset-0 w-full h-full object-cover"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-luxury-navy via-luxury-navy/50 to-transparent" />
 
         <div className="absolute bottom-0 left-0 right-0 pb-12">
           <div className="container-luxury px-4 sm:px-6 lg:px-8">
@@ -146,7 +195,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
               {/* Back link */}
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 mb-4"
+                className="inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 mb-4 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Blog
@@ -154,7 +203,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
 
               {/* Category */}
               {post.categoryName && (
-                <span className="inline-block px-3 py-1 bg-emerald-500/90 text-white text-sm font-medium rounded-full mb-4">
+                <span className="inline-block px-3 py-1 bg-luxury-gold/90 text-luxury-navy text-sm font-medium rounded-full mb-4 ml-4">
                   {post.categoryName}
                 </span>
               )}
@@ -165,7 +214,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
               </h1>
 
               {/* Meta */}
-              <div className="flex flex-wrap items-center gap-4 text-slate-300">
+              <div className="flex flex-wrap items-center gap-4 text-white/60">
                 {post.authorName && <span>By {post.authorName}</span>}
                 {formattedDate && (
                   <span className="flex items-center gap-1">
@@ -195,7 +244,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
             transition={{ delay: 0.2 }}
             className="lg:col-span-2"
           >
-            <article className="prose prose-invert prose-lg max-w-none prose-headings:font-serif prose-headings:text-white prose-p:text-slate-300 prose-a:text-emerald-400 prose-strong:text-white prose-blockquote:border-emerald-500 prose-blockquote:text-slate-300 prose-img:rounded-xl prose-hr:border-slate-700 prose-li:text-slate-300 prose-code:text-emerald-400">
+            <article className="prose prose-invert prose-lg max-w-none prose-headings:font-serif prose-headings:text-white prose-p:text-white/70 prose-a:text-luxury-gold prose-strong:text-white prose-blockquote:border-luxury-gold prose-blockquote:text-white/60 prose-img:rounded-xl prose-hr:border-luxury-gold/20 prose-li:text-white/70 prose-code:text-luxury-gold">
               <ReactMarkdown>
                 {post.content}
               </ReactMarkdown>
@@ -203,13 +252,13 @@ export default function BlogPost({ slug }: BlogPostProps) {
 
             {/* Tags */}
             {post.tags && post.tags.length > 0 && (
-              <div className="mt-12 pt-8 border-t border-slate-800">
-                <h4 className="text-sm font-medium text-slate-400 mb-3">Tags</h4>
+              <div className="mt-12 pt-8 border-t border-luxury-gold/10">
+                <h4 className="text-sm font-medium text-white/40 mb-3">Tags</h4>
                 <div className="flex flex-wrap gap-2">
                   {post.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-slate-800 text-slate-300 text-sm rounded-full"
+                      className="px-3 py-1 bg-white/5 text-white/60 text-sm rounded-full"
                     >
                       {tag}
                     </span>
@@ -219,8 +268,8 @@ export default function BlogPost({ slug }: BlogPostProps) {
             )}
 
             {/* Share */}
-            <div className="mt-8 pt-8 border-t border-slate-800">
-              <h4 className="text-sm font-medium text-slate-400 mb-3 flex items-center gap-2">
+            <div className="mt-8 pt-8 border-t border-luxury-gold/10">
+              <h4 className="text-sm font-medium text-white/40 mb-3 flex items-center gap-2">
                 <Share2 className="w-4 h-4" />
                 Share this article
               </h4>
@@ -229,7 +278,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
                   href={shareLinks.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 bg-slate-800 hover:bg-blue-600 rounded-full transition-colors"
+                  className="p-3 bg-white/5 hover:bg-blue-600 rounded-full transition-colors"
                 >
                   <Facebook className="w-5 h-5 text-white" />
                 </a>
@@ -237,7 +286,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
                   href={shareLinks.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 bg-slate-800 hover:bg-sky-500 rounded-full transition-colors"
+                  className="p-3 bg-white/5 hover:bg-sky-500 rounded-full transition-colors"
                 >
                   <Twitter className="w-5 h-5 text-white" />
                 </a>
@@ -245,7 +294,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
                   href={shareLinks.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 bg-slate-800 hover:bg-blue-700 rounded-full transition-colors"
+                  className="p-3 bg-white/5 hover:bg-blue-700 rounded-full transition-colors"
                 >
                   <Linkedin className="w-5 h-5 text-white" />
                 </a>
@@ -253,16 +302,16 @@ export default function BlogPost({ slug }: BlogPostProps) {
             </div>
 
             {/* CTA */}
-            <div className="mt-12 bg-gradient-to-r from-emerald-900/50 to-teal-900/50 border border-emerald-500/30 rounded-2xl p-8 text-center">
+            <div className="mt-12 border border-luxury-gold/20 rounded-2xl p-8 text-center">
               <h3 className="text-2xl font-serif font-bold text-white mb-3">
                 Ready to Plan Your {post.destinationName || "Himalayan"} Adventure?
               </h3>
-              <p className="text-slate-300 mb-6">
+              <p className="text-white/50 mb-6">
                 Our expedition architects are here to craft your perfect journey.
               </p>
               <Link
                 href="/"
-                className="inline-block px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-full transition-colors"
+                className="inline-block px-8 py-3 bg-luxury-gold text-luxury-navy font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300 hover:shadow-lg hover:shadow-luxury-gold/25"
               >
                 Start Planning
               </Link>
@@ -289,7 +338,7 @@ export default function BlogPost({ slug }: BlogPostProps) {
                       href={`/blog/${related.slug}`}
                       className="block group"
                     >
-                      <div className="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden hover:border-emerald-500/30 transition-colors">
+                      <div className="bg-white/5 border border-luxury-gold/10 rounded-xl overflow-hidden hover:border-luxury-gold/30 transition-colors">
                         {related.featuredImage && (
                           <img
                             src={related.featuredImage}
@@ -298,10 +347,10 @@ export default function BlogPost({ slug }: BlogPostProps) {
                           />
                         )}
                         <div className="p-4">
-                          <h4 className="font-medium text-white group-hover:text-emerald-400 transition-colors line-clamp-2">
+                          <h4 className="font-medium text-white group-hover:text-luxury-gold transition-colors line-clamp-2">
                             {related.title}
                           </h4>
-                          <div className="flex items-center gap-2 mt-2 text-xs text-slate-500">
+                          <div className="flex items-center gap-2 mt-2 text-xs text-white/30">
                             {related.readTimeMinutes && (
                               <span>{related.readTimeMinutes} min read</span>
                             )}
@@ -316,6 +365,23 @@ export default function BlogPost({ slug }: BlogPostProps) {
           </motion.aside>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="border-t border-luxury-gold/10 py-12">
+        <div className="container-luxury px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <Link href="/" className="flex items-center gap-2">
+              <CuratedAscentsLogo className="text-luxury-gold" size={24} />
+              <span className="text-lg font-serif font-bold text-white">
+                CuratedAscents
+              </span>
+            </Link>
+            <p className="text-white/30 text-sm">
+              &copy; {new Date().getFullYear()} CuratedAscents. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -140,7 +140,7 @@ export default function PrivacyPolicyPage() {
           </p>
           <ul>
             <li>Email: <a href="mailto:hello@curatedascents.com" className="text-emerald-400 hover:text-emerald-300">hello@curatedascents.com</a></li>
-            <li>Address: CuratedAscents, Thamel, Kathmandu, Nepal 44600</li>
+            <li>Address: CuratedAscents, 4498 Voyageur Way, Carmel, IN 46074, USA</li>
           </ul>
         </Section>
       </div>

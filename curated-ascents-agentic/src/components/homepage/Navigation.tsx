@@ -5,19 +5,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 import { navSlideIn, mobileMenuVariants, fadeInUp } from "@/lib/animations";
-
-interface NavigationProps {
-  onChatOpen: () => void;
-}
+import { useChatContext } from "./ChatContext";
 
 const navLinks = [
-  { label: "Experiences", href: "#experiences" },
+  { label: "Journeys", href: "#signature-journeys" },
   { label: "Destinations", href: "#destinations" },
   { label: "Blog", href: "/blog", isExternal: true },
   { label: "About", href: "#about" },
 ];
 
-export default function Navigation({ onChatOpen }: NavigationProps) {
+export default function Navigation() {
+  const { openChat } = useChatContext();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -46,7 +44,7 @@ export default function Navigation({ onChatOpen }: NavigationProps) {
         animate="visible"
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled
-            ? "bg-slate-900/95 backdrop-blur-md border-b border-slate-800/50 py-4"
+            ? "bg-luxury-navy/95 backdrop-blur-md border-b border-luxury-gold/10 py-4"
             : "bg-transparent py-6"
         }`}
       >
@@ -61,10 +59,15 @@ export default function Navigation({ onChatOpen }: NavigationProps) {
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
             >
-              <CuratedAscentsLogo className="text-emerald-400 group-hover:text-emerald-300 transition-colors" size={32} />
-              <span className="text-xl font-serif font-bold text-white">
-                CuratedAscents
-              </span>
+              <CuratedAscentsLogo className="text-luxury-gold group-hover:text-luxury-gold/80 transition-colors" size={32} />
+              <div>
+                <span className="text-xl font-serif font-bold text-white">
+                  CuratedAscents
+                </span>
+                <span className="hidden sm:block text-[10px] tracking-[0.2em] uppercase text-luxury-gold/60 -mt-0.5">
+                  Beyond Boundaries, Beyond Ordinary
+                </span>
+              </div>
             </a>
 
             {/* Desktop Navigation */}
@@ -74,7 +77,7 @@ export default function Navigation({ onChatOpen }: NavigationProps) {
                   <a
                     key={link.label}
                     href={link.href}
-                    className="text-slate-300 hover:text-white transition-colors link-underline"
+                    className="text-white/70 hover:text-white transition-colors link-underline"
                   >
                     {link.label}
                   </a>
@@ -82,7 +85,7 @@ export default function Navigation({ onChatOpen }: NavigationProps) {
                   <button
                     key={link.label}
                     onClick={() => scrollToSection(link.href)}
-                    className="text-slate-300 hover:text-white transition-colors link-underline"
+                    className="text-white/70 hover:text-white transition-colors link-underline"
                   >
                     {link.label}
                   </button>
@@ -93,8 +96,8 @@ export default function Navigation({ onChatOpen }: NavigationProps) {
             {/* Desktop CTA */}
             <div className="hidden md:block">
               <button
-                onClick={onChatOpen}
-                className="btn-primary text-sm"
+                onClick={() => openChat()}
+                className="px-6 py-2.5 bg-luxury-gold text-luxury-navy text-sm font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300"
               >
                 Plan Your Journey
               </button>
@@ -103,7 +106,7 @@ export default function Navigation({ onChatOpen }: NavigationProps) {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-white hover:text-emerald-400 transition-colors"
+              className="md:hidden p-2 text-white hover:text-luxury-gold transition-colors"
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {isMobileMenuOpen ? (
@@ -135,14 +138,14 @@ export default function Navigation({ onChatOpen }: NavigationProps) {
               initial="closed"
               animate="open"
               exit="closed"
-              className="fixed top-0 right-0 bottom-0 w-80 bg-slate-900 z-50 md:hidden border-l border-slate-800"
+              className="fixed top-0 right-0 bottom-0 w-80 bg-luxury-navy z-50 md:hidden border-l border-luxury-gold/10"
             >
               <div className="flex flex-col h-full p-6">
                 {/* Close Button */}
                 <div className="flex justify-end mb-8">
                   <button
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="p-2 text-slate-400 hover:text-white transition-colors"
+                    className="p-2 text-white/60 hover:text-white transition-colors"
                   >
                     <X className="w-6 h-6" />
                   </button>
@@ -164,7 +167,7 @@ export default function Navigation({ onChatOpen }: NavigationProps) {
                         key={link.label}
                         variants={fadeInUp}
                         href={link.href}
-                        className="text-left text-2xl font-serif text-white hover:text-emerald-400 transition-colors py-2"
+                        className="text-left text-2xl font-serif text-white hover:text-luxury-gold transition-colors py-2"
                       >
                         {link.label}
                       </motion.a>
@@ -173,7 +176,7 @@ export default function Navigation({ onChatOpen }: NavigationProps) {
                         key={link.label}
                         variants={fadeInUp}
                         onClick={() => scrollToSection(link.href)}
-                        className="text-left text-2xl font-serif text-white hover:text-emerald-400 transition-colors py-2"
+                        className="text-left text-2xl font-serif text-white hover:text-luxury-gold transition-colors py-2"
                       >
                         {link.label}
                       </motion.button>
@@ -189,9 +192,9 @@ export default function Navigation({ onChatOpen }: NavigationProps) {
                   <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
-                      onChatOpen();
+                      openChat();
                     }}
-                    className="btn-primary w-full"
+                    className="w-full px-8 py-4 bg-luxury-gold text-luxury-navy font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300"
                   >
                     Plan Your Journey
                   </button>

@@ -156,7 +156,7 @@ export default function InvoiceSentEmail({
             <strong>Payment Methods:</strong>
           </Text>
           <Text style={paragraph}>
-            We accept bank transfers, credit cards, and wire transfers.
+            We accept credit cards (Stripe), international bank transfers (SWIFT), and cash on arrival for the remaining balance after deposit.
             Please include your invoice number ({invoiceNumber}) as the payment reference.
           </Text>
 

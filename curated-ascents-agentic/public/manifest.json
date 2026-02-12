@@ -1,11 +1,11 @@
 {
   "name": "CuratedAscents - Luxury Adventure Travel",
   "short_name": "CuratedAscents",
-  "description": "Bespoke luxury adventures across Nepal, Tibet, Bhutan, and India",
+  "description": "AI-powered bespoke travel across Nepal, Bhutan, Tibet & India. 28 years of expertise, now at your fingertips.",
   "start_url": "/portal",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#059669",
+  "background_color": "#0F1B2D",
+  "theme_color": "#0F1B2D",
   "orientation": "portrait-primary",
   "icons": [
     {

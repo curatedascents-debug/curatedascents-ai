@@ -90,10 +90,10 @@ export default function BlogList() {
         >
           <button
             onClick={() => handleCategoryChange(null)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
               activeCategory === null
-                ? "bg-emerald-500 text-white"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                ? "bg-luxury-gold text-luxury-navy"
+                : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
             }`}
           >
             All Posts
@@ -102,10 +102,10 @@ export default function BlogList() {
             <button
               key={category.id}
               onClick={() => handleCategoryChange(category.slug)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                 activeCategory === category.slug
-                  ? "bg-emerald-500 text-white"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  ? "bg-luxury-gold text-luxury-navy"
+                  : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
               }`}
             >
               {category.name}
@@ -120,21 +120,21 @@ export default function BlogList() {
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden animate-pulse"
+              className="bg-white/5 border border-luxury-gold/10 rounded-2xl overflow-hidden animate-pulse"
             >
-              <div className="aspect-video bg-slate-800" />
+              <div className="aspect-video bg-white/5" />
               <div className="p-6 space-y-3">
-                <div className="h-6 bg-slate-800 rounded w-3/4" />
-                <div className="h-4 bg-slate-800 rounded" />
-                <div className="h-4 bg-slate-800 rounded w-1/2" />
+                <div className="h-6 bg-white/5 rounded w-3/4" />
+                <div className="h-4 bg-white/5 rounded" />
+                <div className="h-4 bg-white/5 rounded w-1/2" />
               </div>
             </div>
           ))}
         </div>
       ) : posts.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-slate-400 text-lg">No blog posts yet.</p>
-          <p className="text-slate-500 text-sm mt-2">Check back soon for travel stories and insights.</p>
+          <p className="text-white/50 text-lg">No blog posts yet.</p>
+          <p className="text-white/30 text-sm mt-2">Check back soon for travel stories and insights.</p>
         </div>
       ) : (
         <>
@@ -150,7 +150,7 @@ export default function BlogList() {
               <button
                 onClick={() => fetchPosts(true)}
                 disabled={loading}
-                className="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-full font-medium transition-colors disabled:opacity-50"
+                className="px-8 py-3 bg-white/5 hover:bg-white/10 border border-luxury-gold/20 text-white rounded-full font-medium transition-all duration-300 disabled:opacity-50"
               >
                 {loading ? "Loading..." : "Load More"}
               </button>

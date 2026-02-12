@@ -18,7 +18,7 @@ const faqs = {
     },
     {
       q: "How do I start planning a trip?",
-      a: "Simply open our AI chat assistant on the homepage and describe your dream adventure. Our Expedition Architect will recommend destinations, activities, and accommodations tailored to your preferences. You can also email us at hello@curatedascents.com or call +977 1 234 567 890.",
+      a: "Simply open our AI chat assistant on the homepage and describe your dream adventure. Our Expedition Architect will recommend destinations, activities, and accommodations tailored to your preferences. You can also email us at hello@curatedascents.com or call +1-715-505-4964.",
     },
     {
       q: "How far in advance should I book?",
@@ -28,11 +28,11 @@ const faqs = {
   booking: [
     {
       q: "How does the booking process work?",
-      a: "After your consultation with our Expedition Architect, we prepare a detailed quote. Once you accept, we require a 30% deposit to secure your booking. The remaining balance is due 60 days before departure. We handle all logistics including permits, internal flights, and accommodation.",
+      a: "After your consultation with our Expedition Architect, we prepare a detailed quote. Once you accept, we require a 30% deposit to secure your booking. The remaining balance is due 60 days before departure — payable by card, bank transfer (SWIFT), or cash on arrival (arranged in advance). We handle all logistics including permits, internal flights, and accommodation.",
     },
     {
       q: "What payment methods do you accept?",
-      a: "We accept major credit cards (Visa, MasterCard, American Express) via our secure Stripe payment system, as well as bank transfers. All transactions are processed in USD, GBP, EUR, or your preferred supported currency.",
+      a: "We accept major credit cards (Visa, MasterCard, American Express) via our secure Stripe payment system, international bank transfers (SWIFT), and cash payment on arrival for the remaining balance after deposit. All transactions are processed in USD, GBP, EUR, or your preferred supported currency.",
     },
     {
       q: "What is your cancellation policy?",

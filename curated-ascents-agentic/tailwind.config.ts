@@ -7,14 +7,17 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
         serif: ["var(--font-playfair)", "Georgia", "serif"],
       },
       colors: {
         luxury: {
-          gold: "#D4AF37",
-          cream: "#FAF7F2",
-          charcoal: "#2C2C2C",
+          navy: "#0F1B2D",
+          gold: "#C9A96E",
+          cream: "#F5F0EB",
+          charcoal: "#2A2A2A",
+          mist: "#E8E2DA",
+          white: "#FAFAF8",
         },
       },
       animation: {
@@ -26,6 +29,7 @@ const config: Config = {
         "slide-in-left": "slideInLeft 0.5s ease-out forwards",
         "float": "float 6s ease-in-out infinite",
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "ken-burns": "kenBurns 20s ease-in-out infinite alternate",
       },
       keyframes: {
         fadeIn: {
@@ -56,10 +60,14 @@ const config: Config = {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
         },
+        kenBurns: {
+          "0%": { transform: "scale(1)" },
+          "100%": { transform: "scale(1.1)" },
+        },
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "hero-gradient": "linear-gradient(to bottom, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.8))",
+        "hero-gradient": "linear-gradient(to bottom, rgba(15, 27, 45, 0.3), rgba(15, 27, 45, 0.85))",
       },
     },
   },

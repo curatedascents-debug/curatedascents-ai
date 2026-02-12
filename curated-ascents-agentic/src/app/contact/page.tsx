@@ -3,7 +3,7 @@ import StaticPageLayout from "@/components/StaticPageLayout";
 
 export const metadata: Metadata = {
   title: "Contact Us - CuratedAscents",
-  description: "Get in touch with CuratedAscents for luxury adventure travel inquiries. Reach us by email, phone, or visit our office in Kathmandu, Nepal.",
+  description: "Get in touch with CuratedAscents for luxury adventure travel inquiries. Reach us by email, phone, or visit our office in Carmel, Indiana.",
 };
 
 export default function ContactPage() {
@@ -36,13 +36,13 @@ export default function ContactPage() {
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
           <h3 className="text-white font-semibold mb-2">Phone</h3>
           <a
-            href="tel:+9771234567890"
+            href="tel:+17155054964"
             className="text-emerald-400 hover:text-emerald-300 transition-colors"
           >
-            +977 1 234 567 890
+            +1-715-505-4964
           </a>
           <p className="text-slate-500 text-sm mt-2">
-            Available Mon-Sat, 9 AM - 6 PM NPT (Nepal Time).
+            Available Mon-Fri, 9 AM - 6 PM EST.
           </p>
         </div>
 
@@ -51,8 +51,8 @@ export default function ContactPage() {
           <h3 className="text-white font-semibold mb-2">Office</h3>
           <p className="text-slate-300">
             CuratedAscents<br />
-            Thamel, Kathmandu<br />
-            Nepal 44600
+            4498 Voyageur Way<br />
+            Carmel, IN 46074, USA
           </p>
           <p className="text-slate-500 text-sm mt-2">
             Visits by appointment only.

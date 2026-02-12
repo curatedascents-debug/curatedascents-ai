@@ -110,7 +110,7 @@ export default function PaymentReminderEmail({
 
           <Text style={paragraph}>
             <strong>Payment Options:</strong> Please reply to this email or contact our team
-            to arrange payment. We accept bank transfers, credit cards, and other methods.
+            to arrange payment. We accept credit cards (Stripe), bank transfers (SWIFT), and cash on arrival for the remaining balance.
           </Text>
 
           <Text style={paragraph}>

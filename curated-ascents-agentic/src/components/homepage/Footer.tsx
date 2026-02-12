@@ -6,10 +6,7 @@ import { Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Twitter } from "luc
 import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 import { socialLinks } from "@/lib/constants/social-links";
-
-interface FooterProps {
-  onChatOpen?: (message?: string) => void;
-}
+import { useChatContext } from "./ChatContext";
 
 const experienceLinks = [
   { label: "Everest Region", message: "Tell me about Everest Region trips" },
@@ -41,9 +38,11 @@ const socialIconLinks = [
   { icon: Twitter, href: socialLinks.twitter, label: "Twitter" },
 ];
 
-export default function Footer({ onChatOpen }: FooterProps) {
+export default function Footer() {
+  const { openChat } = useChatContext();
+
   return (
-    <footer className="bg-slate-950 border-t border-slate-800">
+    <footer className="bg-luxury-navy border-t border-luxury-gold/10">
       {/* Main Footer */}
       <div className="section-padding pb-12">
         <div className="container-luxury">
@@ -56,13 +55,16 @@ export default function Footer({ onChatOpen }: FooterProps) {
           >
             {/* Brand Column */}
             <motion.div variants={fadeInUp} className="lg:col-span-2">
-              <Link href="/" className="flex items-center gap-3 mb-6">
-                <CuratedAscentsLogo className="text-emerald-400" size={32} />
+              <Link href="/" className="flex items-center gap-3 mb-1">
+                <CuratedAscentsLogo className="text-luxury-gold" size={32} />
                 <span className="text-xl font-serif font-bold text-white">
                   CuratedAscents
                 </span>
               </Link>
-              <p className="text-slate-400 mb-6 max-w-sm">
+              <p className="text-[10px] tracking-[0.2em] uppercase text-luxury-gold/60 mb-6 ml-[44px]">
+                Beyond Boundaries, Beyond Ordinary
+              </p>
+              <p className="text-white/50 mb-6 max-w-sm">
                 Crafting bespoke luxury adventures across the Himalayas since 1996.
                 Where every journey is a masterpiece.
               </p>
@@ -71,21 +73,21 @@ export default function Footer({ onChatOpen }: FooterProps) {
               <div className="space-y-3">
                 <a
                   href="mailto:hello@curatedascents.com"
-                  className="flex items-center gap-3 text-slate-400 hover:text-emerald-400 transition-colors"
+                  className="flex items-center gap-3 text-white/50 hover:text-luxury-gold transition-colors"
                 >
                   <Mail className="w-5 h-5" />
                   <span>hello@curatedascents.com</span>
                 </a>
                 <a
-                  href="tel:+9771234567890"
-                  className="flex items-center gap-3 text-slate-400 hover:text-emerald-400 transition-colors"
+                  href="tel:+17155054964"
+                  className="flex items-center gap-3 text-white/50 hover:text-luxury-gold transition-colors"
                 >
                   <Phone className="w-5 h-5" />
-                  <span>+977 1 234 567 890</span>
+                  <span>+1-715-505-4964</span>
                 </a>
-                <div className="flex items-start gap-3 text-slate-400">
+                <div className="flex items-start gap-3 text-white/50">
                   <MapPin className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span>Thamel, Kathmandu, Nepal</span>
+                  <span>4498 Voyageur Way, Carmel, IN 46074, USA</span>
                 </div>
               </div>
 
@@ -97,7 +99,7 @@ export default function Footer({ onChatOpen }: FooterProps) {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full border border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-400 hover:border-emerald-400 transition-colors"
+                    className="w-10 h-10 rounded-full border border-luxury-gold/20 flex items-center justify-center text-white/40 hover:text-luxury-gold hover:border-luxury-gold/50 transition-colors"
                     aria-label={social.label}
                   >
                     <social.icon className="w-5 h-5" />
@@ -113,8 +115,8 @@ export default function Footer({ onChatOpen }: FooterProps) {
                 {experienceLinks.map((link) => (
                   <li key={link.label}>
                     <button
-                      onClick={() => onChatOpen?.(link.message)}
-                      className="text-slate-400 hover:text-emerald-400 transition-colors text-sm text-left"
+                      onClick={() => openChat(link.message)}
+                      className="text-white/50 hover:text-luxury-gold transition-colors text-sm text-left"
                     >
                       {link.label}
                     </button>
@@ -131,7 +133,7 @@ export default function Footer({ onChatOpen }: FooterProps) {
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="text-slate-400 hover:text-emerald-400 transition-colors text-sm"
+                      className="text-white/50 hover:text-luxury-gold transition-colors text-sm"
                     >
                       {link.label}
                     </a>
@@ -148,7 +150,7 @@ export default function Footer({ onChatOpen }: FooterProps) {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-slate-400 hover:text-emerald-400 transition-colors text-sm"
+                      className="text-white/50 hover:text-luxury-gold transition-colors text-sm"
                     >
                       {link.label}
                     </Link>
@@ -161,20 +163,20 @@ export default function Footer({ onChatOpen }: FooterProps) {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-slate-800">
+      <div className="border-t border-luxury-gold/10">
         <div className="container-luxury px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-slate-500 text-sm">
+            <p className="text-white/30 text-sm">
               &copy; {new Date().getFullYear()} CuratedAscents. All rights reserved.
             </p>
             <div className="flex gap-6">
-              <Link href="/privacy-policy" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+              <Link href="/privacy-policy" className="text-white/30 hover:text-white/60 text-sm transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+              <Link href="/terms" className="text-white/30 hover:text-white/60 text-sm transition-colors">
                 Terms of Service
               </Link>
-              <Link href="/privacy-policy#cookies" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+              <Link href="/privacy-policy#cookies" className="text-white/30 hover:text-white/60 text-sm transition-colors">
                 Cookies
               </Link>
             </div>
