@@ -6,8 +6,18 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 import BlogList from "@/components/blog/BlogList";
+import { ChatProvider, useChatContext } from "@/components/homepage/ChatContext";
 
 export default function BlogPageClient() {
+  return (
+    <ChatProvider>
+      <BlogPageContent />
+    </ChatProvider>
+  );
+}
+
+function BlogPageContent() {
+  const { openChat } = useChatContext();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -63,12 +73,12 @@ export default function BlogPageClient() {
               </Link>
             </nav>
 
-            <Link
-              href="/"
+            <button
+              onClick={() => openChat()}
               className="hidden md:inline-block px-6 py-2.5 bg-luxury-gold text-luxury-navy text-sm font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300"
             >
               Plan Your Journey
-            </Link>
+            </button>
           </div>
         </div>
       </header>
@@ -120,13 +130,13 @@ export default function BlogPageClient() {
               Chat with our AI Expedition Architect to plan your perfect
               Himalayan journey.
             </p>
-            <Link
-              href="/"
+            <button
+              onClick={() => openChat()}
               className="inline-flex items-center gap-2 px-8 py-4 bg-luxury-gold text-luxury-navy font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300 hover:shadow-lg hover:shadow-luxury-gold/25"
             >
               Plan Your Journey
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </button>
           </motion.div>
         </div>
       </section>

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Calendar, Clock, ArrowLeft, Share2, Facebook, Twitter, Linkedin } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
+import { ChatProvider, useChatContext } from "@/components/homepage/ChatContext";
 
 interface Post {
   id: number;
@@ -46,6 +47,15 @@ interface BlogPostProps {
 }
 
 export default function BlogPost({ slug }: BlogPostProps) {
+  return (
+    <ChatProvider>
+      <BlogPostContent slug={slug} />
+    </ChatProvider>
+  );
+}
+
+function BlogPostContent({ slug }: BlogPostProps) {
+  const { openChat } = useChatContext();
   const [post, setPost] = useState<Post | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<RelatedPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -169,12 +179,12 @@ export default function BlogPost({ slug }: BlogPostProps) {
               </Link>
             </nav>
 
-            <Link
-              href="/"
+            <button
+              onClick={() => openChat()}
               className="hidden md:inline-block px-6 py-2.5 bg-luxury-gold text-luxury-navy text-sm font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300"
             >
               Plan Your Journey
-            </Link>
+            </button>
           </div>
         </div>
       </header>
@@ -314,12 +324,12 @@ export default function BlogPost({ slug }: BlogPostProps) {
               <p className="text-white/50 mb-6">
                 Our expedition architects are here to craft your perfect journey.
               </p>
-              <Link
-                href="/"
+              <button
+                onClick={() => openChat()}
                 className="inline-block px-8 py-3 bg-luxury-gold text-luxury-navy font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300 hover:shadow-lg hover:shadow-luxury-gold/25"
               >
                 Start Planning
-              </Link>
+              </button>
             </div>
           </motion.div>
 
