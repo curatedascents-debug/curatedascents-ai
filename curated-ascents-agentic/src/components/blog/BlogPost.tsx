@@ -147,9 +147,14 @@ export default function BlogPost({ slug }: BlogPostProps) {
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3 group">
               <CuratedAscentsLogo className="text-luxury-gold group-hover:text-luxury-gold/80 transition-colors" size={32} />
-              <span className="text-xl font-serif font-bold text-white">
-                CuratedAscents
-              </span>
+              <div>
+                <span className="text-xl font-serif font-bold text-white">
+                  CuratedAscents
+                </span>
+                <span className="hidden sm:block text-[10px] tracking-[0.2em] uppercase text-luxury-gold/60 -mt-0.5">
+                  Beyond Boundaries, Beyond Ordinary
+                </span>
+              </div>
             </Link>
 
             <nav className="hidden md:flex items-center gap-8">
@@ -372,9 +377,14 @@ export default function BlogPost({ slug }: BlogPostProps) {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <Link href="/" className="flex items-center gap-2">
               <CuratedAscentsLogo className="text-luxury-gold" size={24} />
-              <span className="text-lg font-serif font-bold text-white">
-                CuratedAscents
-              </span>
+              <div>
+                <span className="text-lg font-serif font-bold text-white">
+                  CuratedAscents
+                </span>
+                <span className="hidden sm:block text-[9px] tracking-[0.2em] uppercase text-luxury-gold/60 -mt-0.5">
+                  Beyond Boundaries, Beyond Ordinary
+                </span>
+              </div>
             </Link>
             <p className="text-white/30 text-sm">
               &copy; {new Date().getFullYear()} CuratedAscents. All rights reserved.
