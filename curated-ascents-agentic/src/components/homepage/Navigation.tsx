@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Phone } from "lucide-react";
 import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 import { navSlideIn, mobileMenuVariants, fadeInUp } from "@/lib/animations";
 import { useChatContext } from "./ChatContext";
@@ -93,8 +93,15 @@ export default function Navigation() {
               )}
             </nav>
 
-            {/* Desktop CTA */}
-            <div className="hidden md:block">
+            {/* Desktop Phone + CTA */}
+            <div className="hidden md:flex items-center gap-4">
+              <a
+                href="tel:+17155054964"
+                className="flex items-center gap-2 text-white/70 hover:text-luxury-gold transition-colors text-sm"
+              >
+                <Phone className="w-4 h-4" />
+                <span className="hidden lg:inline">+1-715-505-4964</span>
+              </a>
               <button
                 onClick={() => openChat()}
                 className="px-6 py-2.5 bg-luxury-gold text-luxury-navy text-sm font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300"
@@ -103,18 +110,27 @@ export default function Navigation() {
               </button>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-white hover:text-luxury-gold transition-colors"
-              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-            >
+            {/* Mobile Phone + Menu */}
+            <div className="flex items-center gap-2 md:hidden">
+              <a
+                href="tel:+17155054964"
+                className="p-2 text-white/70 hover:text-luxury-gold transition-colors"
+                aria-label="Call us"
+              >
+                <Phone className="w-5 h-5" />
+              </a>
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-white hover:text-luxury-gold transition-colors"
+                aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+              >
               {isMobileMenuOpen ? (
                 <X className="w-6 h-6" />
               ) : (
                 <Menu className="w-6 h-6" />
               )}
             </button>
+            </div>
           </div>
         </div>
       </motion.header>

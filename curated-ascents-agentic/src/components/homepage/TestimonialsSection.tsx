@@ -1,28 +1,31 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, BadgeCheck } from "lucide-react";
 
 const testimonials = [
   {
     quote:
       "From the moment we described our dream to the Expedition Architect, every detail was crafted with extraordinary care. The private helicopter to Everest Base Camp was the highlight of our lives.",
     name: "Sarah & James W.",
-    location: "London",
+    location: "London, UK",
+    tripType: "14-Day Nepal Expedition",
     trip: "Nepal Expedition, 2026",
   },
   {
     quote:
       "The AI understood exactly what we wanted — a spiritual journey through Bhutan that was also luxurious. Tiger's Nest at sunrise, followed by a hot stone bath at Amankora. Perfection.",
     name: "Michael R.",
-    location: "New York",
+    location: "New York, USA",
+    tripType: "10-Day Bhutan Immersion",
     trip: "Bhutan Immersion, 2026",
   },
   {
     quote:
       "We've traveled with Abercrombie & Kent and Scott Dunn. CuratedAscents' combination of deep local expertise and AI-powered personalization is in a class of its own.",
     name: "Elena & David S.",
-    location: "Dubai",
+    location: "Dubai, UAE",
+    tripType: "12-Day Rajasthan Royal Circuit",
     trip: "Rajasthan Royal Circuit, 2026",
   },
 ];
@@ -112,9 +115,15 @@ export default function TestimonialsSection() {
 
             {/* Author */}
             <div>
-              <p className="text-white font-medium">{current.name}</p>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <p className="text-white font-medium">{current.name}</p>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-luxury-gold/10 border border-luxury-gold/20 rounded-full text-luxury-gold text-[10px] font-medium uppercase tracking-wider">
+                  <BadgeCheck className="w-3 h-3" />
+                  Verified Trip
+                </span>
+              </div>
               <p className="text-luxury-cream/50 text-sm">
-                {current.location} &middot; {current.trip}
+                {current.location} &mdash; {current.tripType}
               </p>
             </div>
           </div>

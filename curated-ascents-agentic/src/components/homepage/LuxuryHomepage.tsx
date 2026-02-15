@@ -21,6 +21,7 @@ import SignatureJourneys from "./SignatureJourneys";
 import FounderSection from "./FounderSection";
 import TestimonialsSection from "./TestimonialsSection";
 import TrustStrip from "./TrustStrip";
+import TrustBadges from "./TrustBadges";
 import FinalCTA from "./FinalCTA";
 import Footer from "./Footer";
 
@@ -62,6 +63,9 @@ export default function LuxuryHomepage() {
 
           {/* Trust Strip */}
           <TrustStrip />
+
+          {/* Trust Badges */}
+          <TrustBadges />
 
           {/* Final CTA */}
           <FinalCTA />

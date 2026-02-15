@@ -157,6 +157,19 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
+
+              {/* Call Us */}
+              <div className="mt-6 pt-6 border-t border-luxury-gold/10">
+                <h4 className="text-white font-medium mb-3">Call Us</h4>
+                <a
+                  href="tel:+17155054964"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 border border-luxury-gold/30 rounded-full text-luxury-gold hover:bg-luxury-gold/10 transition-colors text-sm"
+                >
+                  <Phone className="w-4 h-4" />
+                  +1-715-505-4964
+                </a>
+                <p className="text-white/30 text-xs mt-2">Mon-Fri 9AM-6PM EST</p>
+              </div>
             </motion.div>
           </motion.div>
         </div>

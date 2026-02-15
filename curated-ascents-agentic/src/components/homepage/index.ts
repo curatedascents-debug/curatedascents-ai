@@ -7,6 +7,7 @@ export { default as FounderSection } from "./FounderSection";
 export { default as TestimonialsSection } from "./TestimonialsSection";
 export { default as TrustStrip } from "./TrustStrip";
 export { default as FinalCTA } from "./FinalCTA";
+export { default as TrustBadges } from "./TrustBadges";
 export { default as FeaturedExperiences } from "./FeaturedExperiences";
 export { default as ExperienceCard } from "./ExperienceCard";
 export { default as TrustSignals } from "./TrustSignals";
