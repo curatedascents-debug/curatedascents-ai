@@ -13,12 +13,11 @@ import {
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  // Verify cron secret in production
-  const cronSecret = req.headers.get("x-cron-secret");
+  // Verify cron secret
+  const authHeader = req.headers.get("authorization");
   if (
     process.env.CRON_SECRET &&
-    process.env.NODE_ENV === "production" &&
-    cronSecret !== process.env.CRON_SECRET
+    authHeader !== `Bearer ${process.env.CRON_SECRET}`
   ) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

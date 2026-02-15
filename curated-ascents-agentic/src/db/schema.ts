@@ -10,6 +10,7 @@ import {
   date,
   pgEnum,
   index,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 
 // ============================================
@@ -216,6 +217,19 @@ export const exchangeRates = pgTable('exchange_rates', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
+
+// Daily FX rate snapshots (one row per day)
+export const dailyFxRates = pgTable('daily_fx_rates', {
+  id: serial('id').primaryKey(),
+  rateDate: date('rate_date').notNull(),
+  baseCurrency: text('base_currency').notNull().default('USD'),
+  rates: jsonb('rates').notNull(), // { EUR: 0.92, GBP: 0.79, ... }
+  source: text('source'),
+  fetchedAt: timestamp('fetched_at').defaultNow(),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => ({
+  uniqDateCurrency: uniqueIndex('daily_fx_rates_date_currency_idx').on(table.rateDate, table.baseCurrency),
+}));
 
 // ============================================
 // CORE TABLES

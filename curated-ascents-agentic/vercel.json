@@ -73,6 +73,10 @@
       "schedule": "0 4 * * 1"
     },
     {
+      "path": "/api/cron/update-exchange-rates",
+      "schedule": "0 5 * * *"
+    },
+    {
       "path": "/api/cron/price-monitoring",
       "schedule": "0 6 * * *"
     }

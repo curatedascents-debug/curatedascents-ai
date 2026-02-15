@@ -4,7 +4,7 @@
  */
 
 import { db } from "@/db";
-import { exchangeRates, supportedCurrencies } from "@/db/schema";
+import { exchangeRates, supportedCurrencies, dailyFxRates } from "@/db/schema";
 import { eq, desc, and, gte } from "drizzle-orm";
 
 // ============================================
@@ -165,6 +165,30 @@ export async function updateExchangeRates(): Promise<{
     } catch (error) {
       console.error(`Failed to update rate for ${currency}:`, error);
     }
+  }
+
+  // Save daily snapshot
+  try {
+    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    await db
+      .insert(dailyFxRates)
+      .values({
+        rateDate: today,
+        baseCurrency: BASE_CURRENCY,
+        rates: rates,
+        source,
+        fetchedAt: now,
+      })
+      .onConflictDoUpdate({
+        target: [dailyFxRates.rateDate, dailyFxRates.baseCurrency],
+        set: {
+          rates: rates,
+          source,
+          fetchedAt: now,
+        },
+      });
+  } catch (error) {
+    console.error("Failed to save daily FX snapshot:", error);
   }
 
   return { updated, source };
