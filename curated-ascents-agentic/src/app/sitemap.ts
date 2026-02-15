@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { db } from "@/db";
 import { blogPosts } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { itineraries } from "@/lib/constants/itineraries";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://curated-ascents-agentic.vercel.app";
 
@@ -44,6 +45,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 0.3,
     },
+    {
+      url: `${BASE_URL}/itineraries`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    ...itineraries.map((i) => ({
+      url: `${BASE_URL}/itineraries/${i.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
   ];
 
   // Dynamic blog posts

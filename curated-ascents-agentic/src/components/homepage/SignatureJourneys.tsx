@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import AnimateOnScroll from "./AnimateOnScroll";
 import ChatButton from "./ChatButton";
 
@@ -9,7 +10,8 @@ const journeys = [
     subtitle: "14 Days — Nepal",
     description:
       "From the temples of Kathmandu to Everest Base Camp by helicopter. Private lodges, personal sherpa guides, and summit sunrises.",
-    price: "From $18,000 per person",
+    price: "From $4,500 per person",
+    itinerarySlug: "14-day-nepal-luxury-expedition",
     image: "/uploads/media/nepal/landscape/everest-region5-4c22ff59.webp",
     alt: "Everest region mountain landscape in Nepal",
     country: "Nepal",
@@ -20,7 +22,8 @@ const journeys = [
     subtitle: "10 Days — Bhutan",
     description:
       "Tiger's Nest monastery, sacred festivals, luxury Amankora lodges, and private audiences with local hosts.",
-    price: "From $15,000 per person",
+    price: "From $6,200 per person",
+    itinerarySlug: "10-day-bhutan-cultural-immersion",
     image: "/uploads/media/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917.webp",
     alt: "Tiger's Nest Monastery perched on a cliff in Paro, Bhutan",
     country: "Bhutan",
@@ -31,7 +34,8 @@ const journeys = [
     subtitle: "12 Days — Rajasthan & Ranthambore",
     description:
       "Heritage palace hotels, private tiger safaris, Ayurvedic wellness, and the Golden Triangle with a personal historian guide.",
-    price: "From $12,000 per person",
+    price: "From $3,800 per person",
+    itinerarySlug: "12-day-india-himalayan-explorer",
     image: "/uploads/media/india/landscape/udaipur-rajasthan-india-17d99ac2.webp",
     alt: "Udaipur Lake Palace in Rajasthan, India",
     country: "India",
@@ -42,7 +46,8 @@ const journeys = [
     subtitle: "12 Days — Tibet & Nepal",
     description:
       "Lhasa to Everest North Face. Ancient monasteries, high-altitude passes, and the journey of a lifetime along the Friendship Highway.",
-    price: "From $22,000 per person",
+    price: "From $5,500 per person",
+    itinerarySlug: "8-day-tibet-sacred-lands",
     image: "/uploads/media/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
     alt: "Potala Palace in Lhasa, Tibet",
     country: "Tibet",
@@ -96,13 +101,21 @@ export default function SignatureJourneys() {
                     {journey.description}
                   </p>
                   <div className="flex items-center justify-between">
-                    <span className="text-luxury-cream/60 text-sm">{journey.price}</span>
-                    <ChatButton
-                      message={`I'm interested in the ${journey.title} experience in ${journey.country}. Can you customize this for my dates and group size?`}
-                      className="text-luxury-gold text-sm font-medium hover:underline underline-offset-4 transition-all"
-                    >
-                      Customize This Journey &rarr;
-                    </ChatButton>
+                    <span className="text-luxury-gold font-serif font-bold text-sm">{journey.price}</span>
+                    <div className="flex items-center gap-4">
+                      <Link
+                        href={`/itineraries/${journey.itinerarySlug}`}
+                        className="text-luxury-cream/60 text-sm hover:text-white transition-colors"
+                      >
+                        View Itinerary
+                      </Link>
+                      <ChatButton
+                        message={`I'm interested in the ${journey.title} experience in ${journey.country}. Can you customize this for my dates and group size?`}
+                        className="text-luxury-gold text-sm font-medium hover:underline underline-offset-4 transition-all"
+                      >
+                        Customize &rarr;
+                      </ChatButton>
+                    </div>
                   </div>
                 </div>
               </div>
