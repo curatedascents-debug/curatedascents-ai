@@ -10,7 +10,7 @@ const journeys = [
     description:
       "From the temples of Kathmandu to Everest Base Camp by helicopter. Private lodges, personal sherpa guides, and summit sunrises.",
     price: "From $18,000 per person",
-    image: "https://images.unsplash.com/photo-1585938389612-a552a28d6914?w=800&q=80",
+    image: "/uploads/media/nepal/landscape/everest-region5-4c22ff59.webp",
     alt: "Everest region mountain landscape in Nepal",
     country: "Nepal",
   },
@@ -21,8 +21,8 @@ const journeys = [
     description:
       "Tiger's Nest monastery, sacred festivals, luxury Amankora lodges, and private audiences with local hosts.",
     price: "From $15,000 per person",
-    image: "https://images.unsplash.com/photo-1578556881786-851d4b79cb73?w=800&q=80",
-    alt: "Tiger's Nest monastery in Bhutan",
+    image: "/uploads/media/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917.webp",
+    alt: "Tiger's Nest Monastery perched on a cliff in Paro, Bhutan",
     country: "Bhutan",
   },
   {
@@ -32,8 +32,8 @@ const journeys = [
     description:
       "Heritage palace hotels, private tiger safaris, Ayurvedic wellness, and the Golden Triangle with a personal historian guide.",
     price: "From $12,000 per person",
-    image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800&q=80",
-    alt: "Taj Mahal and Rajasthan palace in India",
+    image: "/uploads/media/india/landscape/udaipur-rajasthan-india-17d99ac2.webp",
+    alt: "Udaipur Lake Palace in Rajasthan, India",
     country: "India",
   },
   {
@@ -43,8 +43,8 @@ const journeys = [
     description:
       "Lhasa to Everest North Face. Ancient monasteries, high-altitude passes, and the journey of a lifetime along the Friendship Highway.",
     price: "From $22,000 per person",
-    image: "https://images.unsplash.com/photo-1503641926155-5c17619b79d0?w=800&q=80",
-    alt: "Tibetan plateau and Potala Palace",
+    image: "/uploads/media/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
+    alt: "Potala Palace in Lhasa, Tibet",
     country: "Tibet",
   },
 ];
@@ -71,7 +71,7 @@ export default function SignatureJourneys() {
             <AnimateOnScroll key={journey.id} staggerIndex={index}>
               <div className="group relative rounded-2xl overflow-hidden bg-luxury-navy">
                 {/* Image — 60% height */}
-                <div className="relative h-72 sm:h-80 overflow-hidden">
+                <div className="relative h-64 sm:h-72 lg:h-80 overflow-hidden">
                   <Image
                     src={journey.image}
                     alt={journey.alt}

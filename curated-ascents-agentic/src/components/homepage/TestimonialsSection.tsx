@@ -80,7 +80,7 @@ export default function TestimonialsSection() {
             Traveler Stories
           </span>
           <h2
-            className={`font-serif text-3xl sm:text-4xl font-bold text-luxury-cream transition-all duration-600 delay-100 ${
+            className={`font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-luxury-cream transition-all duration-600 delay-100 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}
           >
@@ -94,7 +94,7 @@ export default function TestimonialsSection() {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <div className="bg-luxury-cream/5 border border-luxury-gold/10 rounded-2xl p-8 sm:p-12 text-center">
+          <div className="bg-luxury-cream/5 border border-luxury-gold/10 rounded-2xl p-6 sm:p-8 md:p-12 text-center">
             {/* Gold quote mark */}
             <div className="flex justify-center mb-8">
               <svg width="48" height="36" viewBox="0 0 48 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -106,7 +106,7 @@ export default function TestimonialsSection() {
             </div>
 
             {/* Quote */}
-            <blockquote className="text-lg sm:text-xl text-luxury-cream font-light italic leading-relaxed mb-8 min-h-[100px]">
+            <blockquote className="text-lg sm:text-xl text-luxury-cream font-light italic leading-relaxed mb-8 min-h-[80px] sm:min-h-[100px]">
               &ldquo;{current.quote}&rdquo;
             </blockquote>
 

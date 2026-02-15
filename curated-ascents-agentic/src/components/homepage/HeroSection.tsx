@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import { useChatContext } from "./ChatContext";
 
-const HERO_IMAGE = "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1920&q=80";
+const HERO_IMAGE = "/uploads/media/nepal/landscape/everest-region5-4c22ff59.webp";
 
 export default function HeroSection() {
   const { openChat } = useChatContext();
@@ -74,7 +74,7 @@ export default function HeroSection() {
 
           {/* Main heading */}
           <h1
-            className={`font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 leading-tight transition-all duration-700 delay-500 ${
+            className={`font-serif text-4xl sm:text-5xl md:text-[3.5rem] lg:text-6xl font-bold text-white mb-6 leading-tight whitespace-nowrap transition-all duration-700 delay-500 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}
           >

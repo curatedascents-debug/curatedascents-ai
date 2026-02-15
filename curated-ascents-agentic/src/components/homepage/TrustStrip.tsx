@@ -12,19 +12,19 @@ const partners = [
 const destinations = [
   {
     name: "Nepal",
-    image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=200&q=80",
+    image: "/uploads/media/nepal/landscape/everest-region5-4c22ff59-thumb.webp",
   },
   {
     name: "Bhutan",
-    image: "https://images.unsplash.com/photo-1578556881786-851d4b79cb73?w=200&q=80",
+    image: "/uploads/media/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917-thumb.webp",
   },
   {
     name: "Tibet",
-    image: "https://images.unsplash.com/photo-1503641926155-5c17619b79d0?w=200&q=80",
+    image: "/uploads/media/tibet/landscape/lhasa-potala-palace-47dd9d03-thumb.webp",
   },
   {
     name: "India",
-    image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=200&q=80",
+    image: "/uploads/media/india/landscape/udaipur-rajasthan-india-17d99ac2-thumb.webp",
   },
 ];
 
@@ -59,7 +59,7 @@ export default function TrustStrip() {
           <p className="text-center text-luxury-charcoal/50 text-sm mb-6">
             Featured Destinations
           </p>
-          <div className="flex justify-center gap-8 sm:gap-12">
+          <div className="flex justify-center gap-6 sm:gap-12">
             {destinations.map((dest) => (
               <ScrollLink
                 key={dest.name}
