@@ -3267,3 +3267,38 @@ export const mediaCollectionItems = pgTable('media_collection_items', {
   mediaId: integer('media_id').references(() => mediaLibrary.id).notNull(),
   sortOrder: integer('sort_order').default(0),
 });
+
+// ============================================
+// PRICE ALERTS
+// ============================================
+
+export const priceAlerts = pgTable('price_alerts', {
+  id: serial('id').primaryKey(),
+
+  alertType: text('alert_type').notNull(), // price_drop, price_increase, negotiation_opportunity, competitor_undercut, seasonal_trend
+  serviceType: text('service_type'), // hotel, transportation, guide, etc.
+  serviceName: text('service_name').notNull(),
+
+  supplierId: integer('supplier_id').references(() => suppliers.id),
+  hotelId: integer('hotel_id').references(() => hotels.id),
+
+  currentPrice: decimal('current_price', { precision: 10, scale: 2 }),
+  previousPrice: decimal('previous_price', { precision: 10, scale: 2 }),
+  changePercent: decimal('change_percent', { precision: 5, scale: 2 }),
+  marketAverage: decimal('market_average', { precision: 10, scale: 2 }),
+
+  priority: text('priority').default('medium').notNull(), // high, medium, low
+  status: text('status').default('new').notNull(), // new, acknowledged, dismissed, actioned
+
+  recommendation: text('recommendation'),
+  metadata: jsonb('metadata'),
+
+  createdAt: timestamp('created_at').defaultNow(),
+  acknowledgedAt: timestamp('acknowledged_at'),
+  dismissedAt: timestamp('dismissed_at'),
+}, (table) => [
+  index('price_alerts_status_idx').on(table.status),
+  index('price_alerts_priority_idx').on(table.priority),
+  index('price_alerts_hotel_idx').on(table.hotelId),
+  index('price_alerts_created_idx').on(table.createdAt),
+]);

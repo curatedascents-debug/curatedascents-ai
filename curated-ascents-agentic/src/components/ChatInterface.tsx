@@ -3,6 +3,17 @@
 import ReactMarkdown from 'react-markdown';
 import { useState, useRef, useEffect } from "react";
 import { Send, Loader2 } from "lucide-react";
+
+const PROGRESS_MESSAGES = [
+  "Searching our luxury collection...",
+  "Comparing the best options for you...",
+  "Reviewing availability and pricing...",
+  "Consulting our local expertise...",
+  "Almost there — crafting your perfect itinerary...",
+  "Finalizing recommendations...",
+];
+
+const PROGRESS_INTERVAL_MS = 8000;
 import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 
 interface Message {
@@ -52,6 +63,35 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
   const [clientId, setClientId] = useState<number | null>(portalClientId ?? null);
   const [conversationId] = useState(() => `conv_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`);
   // ─────────────────────────────────────────────────────────────────────────
+
+  const [progressMessage, setProgressMessage] = useState("");
+  const progressIndexRef = useRef(0);
+
+  // Rotate progress messages while loading
+  useEffect(() => {
+    if (!isLoading) {
+      setProgressMessage("");
+      progressIndexRef.current = 0;
+      return;
+    }
+
+    // Show first message after a short delay
+    const initialTimer = setTimeout(() => {
+      setProgressMessage(PROGRESS_MESSAGES[0]);
+      progressIndexRef.current = 1;
+    }, 3000);
+
+    const interval = setInterval(() => {
+      const idx = progressIndexRef.current % PROGRESS_MESSAGES.length;
+      setProgressMessage(PROGRESS_MESSAGES[idx]);
+      progressIndexRef.current++;
+    }, PROGRESS_INTERVAL_MS);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
+  }, [isLoading]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const initialMessageSent = useRef(false);
@@ -202,7 +242,12 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
             {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3">
-                  <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
+                    {progressMessage && (
+                      <span className="text-xs text-slate-400 animate-pulse">{progressMessage}</span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -341,7 +386,12 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
         {isLoading && (
           <div className="flex justify-start">
             <div className="bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
-              <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
+              <div className="flex items-center gap-3">
+                <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
+                {progressMessage && (
+                  <span className="text-sm text-slate-400 animate-pulse">{progressMessage}</span>
+                )}
+              </div>
             </div>
           </div>
         )}
