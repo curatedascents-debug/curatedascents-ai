@@ -309,7 +309,7 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
-      <div className="max-w-4xl mx-auto space-y-6" style={{ paddingLeft: 0, paddingRight: 0 }}>
+      <div className="max-w-4xl mx-auto space-y-4" style={{ paddingLeft: 0, paddingRight: 0 }}>
       {messages.map((msg, idx) => (
   <div
     key={idx}
@@ -319,7 +319,7 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
       className="rounded-2xl shadow-lg"
       style={{
         maxWidth: '85%',
-        padding: '1.5rem 2rem',
+        padding: '1rem 1.25rem',
         backgroundColor: msg.role === "user" ? '#059669' : '#1e293b',
         color: '#f1f5f9',
         border: msg.role === "assistant" ? '1px solid #334155' : 'none',

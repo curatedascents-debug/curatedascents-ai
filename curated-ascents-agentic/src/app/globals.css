@@ -139,11 +139,15 @@ html {
   width: 100%;
 }
 
-/* Markdown content styling */
+/* Markdown content styling — optimised for chat bubbles */
+.markdown-content {
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
 .markdown-content p {
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.5rem 0;
   padding: 0;
-  line-height: 1.6;
 }
 
 .markdown-content p:last-child {
@@ -152,8 +156,8 @@ html {
 
 .markdown-content ul,
 .markdown-content ol {
-  margin: 0 0 1rem 0;
-  padding: 0 0 0 1.5rem;
+  margin: 0 0 0.5rem 0;
+  padding: 0 0 0 1.25rem;
 }
 
 .markdown-content ul:last-child,
@@ -162,9 +166,8 @@ html {
 }
 
 .markdown-content li {
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.2rem 0;
   padding: 0;
-  line-height: 1.6;
 }
 
 .markdown-content li:last-child {
@@ -181,32 +184,71 @@ html {
   color: #cbd5e1;
 }
 
+/* Headings — clear hierarchy, compact spacing */
 .markdown-content h1,
 .markdown-content h2,
 .markdown-content h3 {
   font-weight: 700;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.35rem 0;
   padding: 0;
+  color: #f8fafc;
+}
+
+/* Add top gap when heading isn't the first element */
+.markdown-content :not(:first-child) > h1,
+.markdown-content :not(:first-child) > h2,
+.markdown-content :not(:first-child) > h3,
+.markdown-content h1:not(:first-child),
+.markdown-content h2:not(:first-child),
+.markdown-content h3:not(:first-child) {
+  margin-top: 0.85rem;
 }
 
 .markdown-content h1 {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
 
 .markdown-content h2 {
-  font-size: 1.25rem;
+  font-size: 1.05rem;
 }
 
 .markdown-content h3 {
-  font-size: 1.125rem;
+  font-size: 0.95rem;
+}
+
+.markdown-content h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0.6rem 0 0.25rem 0;
+  color: #C9A96E;
+}
+
+.markdown-content hr {
+  border: none;
+  border-top: 1px solid #334155;
+  margin: 0.75rem 0;
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid #C9A96E;
+  margin: 0.5rem 0;
+  padding: 0.25rem 0 0.25rem 0.75rem;
+  color: #94a3b8;
 }
 
 .markdown-content code {
   background-color: #0f172a;
-  padding: 0.25rem 0.5rem;
+  padding: 0.15rem 0.4rem;
   border-radius: 0.25rem;
   color: #C9A96E;
   font-family: 'Courier New', monospace;
+  font-size: 0.85em;
+}
+
+.markdown-content a {
+  color: #C9A96E;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* Hide scrollbar but keep functionality */

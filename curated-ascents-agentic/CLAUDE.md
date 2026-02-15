@@ -100,7 +100,7 @@ Defined in `.env.local`:
 - **CSS Variables:** `--font-playfair`, `--font-dm-sans` on `<html>`
 - **Colors:** navy `#0F1B2D`, gold `#C9A96E`, cream `#F5F0EB`, charcoal `#2A2A2A`, mist `#E8E2DA`, white `#FAFAF8`
 - **Tailwind:** `bg-luxury-navy`, `text-luxury-gold`, `bg-luxury-cream`, `text-luxury-charcoal`, `bg-luxury-mist`, `bg-luxury-white`
-- **Global CSS:** `src/app/globals.css` — `.btn-primary`, `.btn-secondary`, `.glass`, `.section-divider`, `.link-underline`, `.text-gradient`
+- **Global CSS:** `src/app/globals.css` — `.btn-primary`, `.btn-secondary`, `.glass`, `.section-divider`, `.link-underline`, `.text-gradient`, `.markdown-content` (chat styling)
 
 ### Routing (Summary)
 
@@ -164,4 +164,8 @@ Homepage uses a **"donut" pattern**: `ChatProvider` (client) wraps the page; `{c
 - **Auth**: Customer (email codes + JWT via `jose`), Agency/Supplier (`bcryptjs` + JWT), Admin (session cookie)
 - **Price security**: `sanitizeForClient()` strips cost/margin before AI sees tool results
 - **Seed**: `/api/seed-all` uses `onConflictDoUpdate` on slug for reliable upsert
-- **Media**: Cloudflare R2 with WebP conversion + thumbnails via `sharp`; Unsplash fallbacks for homepage
+- **Media**: Cloudflare R2 with WebP conversion + thumbnails via `sharp`; local filesystem fallback (`public/uploads/media/`) when R2 not configured
+- **SEO**: Dynamic `sitemap.ts` (static pages + blog posts), `robots.ts` (blocks admin/api/portal/agency/supplier)
+- **Error pages**: Branded `not-found.tsx` (404) and `error.tsx` (error boundary) matching luxury design
+- **Chat markdown**: `.markdown-content` CSS in `globals.css` — compact spacing, gold bold, heading hierarchy, HR/blockquote styling
+- **Neon cache fix**: `fetchOptions: { cache: "no-store" }` on Neon client in `src/db/index.ts` prevents Next.js from caching DB queries

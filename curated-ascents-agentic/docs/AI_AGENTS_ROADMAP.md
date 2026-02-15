@@ -595,12 +595,14 @@ type EventTypes =
 ### Current Stack
 | Component | Technology | Status |
 |-----------|------------|--------|
-| Framework | Next.js 16 (App Router) | ✅ Production |
+| Framework | Next.js 14 (App Router) | ✅ Production |
 | Database | Neon PostgreSQL + Drizzle ORM | ✅ Production |
 | LLM | DeepSeek Chat | ✅ Production |
 | Email | Resend | ✅ Production |
 | Hosting | Vercel | ✅ Production |
-| Styling | Tailwind CSS 4 | ✅ Production |
+| Styling | Tailwind CSS 3 + @tailwindcss/typography | ✅ Production |
+| Media | Cloudflare R2 + sharp | ✅ Production |
+| Payments | Stripe | ✅ Production |
 
 ### Planned Additions
 

@@ -100,6 +100,18 @@
 - **99 new API tests** across 10 new spec files
 - **Total:** 322 tests across 57 spec files, 100% pass rate
 
+## Phase 5.6: MVP Polish & SEO (Complete)
+- **Local Media Fallback** — `r2-client.ts` saves to `public/uploads/media/` when Cloudflare R2 not configured (dev workflow)
+- **Neon Query Cache Fix** — Added `fetchOptions: { cache: "no-store" }` to Neon client to prevent Next.js from caching DB queries
+- **Blog Featured Image Matching** — Improved `findBlogFeaturedImage()` with filename search strategy and country detection from topic text
+- **AI Bulk Auto-Tag** — `/api/admin/media/auto-tag-all` endpoint processes all media in batches of 15 via DeepSeek (title, description, altText, tags, destination, category, season)
+- **Homepage Image Replacement** — All Unsplash placeholder URLs replaced with media library images across HeroSection, SignatureJourneys, TrustStrip, FinalCTA
+- **SEO Essentials** — Dynamic `sitemap.ts` (6 static pages + blog posts), `robots.ts` blocking admin/api/portal/agency/supplier crawlers
+- **Branded Error Pages** — `not-found.tsx` (404) and `error.tsx` (error boundary) matching luxury navy/gold design
+- **Chat Markdown Styling** — Compact `.markdown-content` CSS: smaller font (0.9rem), tighter spacing, heading hierarchy, HR/blockquote/link styling, gold accents
+- **Homepage Alignment** — Fixed hero heading wrapping, mobile spacing in TestimonialsSection/TrustStrip
+- **Deduplication API** — `/api/admin/deduplicate` detects and removes duplicate seed records
+
 ## Phase 6: Future Enhancements
 - **WhatsApp Go-Live** — WhatsApp Business API account verification and production deployment
 - **Video Consultations** — Scheduled video calls with travel experts

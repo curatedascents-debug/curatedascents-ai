@@ -244,6 +244,12 @@
 | GET | `/api/admin/media/stats` | Media library statistics |
 | GET/POST | `/api/admin/media/collections` | List/create collections |
 | GET/PUT/DELETE | `/api/admin/media/collections/[id]` | Single collection CRUD |
+| POST | `/api/admin/media/auto-tag-all` | Bulk AI auto-tag all media (DeepSeek) |
+
+## Admin Utility APIs
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/api/admin/deduplicate` | Detect and remove duplicate seed records |
 
 ## Supplier Portal APIs
 | Method | Endpoint | Purpose |
