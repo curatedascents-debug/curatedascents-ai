@@ -5,17 +5,13 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { uploadMediaFile } from "@/lib/media/media-service";
-import { isR2Configured } from "@/lib/media/r2-client";
+
+// Allow up to 25MB uploads (default is ~1MB)
+export const runtime = "nodejs";
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   try {
-    if (!isR2Configured()) {
-      return NextResponse.json(
-        { error: "R2 storage is not configured. Set R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, and R2_PUBLIC_URL." },
-        { status: 500 }
-      );
-    }
-
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
 

@@ -624,8 +624,19 @@ function UploadModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
         });
 
         if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || "Upload failed");
+          let errorMsg = "Upload failed";
+          try {
+            const errData = await res.json();
+            errorMsg = errData.error || errorMsg;
+          } catch {
+            const text = await res.text();
+            if (res.status === 413) {
+              errorMsg = "File too large. Maximum upload size is 20MB.";
+            } else {
+              errorMsg = text || `Upload failed (${res.status})`;
+            }
+          }
+          throw new Error(errorMsg);
         }
       }
       onSuccess();

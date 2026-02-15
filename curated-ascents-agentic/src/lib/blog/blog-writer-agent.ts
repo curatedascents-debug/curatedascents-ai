@@ -315,9 +315,15 @@ export async function generateBlogPost(
   // Try to find a featured image from the media library
   try {
     const { findBlogFeaturedImage } = await import("@/lib/media/media-service");
+
+    // Derive country from destination or topic (our focus countries)
+    const countries = ["nepal", "bhutan", "tibet", "india"];
+    const searchText = `${request.destination || ""} ${request.topic || ""}`.toLowerCase();
+    const detectedCountry = countries.find((c) => searchText.includes(c));
+
     const image = await findBlogFeaturedImage({
       destination: request.destination,
-      country: request.destination, // destination name may match country
+      country: detectedCountry || undefined,
       contentType: request.contentType,
     });
     if (image) {

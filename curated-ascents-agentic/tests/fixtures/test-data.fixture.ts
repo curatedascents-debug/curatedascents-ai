@@ -128,6 +128,60 @@ export const API_ROUTES = {
 
   // Media
   mediaHomepage: '/api/media/homepage',
+
+  // Deduplication
+  adminDeduplicate: '/api/admin/deduplicate',
+
+  // Financial
+  adminInvoices: '/api/admin/invoices',
+  adminPayments: '/api/admin/payments',
+  adminFinancialReports: '/api/admin/financial/reports',
+  adminFinancialAging: '/api/admin/financial/aging',
+
+  // Availability
+  adminAvailabilityCalendar: '/api/admin/availability/calendar',
+  adminAvailabilityCheck: '/api/admin/availability/check',
+  adminAvailabilityBlackouts: '/api/admin/availability/blackouts',
+  adminAvailabilityHolds: '/api/admin/availability/holds',
+  adminAvailabilityPermits: '/api/admin/availability/permits',
+
+  // Risk & Compliance
+  adminRiskAdvisories: '/api/admin/risk/advisories',
+  adminRiskWeather: '/api/admin/risk/weather',
+  adminRiskCompliance: '/api/admin/risk/compliance',
+  adminRiskEmergencyContacts: '/api/admin/risk/emergency-contacts',
+
+  // Loyalty & Referrals
+  adminLoyaltyAccounts: '/api/admin/loyalty/accounts',
+  adminReferrals: '/api/admin/referrals',
+  adminCustomerSuccess: '/api/admin/customer-success',
+
+  // Content Management
+  adminContentDestinations: '/api/admin/content/destinations',
+  adminContentGuides: '/api/admin/content/guides',
+  adminContentTemplates: '/api/admin/content/templates',
+  adminContentAssets: '/api/admin/content/assets',
+  adminContentGenerate: '/api/admin/content/generate',
+  adminContentSeed: '/api/admin/content/seed',
+
+  // Support
+  adminSupportTickets: '/api/admin/support/tickets',
+
+  // Supplier Extended
+  adminSupplierRankings: '/api/admin/supplier-rankings',
+  adminSupplierRequests: '/api/admin/supplier-requests',
+
+  // WhatsApp
+  adminWhatsappConversations: '/api/admin/whatsapp/conversations',
+  adminWhatsappTemplates: '/api/admin/whatsapp/templates',
+
+  // Agency CRUD
+  agencyMe: '/api/agency/auth/me',
+  agencyClients: '/api/agency/clients',
+  agencyBookings: '/api/agency/bookings',
+  agencyQuotes: '/api/agency/quotes',
+  agencyRates: '/api/agency/rates',
+  agencySuppliers: '/api/agency/suppliers',
 };
 
 export const TIMEOUTS = {

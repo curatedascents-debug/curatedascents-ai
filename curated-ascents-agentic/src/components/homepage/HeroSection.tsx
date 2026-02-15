@@ -20,10 +20,14 @@ export default function HeroSection() {
     fetch("/api/media/homepage")
       .then((r) => r.json())
       .then((data) => {
-        const heroMedia = data?.heroSlides?.["hero"];
-        if (heroMedia?.cdnUrl) {
-          setHeroImageSrc(heroMedia.cdnUrl);
-          if (heroMedia.alt) setHeroImageAlt(heroMedia.alt);
+        // Pick the first available hero slide (Nepal, Bhutan, Tibet, India, or Annapurna)
+        const slides = data?.heroSlides;
+        if (slides) {
+          const firstSlide = Object.values(slides).find((s: unknown) => s && (s as { cdnUrl: string }).cdnUrl) as { cdnUrl: string; alt?: string } | undefined;
+          if (firstSlide?.cdnUrl) {
+            setHeroImageSrc(firstSlide.cdnUrl);
+            if (firstSlide.alt) setHeroImageAlt(firstSlide.alt);
+          }
         }
       })
       .catch(() => {}); // Silently fail — use hardcoded fallback

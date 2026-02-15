@@ -11,10 +11,9 @@ import {
 } from "@/db/schema";
 import { eq, and, ilike, desc, asc, sql, count } from "drizzle-orm";
 import {
-  uploadMedia as uploadToR2Pipeline,
-  deleteMedia as deleteFromR2,
+  uploadMedia as uploadPipeline,
+  deleteMedia as deleteFromStorage,
   keyFromCdnUrl,
-  isR2Configured,
 } from "./r2-client";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -141,12 +140,8 @@ export interface MediaStats {
 export async function uploadMediaFile(
   params: MediaUploadParams
 ): Promise<MediaRecord> {
-  if (!isR2Configured()) {
-    throw new Error("R2 storage is not configured");
-  }
-
-  // Upload to R2 (process → WebP → thumbnail → upload)
-  const r2Result = await uploadToR2Pipeline(
+  // Upload to R2 or local filesystem fallback (process → WebP → thumbnail → upload)
+  const r2Result = await uploadPipeline(
     params.file,
     params.country,
     params.category,
@@ -353,15 +348,13 @@ export async function hardDeleteMedia(id: number): Promise<void> {
   const record = await getMediaById(id);
   if (!record) return;
 
-  // Delete from R2 if configured
-  if (isR2Configured()) {
-    const key = keyFromCdnUrl(record.cdnUrl);
-    if (key) {
-      try {
-        await deleteFromR2(key);
-      } catch (err) {
-        console.error("Failed to delete from R2:", err);
-      }
+  // Delete from storage (R2 or local)
+  const key = keyFromCdnUrl(record.cdnUrl);
+  if (key) {
+    try {
+      await deleteFromStorage(key);
+    } catch (err) {
+      console.error("Failed to delete from storage:", err);
     }
   }
 
@@ -592,7 +585,7 @@ export async function findBlogFeaturedImage(params: {
     ? categoryMap[params.contentType] || "landscape"
     : "landscape";
 
-  // Strategy 1: Match destination + category
+  // Strategy 1: Match destination tag
   if (params.destination) {
     const byDest = await db
       .select({
@@ -617,6 +610,34 @@ export async function findBlogFeaturedImage(params: {
         cdnUrl: byDest[0].cdnUrl,
         altText: byDest[0].altText || byDest[0].title || params.destination,
         mediaId: byDest[0].id,
+      };
+    }
+
+    // Strategy 1b: Match destination in filename or title (images often have place names in filenames)
+    const byFilename = await db
+      .select({
+        id: mediaLibrary.id,
+        cdnUrl: mediaLibrary.cdnUrl,
+        altText: mediaLibrary.altText,
+        title: mediaLibrary.title,
+        filename: mediaLibrary.filename,
+      })
+      .from(mediaLibrary)
+      .where(
+        and(
+          eq(mediaLibrary.active, true),
+          sql`(${ilike(mediaLibrary.filename, `%${params.destination}%`)} OR ${ilike(mediaLibrary.title, `%${params.destination}%`)})`
+        )
+      )
+      .orderBy(desc(mediaLibrary.featured), asc(mediaLibrary.usageCount), sql`RANDOM()`)
+      .limit(1);
+
+    if (byFilename.length > 0) {
+      incrementUsageBatch([byFilename[0].id]);
+      return {
+        cdnUrl: byFilename[0].cdnUrl,
+        altText: byFilename[0].altText || byFilename[0].title || byFilename[0].filename || params.destination,
+        mediaId: byFilename[0].id,
       };
     }
   }

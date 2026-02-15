@@ -96,10 +96,10 @@ tests/
 ├── reporters/
 │   └── summary-reporter.ts       # Custom reporter (features, gaps, failures)
 │
-├── specs/                         # 47 spec files across 9 categories
+├── specs/                         # 57 spec files across 9 categories
 │   ├── admin/       (11 files)
 │   ├── agency/      (3 files)
-│   ├── api/         (7 files)
+│   ├── api/         (17 files)
 │   ├── auth/        (4 files)
 │   ├── chat/        (5 files)
 │   ├── journeys/    (4 files)
@@ -318,7 +318,7 @@ The summary reporter (`tests/reporters/summary-reporter.ts`) runs automatically 
 Sample output:
 ```
 ══════════════════════════════════════════════════════════
-  CuratedAscents Test Suite — 215 tests
+  CuratedAscents Test Suite — 322 tests
 ══════════════════════════════════════════════════════════
 
 ──────────────────────────────────────────────────────────

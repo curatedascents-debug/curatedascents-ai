@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local media uploads (dev fallback when R2 is not configured)
+/public/uploads/
+
 # vercel
 .vercel
 

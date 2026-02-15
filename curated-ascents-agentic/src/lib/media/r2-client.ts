@@ -1,6 +1,6 @@
 /**
- * Cloudflare R2 Client (S3-compatible)
- * Handles file upload, deletion, and key generation for the media library.
+ * Cloudflare R2 Client (S3-compatible) with local filesystem fallback.
+ * When R2 env vars are not set, files are saved to public/uploads/media/ for local dev.
  */
 
 import {
@@ -9,6 +9,8 @@ import {
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import sharp from "sharp";
+import { writeFile, mkdir, unlink } from "fs/promises";
+import path from "path";
 
 // ─── Configuration ───────────────────────────────────────────────────────────
 
@@ -42,7 +44,7 @@ export function isR2Configured(): boolean {
 // ─── Key Generation ──────────────────────────────────────────────────────────
 
 /**
- * Generate an organized R2 object key.
+ * Generate an organized storage key.
  * Format: {country}/{category}/{filename}-{uuid}.webp
  */
 export function generateKey(
@@ -118,6 +120,33 @@ export async function processImage(
   };
 }
 
+// ─── Local Storage Fallback ──────────────────────────────────────────────────
+
+const LOCAL_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "media");
+const LOCAL_URL_PREFIX = "/uploads/media";
+
+/**
+ * Save a buffer to local public/uploads/media/ directory.
+ */
+async function uploadToLocal(file: Buffer, key: string): Promise<string> {
+  const filePath = path.join(LOCAL_UPLOAD_DIR, key);
+  await mkdir(path.dirname(filePath), { recursive: true });
+  await writeFile(filePath, file);
+  return `${LOCAL_URL_PREFIX}/${key}`;
+}
+
+/**
+ * Delete a file from local storage.
+ */
+async function deleteFromLocal(key: string): Promise<void> {
+  const filePath = path.join(LOCAL_UPLOAD_DIR, key);
+  try {
+    await unlink(filePath);
+  } catch (err: unknown) {
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+  }
+}
+
 // ─── R2 Operations ───────────────────────────────────────────────────────────
 
 /**
@@ -173,8 +202,8 @@ export interface UploadResult {
 /**
  * Full upload pipeline:
  * 1. Process image (WebP conversion + thumbnail)
- * 2. Upload both to R2
- * 3. Return CDN URLs and metadata
+ * 2. Upload to R2 (or local filesystem as fallback)
+ * 3. Return URLs and metadata
  */
 export async function uploadMedia(
   file: Buffer,
@@ -189,11 +218,23 @@ export async function uploadMedia(
   const mainKey = generateKey(country, category, filename);
   const thumbKey = thumbnailKey(mainKey);
 
-  // Upload both in parallel
-  const [cdnUrl, thumbUrl] = await Promise.all([
-    uploadToR2(processed.webpBuffer, mainKey, "image/webp"),
-    uploadToR2(processed.thumbnailBuffer, thumbKey, "image/webp"),
-  ]);
+  let cdnUrl: string;
+  let thumbUrl: string;
+
+  if (isR2Configured()) {
+    // Upload to R2
+    [cdnUrl, thumbUrl] = await Promise.all([
+      uploadToR2(processed.webpBuffer, mainKey, "image/webp"),
+      uploadToR2(processed.thumbnailBuffer, thumbKey, "image/webp"),
+    ]);
+  } else {
+    // Local filesystem fallback
+    console.log("[Media] R2 not configured — saving to local public/uploads/media/");
+    [cdnUrl, thumbUrl] = await Promise.all([
+      uploadToLocal(processed.webpBuffer, mainKey),
+      uploadToLocal(processed.thumbnailBuffer, thumbKey),
+    ]);
+  }
 
   return {
     cdnUrl,
@@ -208,17 +249,29 @@ export async function uploadMedia(
 }
 
 /**
- * Delete both main image and thumbnail from R2.
+ * Delete both main image and thumbnail from storage (R2 or local).
  */
 export async function deleteMedia(key: string): Promise<void> {
   const thumbKey = thumbnailKey(key);
-  await Promise.all([deleteFromR2(key), deleteFromR2(thumbKey)]);
+
+  if (isR2Configured()) {
+    await Promise.all([deleteFromR2(key), deleteFromR2(thumbKey)]);
+  } else {
+    await Promise.all([deleteFromLocal(key), deleteFromLocal(thumbKey)]);
+  }
 }
 
 /**
- * Extract the R2 key from a CDN URL.
+ * Extract the storage key from a CDN or local URL.
  */
 export function keyFromCdnUrl(cdnUrl: string): string | null {
-  if (!R2_PUBLIC_URL || !cdnUrl.startsWith(R2_PUBLIC_URL)) return null;
-  return cdnUrl.slice(R2_PUBLIC_URL.length + 1); // +1 for the /
+  // Local URL
+  if (cdnUrl.startsWith(LOCAL_URL_PREFIX)) {
+    return cdnUrl.slice(LOCAL_URL_PREFIX.length + 1);
+  }
+  // R2 URL
+  if (R2_PUBLIC_URL && cdnUrl.startsWith(R2_PUBLIC_URL)) {
+    return cdnUrl.slice(R2_PUBLIC_URL.length + 1);
+  }
+  return null;
 }
