@@ -1,6 +1,6 @@
 # Cron Jobs (Vercel Cron — `vercel.json`)
 
-18 cron jobs configured. All require `CRON_SECRET` via `Authorization: Bearer` header.
+19 cron jobs configured. All require `CRON_SECRET` via `Authorization: Bearer` header.
 
 All cron route files use `export const dynamic = "force-dynamic"`.
 
@@ -19,6 +19,7 @@ All cron route files use `export const dynamic = "force-dynamic"`.
 | Daily 7 AM | `/api/cron/social-media-posting` | Social media post scheduling |
 | Daily 6 AM | `/api/cron/demand-analysis` | Demand metrics calculation |
 | Daily 6 AM | `/api/cron/blog-publishing` | Scheduled blog post publishing |
+| Daily 5 AM | `/api/cron/update-exchange-rates` | Daily FX rate snapshots from exchangerate-api.com |
 | Daily 5 AM | `/api/cron/release-expired-holds` | Release expired inventory |
 | Daily 4 AM | `/api/cron/supplier-performance` | Supplier scoring |
 | Daily 3 AM | `/api/cron/risk-monitoring` | Travel advisory updates |

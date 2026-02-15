@@ -18,7 +18,7 @@
 
 ## Pricing & Currency
 - `src/lib/pricing/pricing-engine.ts` — Dynamic pricing with seasonal, demand, early bird, group, loyalty rules
-- `src/lib/currency/currency-service.ts` — Multi-currency conversion with cached exchange rates
+- `src/lib/currency/currency-service.ts` — Multi-currency conversion with cached exchange rates, daily FX snapshots via exchangerate-api.com, `updateExchangeRates()` for cron
 
 ## Lead Intelligence
 - `src/lib/lead-intelligence/scoring-engine.ts` — Lead scoring based on engagement signals (0-100)

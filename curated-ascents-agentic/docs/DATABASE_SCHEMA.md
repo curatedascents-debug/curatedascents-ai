@@ -16,9 +16,10 @@
 - `supplierUsers` — Supplier staff accounts
 - `supplierPerformance` — Supplier metrics & scoring
 
-**Currency (2 tables):**
+**Currency (3 tables):**
 - `supportedCurrencies` — Supported currencies (15+)
-- `exchangeRates` — Real-time FX rates
+- `exchangeRates` — Real-time FX rates (unique index on `fromCurrency, toCurrency`)
+- `dailyFxRates` — Daily FX rate snapshots for historical tracking
 
 **Service Tables (10 types + 1 room rate):**
 - `hotels` + `hotelRoomRates` — Accommodation with room-level pricing

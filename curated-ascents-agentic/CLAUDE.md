@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > - `docs/MODULES.md` — All ~56 lib modules with file paths
 > - `docs/TESTING.md` — E2E test architecture, patterns, directory structure
 > - `docs/CHANGELOG.md` — Feature status & roadmap (Phases 1-6)
-> - `docs/CRON_JOBS.md` — 18 cron job schedules
+> - `docs/CRON_JOBS.md` — 19 cron job schedules
 
 ## What This Is
 
@@ -169,3 +169,4 @@ Homepage uses a **"donut" pattern**: `ChatProvider` (client) wraps the page; `{c
 - **Error pages**: Branded `not-found.tsx` (404) and `error.tsx` (error boundary) matching luxury design
 - **Chat markdown**: `.markdown-content` CSS in `globals.css` — compact spacing, gold bold, heading hierarchy, HR/blockquote styling
 - **Neon cache fix**: `fetchOptions: { cache: "no-store" }` on Neon client in `src/db/index.ts` prevents Next.js from caching DB queries
+- **FX rate cron**: Daily 5 AM UTC (`/api/cron/update-exchange-rates`) — runs before demand-analysis/price-monitoring (6 AM) so rates are fresh

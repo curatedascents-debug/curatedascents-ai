@@ -180,6 +180,7 @@
 |--------|----------|---------|
 | POST | `/api/currency/convert` | Convert amount |
 | GET | `/api/currency/rates` | Get exchange rates |
+| GET | `/api/admin/fx-rates` | Daily FX rate history (query: `?days=30`, max 365) |
 
 ## Customer APIs
 | Method | Endpoint | Purpose |

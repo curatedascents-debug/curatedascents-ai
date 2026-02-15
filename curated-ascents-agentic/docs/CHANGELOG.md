@@ -112,6 +112,13 @@
 - **Homepage Alignment** — Fixed hero heading wrapping, mobile spacing in TestimonialsSection/TrustStrip
 - **Deduplication API** — `/api/admin/deduplicate` detects and removes duplicate seed records
 
+## Phase 5.7: Daily FX Rate History (Complete)
+- **Daily FX Snapshots** — `dailyFxRates` table stores daily exchange rate snapshots for historical tracking
+- **FX Cron Job** — `/api/cron/update-exchange-rates` runs daily at 5 AM UTC via exchangerate-api.com
+- **Admin FX API** — `/api/admin/fx-rates?days=30` returns historical FX rate data (max 365 days)
+- **Cron Auth Standardization** — All cron jobs verify `CRON_SECRET` via `Authorization: Bearer` header
+- **Unique Index Fix** — Added unique index on `exchangeRates(fromCurrency, toCurrency)` for reliable upserts
+
 ## Phase 6: Future Enhancements
 - **WhatsApp Go-Live** — WhatsApp Business API account verification and production deployment
 - **Video Consultations** — Scheduled video calls with travel experts

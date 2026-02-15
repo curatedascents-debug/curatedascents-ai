@@ -93,7 +93,7 @@ docs/                 # Reference documentation
 - `docs/MODULES.md` — All ~56 lib modules with file paths
 - `docs/TESTING.md` — E2E test architecture and patterns
 - `docs/CHANGELOG.md` — Feature status and roadmap
-- `docs/CRON_JOBS.md` — 18 cron job schedules
+- `docs/CRON_JOBS.md` — 19 cron job schedules
 
 ## Deployment
 

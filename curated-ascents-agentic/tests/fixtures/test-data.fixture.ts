@@ -175,6 +175,10 @@ export const API_ROUTES = {
   adminWhatsappConversations: '/api/admin/whatsapp/conversations',
   adminWhatsappTemplates: '/api/admin/whatsapp/templates',
 
+  // FX Rates
+  adminFxRates: '/api/admin/fx-rates',
+  cronUpdateExchangeRates: '/api/cron/update-exchange-rates',
+
   // Agency CRUD
   agencyMe: '/api/agency/auth/me',
   agencyClients: '/api/agency/clients',
