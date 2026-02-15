@@ -216,7 +216,9 @@ export const exchangeRates = pgTable('exchange_rates', {
   fetchedAt: timestamp('fetched_at').defaultNow(), // When rate was fetched
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
-});
+}, (table) => ({
+  uniqFromTo: uniqueIndex('exchange_rates_from_to_idx').on(table.fromCurrency, table.toCurrency),
+}));
 
 // Daily FX rate snapshots (one row per day)
 export const dailyFxRates = pgTable('daily_fx_rates', {
