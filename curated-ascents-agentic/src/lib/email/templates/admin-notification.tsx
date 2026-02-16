@@ -9,7 +9,7 @@ import {
 } from "@react-email/components";
 import * as React from "react";
 
-type NotificationType = "new_quote" | "new_booking" | "payment_received" | "new_client";
+type NotificationType = "new_quote" | "new_booking" | "payment_received" | "new_client" | "callback_request";
 
 interface AdminNotificationEmailProps {
   notificationType: NotificationType;
@@ -28,6 +28,9 @@ interface AdminNotificationEmailProps {
   paidAmount?: string;
   balanceAmount?: string;
   paymentStatus?: string;
+  // Callback request info
+  preferredTime?: string;
+  callbackMessage?: string;
 }
 
 export default function AdminNotificationEmail({
@@ -43,6 +46,8 @@ export default function AdminNotificationEmail({
   paidAmount,
   balanceAmount,
   paymentStatus,
+  preferredTime,
+  callbackMessage,
 }: AdminNotificationEmailProps) {
   const formatCurrency = (val?: string) => {
     if (!val) return "$0";
@@ -59,6 +64,8 @@ export default function AdminNotificationEmail({
         return "Payment Received";
       case "new_client":
         return "New Client Registered";
+      case "callback_request":
+        return "Callback Requested";
       default:
         return "Admin Notification";
     }
@@ -74,6 +81,8 @@ export default function AdminNotificationEmail({
         return "💰";
       case "new_client":
         return "👤";
+      case "callback_request":
+        return "📞";
       default:
         return "📢";
     }
@@ -165,6 +174,32 @@ export default function AdminNotificationEmail({
                 <Text style={detailValue}>{clientEmail || "-"}</Text>
                 <Text style={detailLabel}>Source</Text>
                 <Text style={detailValue}>Chat / Website</Text>
+              </>
+            )}
+
+            {/* Callback Request Info */}
+            {notificationType === "callback_request" && (
+              <>
+                <Text style={detailLabel}>Email</Text>
+                <Text style={detailValue}>{clientEmail || "-"}</Text>
+                {preferredTime && (
+                  <>
+                    <Text style={detailLabel}>Preferred Time</Text>
+                    <Text style={detailValue}>{preferredTime}</Text>
+                  </>
+                )}
+                {callbackMessage && (
+                  <>
+                    <Text style={detailLabel}>Message</Text>
+                    <Text style={detailValue}>{callbackMessage}</Text>
+                  </>
+                )}
+                <Hr style={hrLight} />
+                <Text style={paragraph}>
+                  <a href={`mailto:${clientEmail}?subject=CuratedAscents — Following up on your callback request`} style={link}>
+                    Reply to Client →
+                  </a>
+                </Text>
               </>
             )}
           </Section>

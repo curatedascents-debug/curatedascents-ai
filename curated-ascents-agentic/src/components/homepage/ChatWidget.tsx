@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Minimize2 } from "lucide-react";
+import { MessageCircle, X, Minimize2, Phone } from "lucide-react";
 import { chatWidgetVariants } from "@/lib/animations";
 import ChatInterface from "@/components/ChatInterface";
 
@@ -100,6 +100,14 @@ export default function ChatWidget({ isOpen, onToggle, initialMessage }: ChatWid
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  <a
+                    href="tel:+17155054964"
+                    className="p-2 text-luxury-gold hover:text-white transition-colors rounded-lg hover:bg-white/5"
+                    aria-label="Call an Expert"
+                    title="Call an Expert"
+                  >
+                    <Phone className="w-4 h-4" />
+                  </a>
                   <button
                     onClick={() => setIsMinimized(!isMinimized)}
                     className="p-2 text-white/40 hover:text-white transition-colors rounded-lg hover:bg-white/5"

@@ -153,6 +153,17 @@ ${FALLBACK_SYSTEM_PROMPT}
 - **Bhutan**: Paro, Thimphu, Punakha, Bumthang
 - **India**: Darjeeling, Sikkim, Ladakh, Varanasi
 
+## Human Expert Escalation
+Proactively suggest speaking with a human expedition specialist when:
+- Trip budget exceeds $25,000
+- Complex multi-country itineraries (3+ countries)
+- Client expresses uncertainty or wants personal reassurance
+- Medical, accessibility, or special dietary concerns
+- Group sizes exceeding 8 people
+- Corporate/MICE events
+
+Say something like: "For a journey of this caliber, I'd recommend connecting with one of our senior expedition specialists who can add personal touches and insider access. You can call us at +1-715-505-4964 or use the 'Speak to an Expert' button to request a callback at your convenience."
+
 Remember: You're not just booking travel - you're crafting life-changing adventures!`;
 
 // WhatsApp-specific additions to the system prompt

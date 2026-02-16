@@ -2,7 +2,7 @@
 
 import ReactMarkdown from 'react-markdown';
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Phone, X } from "lucide-react";
 
 const PROGRESS_MESSAGES = [
   "Searching our luxury collection...",
@@ -57,6 +57,16 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
   // ── NEW: states for the personalization save flow ────────────────────────
   const [personalizeLoading, setPersonalizeLoading] = useState(false);
   const [personalizeSuccess, setPersonalizeSuccess] = useState(false);
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // ── Callback / "Speak to an Expert" states ────────────────────────────────
+  const [showCallbackModal, setShowCallbackModal] = useState(false);
+  const [callbackName, setCallbackName] = useState("");
+  const [callbackEmail, setCallbackEmail] = useState("");
+  const [callbackTime, setCallbackTime] = useState("Morning");
+  const [callbackMessage, setCallbackMessage] = useState("");
+  const [callbackLoading, setCallbackLoading] = useState(false);
+  const [callbackSuccess, setCallbackSuccess] = useState(false);
   // ─────────────────────────────────────────────────────────────────────────
 
   // ── Lead scoring integration ─────────────────────────────────────────────
@@ -209,6 +219,48 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
   };
   // ─────────────────────────────────────────────────────────────────────────
 
+  // ── Callback request handler ──────────────────────────────────────────────
+  const handleCallbackSubmit = async () => {
+    if (!callbackName.trim() || !callbackEmail.trim()) return;
+
+    setCallbackLoading(true);
+    try {
+      const res = await fetch("/api/contact/callback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: callbackName.trim(),
+          email: callbackEmail.trim(),
+          preferredTime: callbackTime,
+          message: callbackMessage.trim() || undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.error || "Failed to submit. Please try again.");
+        setCallbackLoading(false);
+        return;
+      }
+
+      setCallbackSuccess(true);
+      setCallbackLoading(false);
+
+      setTimeout(() => {
+        setShowCallbackModal(false);
+        setCallbackSuccess(false);
+        setCallbackName("");
+        setCallbackEmail("");
+        setCallbackTime("Morning");
+        setCallbackMessage("");
+      }, 2000);
+    } catch {
+      setCallbackLoading(false);
+      alert("Network error — please check your connection and try again.");
+    }
+  };
+  // ─────────────────────────────────────────────────────────────────────────
+
   // Widget mode styling
   if (isWidget) {
     return (
@@ -313,6 +365,108 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
             </div>
           </div>
         )}
+
+        {/* Callback Modal */}
+        {showCallbackModal && (
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-20 p-4">
+            <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-sm w-full relative">
+              <button
+                onClick={() => setShowCallbackModal(false)}
+                className="absolute top-3 right-3 p-1 text-white/40 hover:text-white transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <h3 className="text-lg font-bold text-white mb-4">Speak to an Expert</h3>
+
+              {callbackSuccess ? (
+                <div className="flex flex-col items-center py-6 gap-2">
+                  <div className="text-3xl">✅</div>
+                  <p className="text-emerald-400 font-semibold text-center text-sm">
+                    {"We'll be in touch shortly!"}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* Call Now */}
+                  <div className="mb-5">
+                    <a
+                      href="tel:+17155054964"
+                      className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-luxury-gold text-luxury-navy font-semibold rounded-lg hover:bg-luxury-gold/90 transition text-sm"
+                    >
+                      <Phone className="w-4 h-4" />
+                      Call Now: +1-715-505-4964
+                    </a>
+                    <p className="text-slate-400 text-xs text-center mt-1.5">Available Mon-Fri 9AM-6PM EST</p>
+                  </div>
+
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="flex-1 h-px bg-slate-700" />
+                    <span className="text-slate-500 text-xs">or request a callback</span>
+                    <div className="flex-1 h-px bg-slate-700" />
+                  </div>
+
+                  {/* Request Callback Form */}
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      placeholder="Your name *"
+                      value={callbackName}
+                      onChange={(e) => setCallbackName(e.target.value)}
+                      disabled={callbackLoading}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:border-luxury-gold disabled:opacity-50"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Your email *"
+                      value={callbackEmail}
+                      onChange={(e) => setCallbackEmail(e.target.value)}
+                      disabled={callbackLoading}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:border-luxury-gold disabled:opacity-50"
+                    />
+                    <select
+                      value={callbackTime}
+                      onChange={(e) => setCallbackTime(e.target.value)}
+                      disabled={callbackLoading}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-luxury-gold disabled:opacity-50"
+                    >
+                      <option value="Morning">Morning (9AM-12PM EST)</option>
+                      <option value="Afternoon">Afternoon (12PM-3PM EST)</option>
+                      <option value="Evening">Evening (3PM-6PM EST)</option>
+                    </select>
+                    <textarea
+                      placeholder="Brief message (optional)"
+                      value={callbackMessage}
+                      onChange={(e) => setCallbackMessage(e.target.value)}
+                      disabled={callbackLoading}
+                      rows={2}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:border-luxury-gold disabled:opacity-50 resize-none"
+                    />
+                    <button
+                      onClick={handleCallbackSubmit}
+                      disabled={callbackLoading || !callbackName.trim() || !callbackEmail.trim()}
+                      className="w-full px-4 py-2.5 border border-luxury-gold/40 text-luxury-gold hover:bg-luxury-gold/10 rounded-lg text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {callbackLoading ? "Submitting..." : "Request Callback"}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Speak to an Expert */}
+        <div className="border-t border-slate-700/50 px-4 py-2 bg-slate-800/50">
+          <button
+            onClick={() => setShowCallbackModal(true)}
+            className="flex items-center gap-1.5 border border-luxury-gold/40 text-luxury-gold hover:bg-luxury-gold/10 rounded-lg px-3 py-1.5 text-sm transition"
+          >
+            <Phone className="w-3.5 h-3.5" />
+            Speak to an Expert
+          </button>
+        </div>
 
         {/* Input */}
         <div className="border-t border-slate-700 bg-slate-800 px-4 py-3">
@@ -460,6 +614,110 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
           </div>
         </div>
       )}
+
+      {/* Callback Modal (full page) */}
+      {showCallbackModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-sm w-full relative">
+            <button
+              onClick={() => setShowCallbackModal(false)}
+              className="absolute top-3 right-3 p-1 text-white/40 hover:text-white transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <h3 className="text-xl font-bold text-white mb-4">Speak to an Expert</h3>
+
+            {callbackSuccess ? (
+              <div className="flex flex-col items-center py-6 gap-3">
+                <div className="text-4xl">✅</div>
+                <p className="text-emerald-400 font-semibold text-center">
+                  {"We'll be in touch shortly!"}
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Call Now */}
+                <div className="mb-5">
+                  <a
+                    href="tel:+17155054964"
+                    className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-luxury-gold text-luxury-navy font-semibold rounded-lg hover:bg-luxury-gold/90 transition"
+                  >
+                    <Phone className="w-4 h-4" />
+                    Call Now: +1-715-505-4964
+                  </a>
+                  <p className="text-slate-400 text-xs text-center mt-1.5">Available Mon-Fri 9AM-6PM EST</p>
+                </div>
+
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="flex-1 h-px bg-slate-700" />
+                  <span className="text-slate-500 text-xs">or request a callback</span>
+                  <div className="flex-1 h-px bg-slate-700" />
+                </div>
+
+                {/* Request Callback Form */}
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    placeholder="Your name *"
+                    value={callbackName}
+                    onChange={(e) => setCallbackName(e.target.value)}
+                    disabled={callbackLoading}
+                    className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-luxury-gold disabled:opacity-50"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Your email *"
+                    value={callbackEmail}
+                    onChange={(e) => setCallbackEmail(e.target.value)}
+                    disabled={callbackLoading}
+                    className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-luxury-gold disabled:opacity-50"
+                  />
+                  <select
+                    value={callbackTime}
+                    onChange={(e) => setCallbackTime(e.target.value)}
+                    disabled={callbackLoading}
+                    className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-luxury-gold disabled:opacity-50"
+                  >
+                    <option value="Morning">Morning (9AM-12PM EST)</option>
+                    <option value="Afternoon">Afternoon (12PM-3PM EST)</option>
+                    <option value="Evening">Evening (3PM-6PM EST)</option>
+                  </select>
+                  <textarea
+                    placeholder="Brief message (optional)"
+                    value={callbackMessage}
+                    onChange={(e) => setCallbackMessage(e.target.value)}
+                    disabled={callbackLoading}
+                    rows={3}
+                    className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-luxury-gold disabled:opacity-50 resize-none"
+                  />
+                  <button
+                    onClick={handleCallbackSubmit}
+                    disabled={callbackLoading || !callbackName.trim() || !callbackEmail.trim()}
+                    className="w-full px-4 py-3 border border-luxury-gold/40 text-luxury-gold hover:bg-luxury-gold/10 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {callbackLoading ? "Submitting..." : "Request Callback"}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Speak to an Expert (full page) */}
+      <div className="border-t border-slate-700/50 px-4 py-2 bg-slate-900/50">
+        <div className="max-w-4xl mx-auto">
+          <button
+            onClick={() => setShowCallbackModal(true)}
+            className="flex items-center gap-1.5 border border-luxury-gold/40 text-luxury-gold hover:bg-luxury-gold/10 rounded-lg px-3 py-1.5 text-sm transition"
+          >
+            <Phone className="w-3.5 h-3.5" />
+            Speak to an Expert
+          </button>
+        </div>
+      </div>
 
       {/* Input */}
       <div className="border-t border-slate-700 bg-slate-900/80 backdrop-blur-sm px-4 py-4">
