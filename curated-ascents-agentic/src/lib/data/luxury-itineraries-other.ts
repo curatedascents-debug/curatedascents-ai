@@ -29,7 +29,6 @@ export const nepalClimbs: LuxuryItinerary[] = [
       "Luxury lodge accommodations throughout the trek",
       "Expert IFMGA-certified climbing Sherpas and full technical support",
       "Acclimatization at Chukhung with views of Lhotse South Face",
-      "Helicopter evacuation insurance included",
     ],
     bestMonths: "April-May, October-November",
     route: "Kathmandu → Lukla → Namche Bazaar → Tengboche → Dingboche → Chukhung → Island Peak Base Camp → Summit → Lukla → Kathmandu",
@@ -65,7 +64,6 @@ export const nepalClimbs: LuxuryItinerary[] = [
       "All meals on trek (breakfast, lunch, dinner)",
       "2 nights Dwarika's Hotel Kathmandu",
       "Private guide and porters throughout",
-      "Helicopter evacuation insurance",
     ],
     exclusions: [
       "International flights",
@@ -131,7 +129,6 @@ export const nepalClimbs: LuxuryItinerary[] = [
       "All meals throughout the expedition",
       "2 nights Dwarika's Hotel Kathmandu",
       "Private guide, porters, and cook team",
-      "Helicopter evacuation insurance",
     ],
     exclusions: [
       "International flights",
