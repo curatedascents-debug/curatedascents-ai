@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronLeft, ChevronRight, BadgeCheck } from "lucide-react";
 
 const testimonials = [
@@ -62,6 +62,27 @@ export default function TestimonialsSection() {
     return () => clearInterval(timer);
   }, [isPaused]);
 
+  // Touch/swipe support
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    setIsPaused(true);
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    touchEndX.current = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX.current;
+    const threshold = 50;
+    if (diff > threshold) {
+      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+    } else if (diff < -threshold) {
+      setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+    }
+    setIsPaused(false);
+  }, []);
+
   const current = testimonials[currentIndex];
 
   return (
@@ -96,6 +117,8 @@ export default function TestimonialsSection() {
           className={`relative transition-all duration-600 delay-200 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           <div className="bg-luxury-cream/5 border border-luxury-gold/10 rounded-2xl p-6 sm:p-8 md:p-12 text-center">
             {/* Gold quote mark */}
@@ -129,33 +152,35 @@ export default function TestimonialsSection() {
           </div>
 
           {/* Navigation */}
-          <div className="flex justify-center items-center gap-4 mt-8">
+          <div className="flex justify-center items-center gap-2 mt-8">
             <button
               onClick={() => setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)}
-              className="p-2 rounded-full border border-luxury-gold/20 text-luxury-gold/60 hover:text-luxury-gold hover:border-luxury-gold/50 transition-colors"
+              className="w-11 h-11 flex items-center justify-center rounded-full border border-luxury-gold/20 text-luxury-gold/60 hover:text-luxury-gold hover:border-luxury-gold/50 transition-colors"
               aria-label="Previous testimonial"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               {testimonials.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`rounded-full transition-all duration-300 ${
+                  className="w-11 h-11 flex items-center justify-center"
+                  aria-label={`Go to testimonial ${index + 1}`}
+                >
+                  <span className={`block rounded-full transition-all duration-300 ${
                     index === currentIndex
                       ? "bg-luxury-gold w-6 h-2"
-                      : "bg-luxury-gold/20 w-2 h-2 hover:bg-luxury-gold/40"
-                  }`}
-                  aria-label={`Go to testimonial ${index + 1}`}
-                />
+                      : "bg-luxury-gold/20 w-2 h-2"
+                  }`} />
+                </button>
               ))}
             </div>
 
             <button
               onClick={() => setCurrentIndex((prev) => (prev + 1) % testimonials.length)}
-              className="p-2 rounded-full border border-luxury-gold/20 text-luxury-gold/60 hover:text-luxury-gold hover:border-luxury-gold/50 transition-colors"
+              className="w-11 h-11 flex items-center justify-center rounded-full border border-luxury-gold/20 text-luxury-gold/60 hover:text-luxury-gold hover:border-luxury-gold/50 transition-colors"
               aria-label="Next testimonial"
             >
               <ChevronRight className="w-5 h-5" />

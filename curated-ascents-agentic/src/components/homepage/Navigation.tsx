@@ -112,17 +112,17 @@ export default function Navigation() {
             </div>
 
             {/* Mobile Phone + Menu */}
-            <div className="flex items-center gap-2 md:hidden">
+            <div className="flex items-center gap-1 md:hidden">
               <a
                 href="tel:+17155054964"
-                className="p-2 text-white/70 hover:text-luxury-gold transition-colors"
+                className="w-11 h-11 flex items-center justify-center text-white/70 hover:text-luxury-gold transition-colors"
                 aria-label="Call us"
               >
                 <Phone className="w-5 h-5" />
               </a>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-white hover:text-luxury-gold transition-colors"
+                className="w-11 h-11 flex items-center justify-center text-white hover:text-luxury-gold transition-colors"
                 aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               >
               {isMobileMenuOpen ? (
@@ -155,14 +155,14 @@ export default function Navigation() {
               initial="closed"
               animate="open"
               exit="closed"
-              className="fixed top-0 right-0 bottom-0 w-80 bg-luxury-navy z-50 md:hidden border-l border-luxury-gold/10"
+              className="fixed top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-luxury-navy z-50 md:hidden border-l border-luxury-gold/10 overflow-y-auto"
             >
               <div className="flex flex-col h-full p-6">
                 {/* Close Button */}
                 <div className="flex justify-end mb-8">
                   <button
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="p-2 text-white/60 hover:text-white transition-colors"
+                    className="w-11 h-11 flex items-center justify-center text-white/60 hover:text-white transition-colors -mr-2"
                   >
                     <X className="w-6 h-6" />
                   </button>
@@ -176,7 +176,7 @@ export default function Navigation() {
                     },
                     closed: {},
                   }}
-                  className="flex flex-col gap-4"
+                  className="flex flex-col gap-2"
                 >
                   {navLinks.map((link) =>
                     link.isExternal ? (
@@ -184,7 +184,7 @@ export default function Navigation() {
                         key={link.label}
                         variants={fadeInUp}
                         href={link.href}
-                        className="text-left text-2xl font-serif text-white hover:text-luxury-gold transition-colors py-2"
+                        className="text-left text-2xl font-serif text-white hover:text-luxury-gold transition-colors py-3 min-h-[44px]"
                       >
                         {link.label}
                       </motion.a>
@@ -193,7 +193,7 @@ export default function Navigation() {
                         key={link.label}
                         variants={fadeInUp}
                         onClick={() => scrollToSection(link.href)}
-                        className="text-left text-2xl font-serif text-white hover:text-luxury-gold transition-colors py-2"
+                        className="text-left text-2xl font-serif text-white hover:text-luxury-gold transition-colors py-3 min-h-[44px]"
                       >
                         {link.label}
                       </motion.button>
@@ -201,17 +201,28 @@ export default function Navigation() {
                   )}
                 </motion.nav>
 
+                {/* Phone number */}
+                <motion.div variants={fadeInUp} className="mt-8">
+                  <a
+                    href="tel:+17155054964"
+                    className="flex items-center gap-3 text-white/70 hover:text-luxury-gold transition-colors py-3 min-h-[44px]"
+                  >
+                    <Phone className="w-5 h-5" />
+                    <span className="text-sm">+1-715-505-4964</span>
+                  </a>
+                </motion.div>
+
                 {/* Mobile CTA */}
                 <motion.div
                   variants={fadeInUp}
-                  className="mt-auto"
+                  className="mt-auto pt-6"
                 >
                   <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       openChat();
                     }}
-                    className="w-full px-8 py-4 bg-luxury-gold text-luxury-navy font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300"
+                    className="w-full px-8 py-4 min-h-[48px] bg-luxury-gold text-luxury-navy font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300"
                   >
                     Plan Your Journey
                   </button>

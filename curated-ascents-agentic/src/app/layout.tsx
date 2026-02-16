@@ -18,6 +18,7 @@ const dmSans = DM_Sans({
 
 export const viewport: Viewport = {
   themeColor: "#0F1B2D",
+  viewportFit: "cover",
 };
 
 export const metadata: Metadata = {

@@ -348,14 +348,14 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
                     <button
                       onClick={() => setShowEmailPrompt(false)}
                       disabled={personalizeLoading}
-                      className="flex-1 px-3 py-2 bg-slate-700 text-white text-sm rounded-lg hover:bg-slate-600 transition disabled:opacity-50"
+                      className="flex-1 px-3 min-h-[44px] bg-slate-700 text-white text-sm rounded-lg hover:bg-slate-600 transition disabled:opacity-50"
                     >
                       Skip
                     </button>
                     <button
                       onClick={handleEmailSubmit}
                       disabled={personalizeLoading || !clientName.trim() || !clientEmail.trim()}
-                      className="flex-1 px-3 py-2 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 px-3 min-h-[44px] bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {personalizeLoading ? "Saving…" : "Continue"}
                     </button>
@@ -369,13 +369,13 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
         {/* Callback Modal */}
         {showCallbackModal && (
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-20 p-4">
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-sm w-full relative">
+            <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-sm w-full relative max-h-full overflow-y-auto">
               <button
                 onClick={() => setShowCallbackModal(false)}
-                className="absolute top-3 right-3 p-1 text-white/40 hover:text-white transition-colors"
+                className="absolute top-2 right-2 w-11 h-11 flex items-center justify-center text-white/40 hover:text-white transition-colors"
                 aria-label="Close"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
 
               <h3 className="text-lg font-bold text-white mb-4">Speak to an Expert</h3>
@@ -393,7 +393,7 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
                   <div className="mb-5">
                     <a
                       href="tel:+17155054964"
-                      className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-luxury-gold text-luxury-navy font-semibold rounded-lg hover:bg-luxury-gold/90 transition text-sm"
+                      className="flex items-center justify-center gap-2 w-full px-4 min-h-[44px] py-3 bg-luxury-gold text-luxury-navy font-semibold rounded-lg hover:bg-luxury-gold/90 transition text-sm"
                     >
                       <Phone className="w-4 h-4" />
                       Call Now: +1-715-505-4964
@@ -415,7 +415,7 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
                       value={callbackName}
                       onChange={(e) => setCallbackName(e.target.value)}
                       disabled={callbackLoading}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:border-luxury-gold disabled:opacity-50"
+                      className="w-full px-3 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white text-base placeholder-slate-500 focus:outline-none focus:border-luxury-gold disabled:opacity-50"
                     />
                     <input
                       type="email"
@@ -423,13 +423,13 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
                       value={callbackEmail}
                       onChange={(e) => setCallbackEmail(e.target.value)}
                       disabled={callbackLoading}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:border-luxury-gold disabled:opacity-50"
+                      className="w-full px-3 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white text-base placeholder-slate-500 focus:outline-none focus:border-luxury-gold disabled:opacity-50"
                     />
                     <select
                       value={callbackTime}
                       onChange={(e) => setCallbackTime(e.target.value)}
                       disabled={callbackLoading}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-luxury-gold disabled:opacity-50"
+                      className="w-full px-3 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white text-base focus:outline-none focus:border-luxury-gold disabled:opacity-50"
                     >
                       <option value="Morning">Morning (9AM-12PM EST)</option>
                       <option value="Afternoon">Afternoon (12PM-3PM EST)</option>
@@ -441,12 +441,12 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
                       onChange={(e) => setCallbackMessage(e.target.value)}
                       disabled={callbackLoading}
                       rows={2}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:border-luxury-gold disabled:opacity-50 resize-none"
+                      className="w-full px-3 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white text-base placeholder-slate-500 focus:outline-none focus:border-luxury-gold disabled:opacity-50 resize-none"
                     />
                     <button
                       onClick={handleCallbackSubmit}
                       disabled={callbackLoading || !callbackName.trim() || !callbackEmail.trim()}
-                      className="w-full px-4 py-2.5 border border-luxury-gold/40 text-luxury-gold hover:bg-luxury-gold/10 rounded-lg text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full px-4 min-h-[44px] py-2.5 border border-luxury-gold/40 text-luxury-gold hover:bg-luxury-gold/10 rounded-lg text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {callbackLoading ? "Submitting..." : "Request Callback"}
                     </button>
@@ -461,7 +461,7 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
         <div className="border-t border-slate-700/50 px-4 py-2 bg-slate-800/50">
           <button
             onClick={() => setShowCallbackModal(true)}
-            className="flex items-center gap-1.5 border border-luxury-gold/40 text-luxury-gold hover:bg-luxury-gold/10 rounded-lg px-3 py-1.5 text-sm transition"
+            className="flex items-center gap-1.5 border border-luxury-gold/40 text-luxury-gold hover:bg-luxury-gold/10 rounded-lg px-3 py-2.5 text-sm transition min-h-[44px]"
           >
             <Phone className="w-3.5 h-3.5" />
             Speak to an Expert
@@ -469,7 +469,7 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
         </div>
 
         {/* Input */}
-        <div className="border-t border-slate-700 bg-slate-800 px-4 py-3">
+        <div className="border-t border-slate-700 bg-slate-800 px-4 py-3 safe-area-bottom">
           <form onSubmit={handleSubmit} className="flex gap-2">
             <input
               type="text"
@@ -477,12 +477,12 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type your message..."
               disabled={isLoading}
-              className="flex-1 px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
             />
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-11 h-11 flex items-center justify-center bg-emerald-600 text-white rounded-xl hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             >
               <Send className="w-4 h-4" />
             </button>
@@ -596,14 +596,14 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
                   <button
                     onClick={() => setShowEmailPrompt(false)}
                     disabled={personalizeLoading}
-                    className="flex-1 px-4 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition disabled:opacity-50"
+                    className="flex-1 px-4 min-h-[44px] py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition disabled:opacity-50"
                   >
                     Skip for now
                   </button>
                   <button
                     onClick={handleEmailSubmit}
                     disabled={personalizeLoading || !clientName.trim() || !clientEmail.trim()}
-                    className="flex-1 px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 min-h-[44px] py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {personalizeLoading ? "Saving…" : "Continue"}
                   </button>
@@ -618,13 +618,13 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
       {/* Callback Modal (full page) */}
       {showCallbackModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-sm w-full relative">
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-sm w-full relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setShowCallbackModal(false)}
-              className="absolute top-3 right-3 p-1 text-white/40 hover:text-white transition-colors"
+              className="absolute top-2 right-2 w-11 h-11 flex items-center justify-center text-white/40 hover:text-white transition-colors"
               aria-label="Close"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
 
             <h3 className="text-xl font-bold text-white mb-4">Speak to an Expert</h3>
@@ -711,7 +711,7 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
         <div className="max-w-4xl mx-auto">
           <button
             onClick={() => setShowCallbackModal(true)}
-            className="flex items-center gap-1.5 border border-luxury-gold/40 text-luxury-gold hover:bg-luxury-gold/10 rounded-lg px-3 py-1.5 text-sm transition"
+            className="flex items-center gap-1.5 border border-luxury-gold/40 text-luxury-gold hover:bg-luxury-gold/10 rounded-lg px-3 py-2.5 text-sm transition min-h-[44px]"
           >
             <Phone className="w-3.5 h-3.5" />
             Speak to an Expert
@@ -720,7 +720,7 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
       </div>
 
       {/* Input */}
-      <div className="border-t border-slate-700 bg-slate-900/80 backdrop-blur-sm px-4 py-4">
+      <div className="border-t border-slate-700 bg-slate-900/80 backdrop-blur-sm px-4 py-4 safe-area-bottom">
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
           <div className="flex gap-3">
             <input
@@ -729,12 +729,12 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
               onChange={(e) => setInput(e.target.value)}
               placeholder="Tell me about your dream adventure..."
               disabled={isLoading}
-              className="flex-1 px-6 py-4 bg-slate-800 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+              className="flex-1 px-6 py-4 bg-slate-800 border border-slate-700 rounded-2xl text-white text-base placeholder-slate-500 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
             />
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="px-6 py-4 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-14 h-14 flex items-center justify-center bg-emerald-600 text-white rounded-2xl hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             >
               <Send className="w-5 h-5" />
             </button>

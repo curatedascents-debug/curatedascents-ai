@@ -35,7 +35,7 @@ export default function FinalCTA() {
             Begin Planning Now
           </ChatButton>
           <p className="text-luxury-cream/40 text-sm mt-6">
-            Or call us: +1-715-505-4964
+            Or call us: <a href="tel:+17155054964" className="text-luxury-cream/60 hover:text-luxury-gold transition-colors underline underline-offset-2">+1-715-505-4964</a>
           </p>
         </AnimateOnScroll>
       </div>

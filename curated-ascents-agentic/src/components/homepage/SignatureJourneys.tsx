@@ -100,18 +100,18 @@ export default function SignatureJourneys() {
                   <p className="text-white/70 text-sm leading-relaxed mb-4 max-w-md">
                     {journey.description}
                   </p>
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <span className="text-luxury-gold font-serif font-bold text-sm">{journey.price}</span>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
                       <Link
                         href={`/itineraries/${journey.itinerarySlug}`}
-                        className="text-luxury-cream/60 text-sm hover:text-white transition-colors"
+                        className="text-luxury-cream/60 text-sm hover:text-white transition-colors py-2 px-3 min-h-[44px] flex items-center"
                       >
                         View Itinerary
                       </Link>
                       <ChatButton
                         message={`I'm interested in the ${journey.title} experience in ${journey.country}. Can you customize this for my dates and group size?`}
-                        className="text-luxury-gold text-sm font-medium hover:underline underline-offset-4 transition-all"
+                        className="text-luxury-gold text-sm font-medium hover:underline underline-offset-4 transition-all py-2 px-3 min-h-[44px] flex items-center"
                       >
                         Customize &rarr;
                       </ChatButton>

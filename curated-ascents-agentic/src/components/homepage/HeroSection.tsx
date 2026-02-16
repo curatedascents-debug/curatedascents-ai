@@ -74,7 +74,7 @@ export default function HeroSection() {
 
           {/* Main heading */}
           <h1
-            className={`font-serif text-4xl sm:text-5xl md:text-[3.5rem] lg:text-6xl font-bold text-white mb-6 leading-tight whitespace-nowrap transition-all duration-700 delay-500 ${
+            className={`font-serif text-[1.75rem] sm:text-5xl md:text-[3.5rem] lg:text-6xl font-bold text-white mb-6 leading-tight transition-all duration-700 delay-500 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}
           >
@@ -121,7 +121,7 @@ export default function HeroSection() {
       >
         <button
           onClick={scrollToJourneys}
-          className="flex flex-col items-center gap-2 text-white/50 hover:text-white/80 transition-colors"
+          className="flex flex-col items-center gap-2 text-white/50 hover:text-white/80 transition-colors py-2 px-4 min-h-[44px]"
           aria-label="Scroll to discover more"
         >
           <span className="text-xs tracking-[0.2em] uppercase">Discover</span>
