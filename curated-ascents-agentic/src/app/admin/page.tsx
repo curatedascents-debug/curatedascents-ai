@@ -20,6 +20,7 @@ import BlogTab from "@/components/admin/BlogTab";
 import WhatsAppTab from "@/components/admin/WhatsAppTab";
 import MediaTab from "@/components/admin/MediaTab";
 import PriceAlertsTab from "@/components/admin/PriceAlertsTab";
+import FxRatesTab from "@/components/admin/FxRatesTab";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -98,6 +99,7 @@ export default function AdminDashboard() {
     { key: "whatsapp" as TabType, label: "WhatsApp" },
     { key: "media" as TabType, label: "Media" },
     { key: "price-alerts" as TabType, label: "Price Alerts" },
+    { key: "fx-rates" as TabType, label: "FX Rates" },
     { key: "reports" as TabType, label: "Reports" },
   ];
 
@@ -147,6 +149,7 @@ export default function AdminDashboard() {
         {activeTab === "whatsapp" && <WhatsAppTab />}
         {activeTab === "media" && <MediaTab />}
         {activeTab === "price-alerts" && <PriceAlertsTab />}
+        {activeTab === "fx-rates" && <FxRatesTab />}
         {activeTab === "reports" && <AdvancedReportsTab />}
       </div>
     </div>

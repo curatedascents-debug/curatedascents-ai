@@ -10,7 +10,7 @@ import { useChatContext } from "./ChatContext";
 const navLinks = [
   { label: "Journeys", href: "#signature-journeys" },
   { label: "Itineraries", href: "/itineraries", isExternal: true },
-  { label: "Destinations", href: "#destinations" },
+  { label: "Destinations", href: "/destinations", isExternal: true },
   { label: "Blog", href: "/blog", isExternal: true },
   { label: "About", href: "#about" },
 ];

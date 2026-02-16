@@ -16,6 +16,13 @@ const experienceLinks = [
   { label: "Wildlife Safaris", message: "Tell me about wildlife safari experiences in India" },
 ];
 
+const destinationLinks = [
+  { label: "Nepal", href: "/destinations/nepal" },
+  { label: "Bhutan", href: "/destinations/bhutan" },
+  { label: "Tibet", href: "/destinations/tibet" },
+  { label: "India", href: "/destinations/india" },
+];
+
 const companyLinks = [
   { label: "About Us", href: "#about" },
   { label: "Testimonials", href: "#testimonials" },
@@ -120,6 +127,23 @@ export default function Footer() {
                     >
                       {link.label}
                     </button>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            {/* Destinations Column */}
+            <motion.div variants={fadeInUp}>
+              <h3 className="text-white font-medium mb-4">Destinations</h3>
+              <ul className="space-y-3">
+                {destinationLinks.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-white/50 hover:text-luxury-gold transition-colors text-sm"
+                    >
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>

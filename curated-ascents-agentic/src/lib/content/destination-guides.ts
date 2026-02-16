@@ -234,6 +234,63 @@ const DESTINATION_DATA: Record<string, Partial<DestinationGuide>> = {
       hospitals: ["Tibet Autonomous Region People's Hospital (Lhasa)"],
     },
   },
+  india: {
+    title: "India Travel Guide",
+    subtitle: "A Tapestry of Cultures, Landscapes & Legends",
+    overview: `India, the world's most diverse subcontinent, offers an extraordinary range of luxury travel experiences — from the snow-capped Himalayas of Ladakh and the spiritual banks of the Ganges to the royal palaces of Rajasthan and the tranquil backwaters of Kerala. With over 5,000 years of unbroken civilization, India weaves together ancient temples, vibrant bazaars, world-class cuisine, and breathtaking natural beauty into journeys that are as enriching as they are exhilarating.`,
+    highlights: [
+      { title: "Rajasthan's Royal Palaces", description: "Magnificent forts and heritage palace hotels across the Land of Kings", icon: "palace" },
+      { title: "Ladakh & the Himalayas", description: "High-altitude monasteries, pristine lakes, and dramatic mountain passes", icon: "mountain" },
+      { title: "Kerala Backwaters", description: "Luxury houseboat cruises through palm-fringed waterways", icon: "lake" },
+      { title: "Rishikesh & Yoga", description: "World capital of yoga on the banks of the sacred Ganges", icon: "spiritual" },
+      { title: "Golden Triangle", description: "Delhi, Agra (Taj Mahal), and Jaipur — India's iconic cultural circuit", icon: "temple" },
+      { title: "Darjeeling & Tea Country", description: "Colonial hill stations, Himalayan panoramas, and world-famous tea estates", icon: "valley" },
+    ],
+    bestTimeToVisit: {
+      recommended: ["October", "November", "December", "January", "February", "March"],
+      weather: {
+        spring: "Warming temperatures, wildflowers in the hills",
+        summer: "Hot in plains, pleasant in hill stations; monsoon June–September",
+        autumn: "Post-monsoon clarity, comfortable temperatures",
+        winter: "Cool and dry — ideal for most destinations; cold in the north",
+      },
+      crowds: {
+        spring: "Moderate",
+        summer: "Low in plains, high in hill stations",
+        autumn: "Rising, festival season (Diwali, Dussehra)",
+        winter: "Peak tourist season",
+      },
+      prices: {
+        spring: "Moderate",
+        summer: "Low season rates (except hill stations)",
+        autumn: "Moderate to high (festival surcharge)",
+        winter: "Peak season rates",
+      },
+    },
+    gettingThere: `India has multiple international gateways: Indira Gandhi International Airport (DEL) in New Delhi, Chhatrapati Shivaji Maharaj International Airport (BOM) in Mumbai, and Kempegowda International Airport (BLR) in Bangalore. Direct flights connect from all major global hubs. For Ladakh, domestic flights operate from Delhi to Leh (seasonal).`,
+    gettingAround: `India has an extensive domestic flight network connecting all major cities. Premium trains like the Palace on Wheels and Maharajas' Express offer luxury rail journeys. Private chauffeur-driven cars are the preferred option for touring — comfortable, flexible, and affordable. In cities, hotel transfers and ride-hailing apps are convenient.`,
+    culturalTips: [
+      { tip: "Remove shoes before entering temples and homes", explanation: "Footwear is considered impure at sacred and domestic spaces" },
+      { tip: "Dress modestly at religious sites", explanation: "Cover shoulders and knees at temples, mosques, and gurudwaras" },
+      { tip: "Use your right hand for eating and greetings", explanation: "The left hand is traditionally considered unclean" },
+      { tip: "Greet with 'Namaste' (palms together)", explanation: "A respectful and universally understood greeting across India" },
+      { tip: "Ask permission before photographing people", explanation: "Especially important at temples, with sadhus, and in rural areas" },
+      { tip: "Bargain at markets but not at fixed-price shops", explanation: "Negotiation is expected at bazaars; start at 40–50% of the quoted price" },
+    ],
+    packingList: {
+      general: ["Lightweight cotton clothing", "Comfortable walking shoes", "Sun hat", "Sunscreen SPF50+", "Insect repellent", "Modest attire for temples", "Power adapter (Type C/D)", "Reusable water bottle"],
+      himalayan: ["Warm layered clothing", "Down jacket", "Sturdy hiking boots", "UV-protection sunglasses", "Altitude sickness medication", "Sleeping bag liner"],
+      cultural: ["Light scarf/shawl for temples", "Camera", "Daypack", "Hand sanitizer", "Anti-diarrheal medication"],
+    },
+    healthAndSafety: `Drink only bottled or purified water. Travel insurance with medical evacuation is essential, especially for high-altitude Ladakh travel. Altitude sickness is a concern above 3,000m — acclimatize slowly. Vaccinations for Hepatitis A, Typhoid, and Tetanus are recommended. Malaria prophylaxis may be needed for some regions. Food hygiene at luxury hotels is excellent; exercise caution at street stalls.`,
+    moneyMatters: `The Indian Rupee (INR) is the local currency. ATMs are widely available. Credit cards accepted at hotels, restaurants, and shops in tourist areas. Tipping is customary — 10% at restaurants, INR 200–500 per day for drivers and guides. Bargaining is expected at markets. Many luxury hotels quote in USD and accept international payment.`,
+    emergencyInfo: {
+      police: "100",
+      ambulance: "102 / 108",
+      embassy: "Contact your country's embassy in New Delhi",
+      hospitals: ["Max Super Speciality Hospital (New Delhi)", "Apollo Hospitals (multiple cities)", "Fortis Memorial Research Institute (Gurugram)"],
+    },
+  },
 };
 
 // ─── Guide Generation ─────────────────────────────────────────────────────────
