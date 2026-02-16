@@ -32,6 +32,12 @@ export const ROUTES = {
   contact: '/contact',
   privacyPolicy: '/privacy-policy',
   terms: '/terms',
+  destinations: '/destinations',
+  destinationNepal: '/destinations/nepal',
+  destinationBhutan: '/destinations/bhutan',
+  destinationTibet: '/destinations/tibet',
+  destinationIndia: '/destinations/india',
+  itineraries: '/itineraries',
 
   // Admin
   adminLogin: '/admin/login',
@@ -178,6 +184,11 @@ export const API_ROUTES = {
   // FX Rates
   adminFxRates: '/api/admin/fx-rates',
   cronUpdateExchangeRates: '/api/cron/update-exchange-rates',
+
+  // Seed & Cleanup
+  adminSeedItineraries: '/api/admin/seed-itineraries',
+  adminSeedDestinations: '/api/admin/seed-destinations',
+  adminCleanupItineraries: '/api/admin/cleanup-itineraries',
 
   // Agency CRUD
   agencyMe: '/api/agency/auth/me',
