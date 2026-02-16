@@ -53,19 +53,18 @@ export default function Navigation() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <a
-              href="#"
+              href="/"
               className="flex items-center gap-3 group"
-              onClick={(e) => {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
             >
               <CuratedAscentsLogo className="text-luxury-gold group-hover:text-luxury-gold/80 transition-colors" size={32} />
               <div>
                 <span className="text-xl font-serif font-bold text-white">
                   CuratedAscents
                 </span>
-                <span className="hidden sm:block text-[10px] tracking-[0.2em] uppercase text-luxury-gold/60 -mt-0.5">
+                <span
+                  className="hidden sm:block text-[10px] tracking-[0.2em] uppercase text-luxury-gold/70 -mt-0.5"
+                  style={{ textShadow: "0 1px 3px rgba(15, 27, 45, 0.8)" }}
+                >
                   Beyond Boundaries, Beyond Ordinary
                 </span>
               </div>
