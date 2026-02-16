@@ -1,0 +1,2765 @@
+{
+  "metadata": {
+    "exchange_rate": {
+      "usd_to_npr": 130,
+      "description": "$1 = NRs 130"
+    },
+    "vehicle_types": {
+      "car": {
+        "description": "Standard Car",
+        "rate_multiplier": 1
+      },
+      "luxury_4x4_suv": {
+        "description": "Luxury 4x4 SUV (3x Car rate)",
+        "rate_multiplier": 3
+      }
+    },
+    "currency": "USD",
+    "notes": [
+      "All rates include 20% A/C surcharge (pre-applied)",
+      "Night charge (50% after 8pm) NOT included - apply separately if needed",
+      "Rough road surcharge (25%) NOT included - apply separately if needed",
+      "Overnight charged if day return vehicle doesn't enter Kathmandu valley by 8pm",
+      "Day return = drop at station and return same day to Kathmandu",
+      "Kilometer/Rate is fixed for two ways (round trip)",
+      "Taxes are exclusive on above mentioned rates",
+      "25% cancellation charge if booked trip cancelled",
+      "If fuel increases more than 5 rupees/liter, rates will increase"
+    ],
+    "prepared_for": "CuratedAscents",
+    "prepared_date": "2026-02-15",
+    "total_routes": 260,
+    "total_categories": 15,
+    "ac_surcharge": "20% included in all rates"
+  },
+  "categories": [
+    {
+      "category_id": 1,
+      "category_name": "Airport Route / Disposal / Overnight Charge",
+      "trip_type": "hourly_fixed",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Disposal Charge per hour",
+          "km": null,
+          "car_npr": 660.0,
+          "car_usd": 5.08,
+          "luxury_4x4_suv_npr": 1980.0,
+          "luxury_4x4_suv_usd": 15.23
+        },
+        {
+          "sn": 2,
+          "description": "Overnight Charge",
+          "km": null,
+          "car_npr": 3000.0,
+          "car_usd": 23.08,
+          "luxury_4x4_suv_npr": 9000.0,
+          "luxury_4x4_suv_usd": 69.23
+        },
+        {
+          "sn": 3,
+          "description": "Airport Arrival/Departure (2 hours)",
+          "km": null,
+          "car_npr": 1200.0,
+          "car_usd": 9.23,
+          "luxury_4x4_suv_npr": 3600.0,
+          "luxury_4x4_suv_usd": 27.69
+        },
+        {
+          "sn": 4,
+          "description": "Mountain Flight",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        }
+      ]
+    },
+    {
+      "category_id": 2,
+      "category_name": "Kathmandu Half Day Sightseeing (4 hours)",
+      "trip_type": "half_day",
+      "overtime_rule": "After 4 hrs, disposal charge per hour applies",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Kapan",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        },
+        {
+          "sn": 2,
+          "description": "Gokarna",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        },
+        {
+          "sn": 3,
+          "description": "Within Ring Road (only two places)",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        },
+        {
+          "sn": 4,
+          "description": "Dinner",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        }
+      ]
+    },
+    {
+      "category_id": 3,
+      "category_name": "Half Day Sightseeing (4 hours)",
+      "trip_type": "half_day",
+      "overtime_rule": "After 4 hrs, disposal charge per hour applies",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Fulchowki",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 2,
+          "description": "Bhaktapur, Dhulikhel",
+          "km": null,
+          "car_npr": 3600.0,
+          "car_usd": 27.69,
+          "luxury_4x4_suv_npr": 10800.0,
+          "luxury_4x4_suv_usd": 83.08
+        },
+        {
+          "sn": 3,
+          "description": "Kakani",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 4,
+          "description": "Nagarjun",
+          "km": null,
+          "car_npr": 3600.0,
+          "car_usd": 27.69,
+          "luxury_4x4_suv_npr": 10800.0,
+          "luxury_4x4_suv_usd": 83.08
+        },
+        {
+          "sn": 5,
+          "description": "Bhaktapur, Changunarayan",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 6,
+          "description": "Lakuri Bhanjyang",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 7,
+          "description": "Nagarkot only",
+          "km": null,
+          "car_npr": 3600.0,
+          "car_usd": 27.69,
+          "luxury_4x4_suv_npr": 10800.0,
+          "luxury_4x4_suv_usd": 83.08
+        },
+        {
+          "sn": 8,
+          "description": "Bhaktapur, Nagarkot",
+          "km": null,
+          "car_npr": 3630.0,
+          "car_usd": 27.92,
+          "luxury_4x4_suv_npr": 10890.0,
+          "luxury_4x4_suv_usd": 83.77
+        },
+        {
+          "sn": 9,
+          "description": "Panauti only",
+          "km": null,
+          "car_npr": 3102.0,
+          "car_usd": 23.86,
+          "luxury_4x4_suv_npr": 9306.0,
+          "luxury_4x4_suv_usd": 71.58
+        },
+        {
+          "sn": 10,
+          "description": "Dhulikhel and Panauti",
+          "km": null,
+          "car_npr": 3630.0,
+          "car_usd": 27.92,
+          "luxury_4x4_suv_npr": 10890.0,
+          "luxury_4x4_suv_usd": 83.77
+        },
+        {
+          "sn": 11,
+          "description": "Dhulikhel, Khawa",
+          "km": null,
+          "car_npr": 3600.0,
+          "car_usd": 27.69,
+          "luxury_4x4_suv_npr": 10800.0,
+          "luxury_4x4_suv_usd": 83.08
+        },
+        {
+          "sn": 12,
+          "description": "Dhulikhel",
+          "km": null,
+          "car_npr": 3600.0,
+          "car_usd": 27.69,
+          "luxury_4x4_suv_npr": 10800.0,
+          "luxury_4x4_suv_usd": 83.08
+        },
+        {
+          "sn": 13,
+          "description": "Sanga Bhanjyang (Shiva Temple)",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 14,
+          "description": "Changunarayan",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 15,
+          "description": "Saakhu",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 16,
+          "description": "Sudarijal",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 17,
+          "description": "Hattiban Resort",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 18,
+          "description": "Dakshinkali",
+          "km": null,
+          "car_npr": 3600.0,
+          "car_usd": 27.69,
+          "luxury_4x4_suv_npr": 10800.0,
+          "luxury_4x4_suv_usd": 83.08
+        },
+        {
+          "sn": 19,
+          "description": "Vajrabarahi, Chaapagaun",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 20,
+          "description": "Godawari",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 21,
+          "description": "Bungmati and Khokana",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 22,
+          "description": "Kirtipur",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        },
+        {
+          "sn": 23,
+          "description": "Ring Road (any two places)",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        },
+        {
+          "sn": 24,
+          "description": "Bhaktapur",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        },
+        {
+          "sn": 25,
+          "description": "Chovar",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        },
+        {
+          "sn": 26,
+          "description": "Budhanilkantha",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        }
+      ]
+    },
+    {
+      "category_id": 4,
+      "category_name": "Full Day Sightseeing (8 hours)",
+      "trip_type": "full_day",
+      "overtime_rule": "After 8 hrs, disposal charge per hour applies",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Bhaktapur, Changunarayan and Nagarkot",
+          "km": null,
+          "car_npr": 6000.0,
+          "car_usd": 46.15,
+          "luxury_4x4_suv_npr": 18000.0,
+          "luxury_4x4_suv_usd": 138.46
+        },
+        {
+          "sn": 2,
+          "description": "Phulchoki and Godawari",
+          "km": null,
+          "car_npr": 6600.0,
+          "car_usd": 50.77,
+          "luxury_4x4_suv_npr": 19800.0,
+          "luxury_4x4_suv_usd": 152.31
+        },
+        {
+          "sn": 3,
+          "description": "Nagarjun and Balaju",
+          "km": null,
+          "car_npr": 6600.0,
+          "car_usd": 50.77,
+          "luxury_4x4_suv_npr": 19800.0,
+          "luxury_4x4_suv_usd": 152.31
+        },
+        {
+          "sn": 4,
+          "description": "Dakshinkali, Chovar and Kirtipur",
+          "km": null,
+          "car_npr": 4800.0,
+          "car_usd": 36.92,
+          "luxury_4x4_suv_npr": 14400.0,
+          "luxury_4x4_suv_usd": 110.77
+        },
+        {
+          "sn": 5,
+          "description": "Within Ring Road (any 4 places)",
+          "km": null,
+          "car_npr": 4800.0,
+          "car_usd": 36.92,
+          "luxury_4x4_suv_npr": 14400.0,
+          "luxury_4x4_suv_usd": 110.77
+        },
+        {
+          "sn": 6,
+          "description": "Pashupatinath, Boudhanath and Bhaktapur",
+          "km": null,
+          "car_npr": 6600.0,
+          "car_usd": 50.77,
+          "luxury_4x4_suv_npr": 19800.0,
+          "luxury_4x4_suv_usd": 152.31
+        },
+        {
+          "sn": 7,
+          "description": "Kathmandu Durbar Square, Swayambhunath, Patan Durbar Square",
+          "km": null,
+          "car_npr": 6600.0,
+          "car_usd": 50.77,
+          "luxury_4x4_suv_npr": 19800.0,
+          "luxury_4x4_suv_usd": 152.31
+        }
+      ]
+    },
+    {
+      "category_id": 5,
+      "category_name": "Tour Officer / Guide Pick Up / Drop (Inside Ring Road)",
+      "trip_type": "transfer",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Guide Pick Up / Drop Inside Ring Road",
+          "km": null,
+          "car_npr": 420.0,
+          "car_usd": 3.23,
+          "luxury_4x4_suv_npr": 1260.0,
+          "luxury_4x4_suv_usd": 9.69
+        }
+      ]
+    },
+    {
+      "category_id": 6,
+      "category_name": "Trishuli Dhunche Route",
+      "trip_type": "day_return",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Kathmandu to Syabrubenshi Day return",
+          "km": 300,
+          "car_npr": 15750.0,
+          "car_usd": 121.15,
+          "luxury_4x4_suv_npr": 47250.0,
+          "luxury_4x4_suv_usd": 363.46
+        },
+        {
+          "sn": 2,
+          "description": "Kathmandu to Dhunche Day return",
+          "km": 260,
+          "car_npr": 13650.0,
+          "car_usd": 105.0,
+          "luxury_4x4_suv_npr": 40950.0,
+          "luxury_4x4_suv_usd": 315.0
+        },
+        {
+          "sn": 3,
+          "description": "Kathmandu to Trishuli Day return",
+          "km": 160,
+          "car_npr": 8400.0,
+          "car_usd": 64.62,
+          "luxury_4x4_suv_npr": 25200.0,
+          "luxury_4x4_suv_usd": 193.85
+        }
+      ]
+    },
+    {
+      "category_id": 7,
+      "category_name": "Daman Sim Bhanjyang Route",
+      "trip_type": "day_return",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Chitwan to Daman to Kathmandu",
+          "km": null,
+          "car_npr": 5145.0,
+          "car_usd": 39.58,
+          "luxury_4x4_suv_npr": 15435.0,
+          "luxury_4x4_suv_usd": 118.73
+        },
+        {
+          "sn": 2,
+          "description": "Kathmandu to Daman Day return",
+          "km": 180,
+          "car_npr": 9450.0,
+          "car_usd": 72.69,
+          "luxury_4x4_suv_npr": 28350.0,
+          "luxury_4x4_suv_usd": 218.08
+        },
+        {
+          "sn": 3,
+          "description": "Kathmandu to Sim Bhanjyang Day return",
+          "km": null,
+          "car_npr": 9450.0,
+          "car_usd": 72.69,
+          "luxury_4x4_suv_npr": 28350.0,
+          "luxury_4x4_suv_usd": 218.08
+        }
+      ]
+    },
+    {
+      "category_id": 8,
+      "category_name": "Kathmandu - Namobuddha - Kodari - Jiri Route",
+      "trip_type": "day_return",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Kathmandu to Jiri Day return",
+          "km": 396,
+          "car_npr": 16632.0,
+          "car_usd": 127.94,
+          "luxury_4x4_suv_npr": 49896.0,
+          "luxury_4x4_suv_usd": 383.82
+        },
+        {
+          "sn": 2,
+          "description": "Kathmandu to Charikot Day return",
+          "km": 290,
+          "car_npr": 12180.0,
+          "car_usd": 93.69,
+          "luxury_4x4_suv_npr": 36540.0,
+          "luxury_4x4_suv_usd": 281.08
+        },
+        {
+          "sn": 3,
+          "description": "Kathmandu to Kodari Day return",
+          "km": 238,
+          "car_npr": 9996.0,
+          "car_usd": 76.89,
+          "luxury_4x4_suv_npr": 29988.0,
+          "luxury_4x4_suv_usd": 230.68
+        },
+        {
+          "sn": 4,
+          "description": "Kathmandu to Borderland Day return",
+          "km": 210,
+          "car_npr": 8820.0,
+          "car_usd": 67.85,
+          "luxury_4x4_suv_npr": 26460.0,
+          "luxury_4x4_suv_usd": 203.54
+        },
+        {
+          "sn": 5,
+          "description": "Kathmandu to Barabise Day return",
+          "km": 186,
+          "car_npr": 7812.0,
+          "car_usd": 60.09,
+          "luxury_4x4_suv_npr": 23436.0,
+          "luxury_4x4_suv_usd": 180.28
+        },
+        {
+          "sn": 6,
+          "description": "Kathmandu to Chautara Day return",
+          "km": 190,
+          "car_npr": 7980.0,
+          "car_usd": 61.38,
+          "luxury_4x4_suv_npr": 23940.0,
+          "luxury_4x4_suv_usd": 184.15
+        },
+        {
+          "sn": 7,
+          "description": "Kathmandu to Melamchi Day return",
+          "km": 160,
+          "car_npr": 8400.0,
+          "car_usd": 64.62,
+          "luxury_4x4_suv_npr": 25200.0,
+          "luxury_4x4_suv_usd": 193.85
+        },
+        {
+          "sn": 8,
+          "description": "Kathmandu to Palanchok Bhagwati Day return",
+          "km": 130,
+          "car_npr": 5460.0,
+          "car_usd": 42.0,
+          "luxury_4x4_suv_npr": 16380.0,
+          "luxury_4x4_suv_usd": 126.0
+        },
+        {
+          "sn": 9,
+          "description": "Kathmandu to Nepalthok Day return",
+          "km": 185,
+          "car_npr": 7770.0,
+          "car_usd": 59.77,
+          "luxury_4x4_suv_npr": 23310.0,
+          "luxury_4x4_suv_usd": 179.31
+        },
+        {
+          "sn": 10,
+          "description": "Kathmandu to Bhakundebensi Day return",
+          "km": 132,
+          "car_npr": 5544.0,
+          "car_usd": 42.65,
+          "luxury_4x4_suv_npr": 16632.0,
+          "luxury_4x4_suv_usd": 127.94
+        },
+        {
+          "sn": 11,
+          "description": "Kathmandu to Namobuddha Day return",
+          "km": 115,
+          "car_npr": 6037.5,
+          "car_usd": 46.44,
+          "luxury_4x4_suv_npr": 18112.5,
+          "luxury_4x4_suv_usd": 139.33
+        },
+        {
+          "sn": 12,
+          "description": "Kathmandu to Dolalghat Day return",
+          "km": 120,
+          "car_npr": 4356.0,
+          "car_usd": 33.51,
+          "luxury_4x4_suv_npr": 13068.0,
+          "luxury_4x4_suv_usd": 100.52
+        }
+      ]
+    },
+    {
+      "category_id": 9,
+      "category_name": "Kathmandu - Charaudi - Mugling Route",
+      "trip_type": "day_return",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Kathmandu to Mugling Day return",
+          "km": 240,
+          "car_npr": 10080.0,
+          "car_usd": 77.54,
+          "luxury_4x4_suv_npr": 30240.0,
+          "luxury_4x4_suv_usd": 232.62
+        },
+        {
+          "sn": 2,
+          "description": "Kathmandu to Kuringhat Day return",
+          "km": 220,
+          "car_npr": 9360.0,
+          "car_usd": 72.0,
+          "luxury_4x4_suv_npr": 28080.0,
+          "luxury_4x4_suv_usd": 216.0
+        },
+        {
+          "sn": 3,
+          "description": "Kathmandu to Dhadingbensi Day return",
+          "km": 195,
+          "car_npr": 5664.0,
+          "car_usd": 43.57,
+          "luxury_4x4_suv_npr": 16992.0,
+          "luxury_4x4_suv_usd": 130.71
+        },
+        {
+          "sn": 4,
+          "description": "Kathmandu to Fishling Day return",
+          "km": 210,
+          "car_npr": 5820.0,
+          "car_usd": 44.77,
+          "luxury_4x4_suv_npr": 17460.0,
+          "luxury_4x4_suv_usd": 134.31
+        },
+        {
+          "sn": 5,
+          "description": "Kathmandu to Charaudi Day return",
+          "km": 182,
+          "car_npr": 7644.0,
+          "car_usd": 58.8,
+          "luxury_4x4_suv_npr": 22932.0,
+          "luxury_4x4_suv_usd": 176.4
+        },
+        {
+          "sn": 6,
+          "description": "Kathmandu to Malekhu Day return",
+          "km": 150,
+          "car_npr": 6300.0,
+          "car_usd": 48.46,
+          "luxury_4x4_suv_npr": 18900.0,
+          "luxury_4x4_suv_usd": 145.38
+        },
+        {
+          "sn": 7,
+          "description": "Mugling to Pokhara Day return",
+          "km": 190,
+          "car_npr": 7980.0,
+          "car_usd": 61.38,
+          "luxury_4x4_suv_npr": 23940.0,
+          "luxury_4x4_suv_usd": 184.15
+        }
+      ]
+    },
+    {
+      "category_id": 10,
+      "category_name": "Kathmandu - Syangja - Gorkha - Pokhara - Beni Route",
+      "trip_type": "mixed",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Kathmandu to Pokhara to Syangja Day return",
+          "km": 544,
+          "car_npr": 22848.0,
+          "car_usd": 175.75,
+          "luxury_4x4_suv_npr": 68544.0,
+          "luxury_4x4_suv_usd": 527.26
+        },
+        {
+          "sn": 2,
+          "description": "Kathmandu to Beni Day return",
+          "km": 574,
+          "car_npr": 24108.0,
+          "car_usd": 185.45,
+          "luxury_4x4_suv_npr": 72324.0,
+          "luxury_4x4_suv_usd": 556.34
+        },
+        {
+          "sn": 3,
+          "description": "Kathmandu to Baglung Day return",
+          "km": 558,
+          "car_npr": 23436.0,
+          "car_usd": 180.28,
+          "luxury_4x4_suv_npr": 70308.0,
+          "luxury_4x4_suv_usd": 540.83
+        },
+        {
+          "sn": 4,
+          "description": "Kathmandu to Nayapul Day return",
+          "km": 495,
+          "car_npr": 20790.0,
+          "car_usd": 159.92,
+          "luxury_4x4_suv_npr": 62370.0,
+          "luxury_4x4_suv_usd": 479.77
+        },
+        {
+          "sn": 5,
+          "description": "Kathmandu to Pokhara Day return",
+          "km": 410,
+          "car_npr": 17220.0,
+          "car_usd": 132.46,
+          "luxury_4x4_suv_npr": 51660.0,
+          "luxury_4x4_suv_usd": 397.38
+        },
+        {
+          "sn": 6,
+          "description": "Kathmandu to Khairenitar Day return",
+          "km": 360,
+          "car_npr": 15120.0,
+          "car_usd": 116.31,
+          "luxury_4x4_suv_npr": 45360.0,
+          "luxury_4x4_suv_usd": 348.92
+        },
+        {
+          "sn": 7,
+          "description": "Kathmandu to Damauli Day return",
+          "km": 310,
+          "car_npr": 13020.0,
+          "car_usd": 100.15,
+          "luxury_4x4_suv_npr": 39060.0,
+          "luxury_4x4_suv_usd": 300.46
+        },
+        {
+          "sn": 8,
+          "description": "Kathmandu to Dumre Day return",
+          "km": 290,
+          "car_npr": 12180.0,
+          "car_usd": 93.69,
+          "luxury_4x4_suv_npr": 36540.0,
+          "luxury_4x4_suv_usd": 281.08
+        },
+        {
+          "sn": 9,
+          "description": "Kathmandu to Besishahar Day return",
+          "km": 380,
+          "car_npr": 15960.0,
+          "car_usd": 122.77,
+          "luxury_4x4_suv_npr": 47880.0,
+          "luxury_4x4_suv_usd": 368.31
+        },
+        {
+          "sn": 10,
+          "description": "Kathmandu to Gorkha Day return",
+          "km": 296,
+          "car_npr": 12432.0,
+          "car_usd": 95.63,
+          "luxury_4x4_suv_npr": 37296.0,
+          "luxury_4x4_suv_usd": 286.89
+        },
+        {
+          "sn": 11,
+          "description": "Kathmandu to Aabu Khaireni Day return",
+          "km": 244,
+          "car_npr": 10248.0,
+          "car_usd": 78.83,
+          "luxury_4x4_suv_npr": 30744.0,
+          "luxury_4x4_suv_usd": 236.49
+        },
+        {
+          "sn": 12,
+          "description": "Abukhaireni to Gorkha Day return",
+          "km": 52,
+          "car_npr": 2208.0,
+          "car_usd": 16.98,
+          "luxury_4x4_suv_npr": 6624.0,
+          "luxury_4x4_suv_usd": 50.95
+        },
+        {
+          "sn": 13,
+          "description": "Pokhara Half Day Sightseeing",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        },
+        {
+          "sn": 14,
+          "description": "Pokhara Full Day Sightseeing",
+          "km": null,
+          "car_npr": 4800.0,
+          "car_usd": 36.92,
+          "luxury_4x4_suv_npr": 14400.0,
+          "luxury_4x4_suv_usd": 110.77
+        },
+        {
+          "sn": 15,
+          "description": "Pokhara to Begnas Lake Half Day Sightseeing",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        },
+        {
+          "sn": 16,
+          "description": "Pokhara to Sarangkot Sunrise Half Day Sightseeing",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        },
+        {
+          "sn": 17,
+          "description": "Pokhara to Naudanda Half Day Sightseeing",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 18,
+          "description": "Pokhara to Matepani Gumba Half Day Sightseeing",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 19,
+          "description": "Pokhara to Shanti Stupa (Peace Stupa) Half Day Sightseeing",
+          "km": null,
+          "car_npr": 2400.0,
+          "car_usd": 18.46,
+          "luxury_4x4_suv_npr": 7200.0,
+          "luxury_4x4_suv_usd": 55.38
+        },
+        {
+          "sn": 20,
+          "description": "Pokhara to Phedi Drop / Pick Up",
+          "km": null,
+          "car_npr": 2820.0,
+          "car_usd": 21.69,
+          "luxury_4x4_suv_npr": 8460.0,
+          "luxury_4x4_suv_usd": 65.08
+        },
+        {
+          "sn": 21,
+          "description": "Pokhara to Nayapul Drop / Pick Up",
+          "km": null,
+          "car_npr": 4800.0,
+          "car_usd": 36.92,
+          "luxury_4x4_suv_npr": 14400.0,
+          "luxury_4x4_suv_usd": 110.77
+        }
+      ]
+    },
+    {
+      "category_id": 11,
+      "category_name": "Kathmandu to Gaighat - Chitwan - Narayangadh Route",
+      "trip_type": "day_return",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Kathmandu to Chitwan Meghauli Day return",
+          "km": 370,
+          "car_npr": 15540.0,
+          "car_usd": 119.54,
+          "luxury_4x4_suv_npr": 46620.0,
+          "luxury_4x4_suv_usd": 358.62
+        },
+        {
+          "sn": 2,
+          "description": "Kathmandu to Chitwan Temple Tiger Day return",
+          "km": 410,
+          "car_npr": 17220.0,
+          "car_usd": 132.46,
+          "luxury_4x4_suv_npr": 51660.0,
+          "luxury_4x4_suv_usd": 397.38
+        },
+        {
+          "sn": 3,
+          "description": "Kathmandu to Chitwan Tharu Village Day return",
+          "km": 410,
+          "car_npr": 17220.0,
+          "car_usd": 132.46,
+          "luxury_4x4_suv_npr": 51660.0,
+          "luxury_4x4_suv_usd": 397.38
+        },
+        {
+          "sn": 4,
+          "description": "Kathmandu to Chitwan Island Day return",
+          "km": 390,
+          "car_npr": 16380.0,
+          "car_usd": 126.0,
+          "luxury_4x4_suv_npr": 49140.0,
+          "luxury_4x4_suv_usd": 378.0
+        },
+        {
+          "sn": 5,
+          "description": "Kathmandu to Narayani Safari Paradise Day return",
+          "km": 370,
+          "car_npr": 15540.0,
+          "car_usd": 119.54,
+          "luxury_4x4_suv_npr": 46620.0,
+          "luxury_4x4_suv_usd": 358.62
+        },
+        {
+          "sn": 6,
+          "description": "Kathmandu to Chitwan Machan Day return",
+          "km": 390,
+          "car_npr": 16380.0,
+          "car_usd": 126.0,
+          "luxury_4x4_suv_npr": 49140.0,
+          "luxury_4x4_suv_usd": 378.0
+        },
+        {
+          "sn": 7,
+          "description": "Kathmandu to Chitwan Sauraha Day return",
+          "km": 350,
+          "car_npr": 14700.0,
+          "car_usd": 113.08,
+          "luxury_4x4_suv_npr": 44100.0,
+          "luxury_4x4_suv_usd": 339.23
+        },
+        {
+          "sn": 8,
+          "description": "Kathmandu to Chitwan Narayangadh/Bharatpur Day return",
+          "km": 312,
+          "car_npr": 8646.0,
+          "car_usd": 66.51,
+          "luxury_4x4_suv_npr": 25938.0,
+          "luxury_4x4_suv_usd": 199.52
+        },
+        {
+          "sn": 9,
+          "description": "Kathmandu to Chitwan Jugedi Day return",
+          "km": 290,
+          "car_npr": 8040.0,
+          "car_usd": 61.85,
+          "luxury_4x4_suv_npr": 24120.0,
+          "luxury_4x4_suv_usd": 185.54
+        },
+        {
+          "sn": 10,
+          "description": "Kathmandu to Chitwan Jungle Lodge Day return",
+          "km": 370,
+          "car_npr": 14700.0,
+          "car_usd": 113.08,
+          "luxury_4x4_suv_npr": 44100.0,
+          "luxury_4x4_suv_usd": 339.23
+        },
+        {
+          "sn": 11,
+          "description": "Kathmandu to Chitwan Gaighat Day return",
+          "km": 280,
+          "car_npr": 11760.0,
+          "car_usd": 90.46,
+          "luxury_4x4_suv_npr": 35280.0,
+          "luxury_4x4_suv_usd": 271.38
+        }
+      ]
+    },
+    {
+      "category_id": 12,
+      "category_name": "Round Trip Routes",
+      "trip_type": "multi_day",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Kathmandu - Mugling - Pokhara - Chitwan Sauraha - Lumbini and back (4N/5D)",
+          "km": 858,
+          "car_npr": 48036.0,
+          "car_usd": 369.51,
+          "luxury_4x4_suv_npr": 144108.0,
+          "luxury_4x4_suv_usd": 1108.52
+        },
+        {
+          "sn": 2,
+          "description": "Kathmandu - Pokhara - Palpa - Tansen - Lumbini - Chitwan (4N/5D)",
+          "km": 750,
+          "car_npr": 43500.0,
+          "car_usd": 334.62,
+          "luxury_4x4_suv_npr": 130500.0,
+          "luxury_4x4_suv_usd": 1003.85
+        }
+      ]
+    },
+    {
+      "category_id": 13,
+      "category_name": "Kathmandu - Hetauda - Birganj - Janakpur - Biratnagar - Kakadvitta - Dharan Route",
+      "trip_type": "overnight",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Kathmandu to Pashupatinagar 1 O/N",
+          "km": 1310,
+          "car_npr": 50400.0,
+          "car_usd": 387.69,
+          "luxury_4x4_suv_npr": 151200.0,
+          "luxury_4x4_suv_usd": 1163.08
+        },
+        {
+          "sn": 2,
+          "description": "Kathmandu to Ilam 1 O/N",
+          "km": 1360,
+          "car_npr": 57120.0,
+          "car_usd": 439.38,
+          "luxury_4x4_suv_npr": 171360.0,
+          "luxury_4x4_suv_usd": 1318.15
+        },
+        {
+          "sn": 3,
+          "description": "Dhankuta to Hiley Day Return",
+          "km": 40,
+          "car_npr": 1680.0,
+          "car_usd": 12.92,
+          "luxury_4x4_suv_npr": 5040.0,
+          "luxury_4x4_suv_usd": 38.77
+        },
+        {
+          "sn": 4,
+          "description": "Kathmandu to Dhankuta Day return",
+          "km": 1182,
+          "car_npr": 49644.0,
+          "car_usd": 381.88,
+          "luxury_4x4_suv_npr": 148932.0,
+          "luxury_4x4_suv_usd": 1145.63
+        },
+        {
+          "sn": 5,
+          "description": "Kathmandu to Dharan 1 O/N",
+          "km": 1087,
+          "car_npr": 45654.0,
+          "car_usd": 351.18,
+          "luxury_4x4_suv_npr": 136962.0,
+          "luxury_4x4_suv_usd": 1053.55
+        },
+        {
+          "sn": 6,
+          "description": "Kathmandu to Kakarvitta 1 O/N",
+          "km": 1220,
+          "car_npr": 51240.0,
+          "car_usd": 394.15,
+          "luxury_4x4_suv_npr": 153720.0,
+          "luxury_4x4_suv_usd": 1182.46
+        },
+        {
+          "sn": 7,
+          "description": "Kathmandu to Lahan 1 O/N",
+          "km": 870,
+          "car_npr": 36540.0,
+          "car_usd": 281.08,
+          "luxury_4x4_suv_npr": 109620.0,
+          "luxury_4x4_suv_usd": 843.23
+        },
+        {
+          "sn": 8,
+          "description": "Kathmandu to Biratnagar 1 O/N",
+          "km": 1082,
+          "car_npr": 45444.0,
+          "car_usd": 349.57,
+          "luxury_4x4_suv_npr": 136332.0,
+          "luxury_4x4_suv_usd": 1048.71
+        },
+        {
+          "sn": 9,
+          "description": "Kathmandu to Malangawa 1 O/N",
+          "km": 682,
+          "car_npr": 27720.0,
+          "car_usd": 213.23,
+          "luxury_4x4_suv_npr": 83160.0,
+          "luxury_4x4_suv_usd": 639.69
+        },
+        {
+          "sn": 10,
+          "description": "Kathmandu to Gaur 1 O/N",
+          "km": 660,
+          "car_npr": 27720.0,
+          "car_usd": 213.23,
+          "luxury_4x4_suv_npr": 83160.0,
+          "luxury_4x4_suv_usd": 639.69
+        },
+        {
+          "sn": 11,
+          "description": "Kathmandu to Janakpur 1 O/N",
+          "km": 750,
+          "car_npr": 45654.0,
+          "car_usd": 351.18,
+          "luxury_4x4_suv_npr": 136962.0,
+          "luxury_4x4_suv_usd": 1053.55
+        },
+        {
+          "sn": 12,
+          "description": "Kathmandu to Birgunj Day return",
+          "km": 556,
+          "car_npr": 14805.6,
+          "car_usd": 113.89,
+          "luxury_4x4_suv_npr": 44416.8,
+          "luxury_4x4_suv_usd": 341.67
+        },
+        {
+          "sn": 13,
+          "description": "Kathmandu to Hetauda Day return",
+          "km": 468,
+          "car_npr": 9450.0,
+          "car_usd": 72.69,
+          "luxury_4x4_suv_npr": 28350.0,
+          "luxury_4x4_suv_usd": 218.08
+        },
+        {
+          "sn": 14,
+          "description": "Kathmandu to Gaighat 1 O/N",
+          "km": 905,
+          "car_npr": 38010.0,
+          "car_usd": 292.38,
+          "luxury_4x4_suv_npr": 114030.0,
+          "luxury_4x4_suv_usd": 877.15
+        },
+        {
+          "sn": 15,
+          "description": "Kathmandu to Sindhuli 1 O/N",
+          "km": 732,
+          "car_npr": 30744.0,
+          "car_usd": 236.49,
+          "luxury_4x4_suv_npr": 92232.0,
+          "luxury_4x4_suv_usd": 709.48
+        },
+        {
+          "sn": 16,
+          "description": "Kathmandu to Siraha 1 O/N",
+          "km": 830,
+          "car_npr": 34860.0,
+          "car_usd": 268.15,
+          "luxury_4x4_suv_npr": 104580.0,
+          "luxury_4x4_suv_usd": 804.46
+        },
+        {
+          "sn": 17,
+          "description": "Kathmandu to Phidim 1 O/N",
+          "km": 1498,
+          "car_npr": 62916.0,
+          "car_usd": 483.97,
+          "luxury_4x4_suv_npr": 188748.0,
+          "luxury_4x4_suv_usd": 1451.91
+        }
+      ]
+    },
+    {
+      "category_id": 14,
+      "category_name": "Kathmandu - Butwal - Lumbini - Nepalganj - Bardia - Dhangadhi - Mahendranagar Route",
+      "trip_type": "overnight",
+      "routes": [
+        {
+          "sn": 1,
+          "description": "Kathmandu to Butwal Day return",
+          "km": 542,
+          "car_npr": 22764.0,
+          "car_usd": 175.11,
+          "luxury_4x4_suv_npr": 68292.0,
+          "luxury_4x4_suv_usd": 525.32
+        },
+        {
+          "sn": 2,
+          "description": "Kathmandu to Bhairahawa/Sunauli Day return",
+          "km": 600,
+          "car_npr": 25200.0,
+          "car_usd": 193.85,
+          "luxury_4x4_suv_npr": 75600.0,
+          "luxury_4x4_suv_usd": 581.54
+        },
+        {
+          "sn": 3,
+          "description": "Kathmandu to Lumbini 1 O/N",
+          "km": 630,
+          "car_npr": 26460.0,
+          "car_usd": 203.54,
+          "luxury_4x4_suv_npr": 79380.0,
+          "luxury_4x4_suv_usd": 610.62
+        },
+        {
+          "sn": 4,
+          "description": "Lumbini to Tilaurakot Day return",
+          "km": 50,
+          "car_npr": 2100.0,
+          "car_usd": 16.15,
+          "luxury_4x4_suv_npr": 6300.0,
+          "luxury_4x4_suv_usd": 48.46
+        },
+        {
+          "sn": 5,
+          "description": "Kathmandu to Tansen 1 O/N",
+          "km": 630,
+          "car_npr": 26460.0,
+          "car_usd": 203.54,
+          "luxury_4x4_suv_npr": 79380.0,
+          "luxury_4x4_suv_usd": 610.62
+        },
+        {
+          "sn": 6,
+          "description": "Kathmandu to Krishnanagar 1 O/N",
+          "km": 730,
+          "car_npr": 30660.0,
+          "car_usd": 235.85,
+          "luxury_4x4_suv_npr": 91980.0,
+          "luxury_4x4_suv_usd": 707.54
+        },
+        {
+          "sn": 7,
+          "description": "Kathmandu to Dang 1 O/N",
+          "km": 890,
+          "car_npr": 37380.0,
+          "car_usd": 287.54,
+          "luxury_4x4_suv_npr": 112140.0,
+          "luxury_4x4_suv_usd": 862.62
+        },
+        {
+          "sn": 8,
+          "description": "Kathmandu to Ghorahi Tulsipur 1 O/N",
+          "km": 878,
+          "car_npr": 36912.0,
+          "car_usd": 283.94,
+          "luxury_4x4_suv_npr": 110736.0,
+          "luxury_4x4_suv_usd": 851.82
+        },
+        {
+          "sn": 9,
+          "description": "Kathmandu to Pyuthan 1 O/N",
+          "km": 860,
+          "car_npr": 36120.0,
+          "car_usd": 277.85,
+          "luxury_4x4_suv_npr": 108360.0,
+          "luxury_4x4_suv_usd": 833.54
+        },
+        {
+          "sn": 10,
+          "description": "Kathmandu to Nepalganj 1 O/N",
+          "km": 1040,
+          "car_npr": 43680.0,
+          "car_usd": 336.0,
+          "luxury_4x4_suv_npr": 131040.0,
+          "luxury_4x4_suv_usd": 1008.0
+        },
+        {
+          "sn": 11,
+          "description": "Kathmandu to Bardia National Park 1 O/N",
+          "km": 1160,
+          "car_npr": 48720.0,
+          "car_usd": 374.77,
+          "luxury_4x4_suv_npr": 146160.0,
+          "luxury_4x4_suv_usd": 1124.31
+        },
+        {
+          "sn": 12,
+          "description": "Kathmandu to Mahendranagar 1 O/N",
+          "km": 1420,
+          "car_npr": 59640.0,
+          "car_usd": 458.77,
+          "luxury_4x4_suv_npr": 178920.0,
+          "luxury_4x4_suv_usd": 1376.31
+        },
+        {
+          "sn": 13,
+          "description": "Kathmandu to Dhangadhi 1 O/N",
+          "km": 1330,
+          "car_npr": 55860.0,
+          "car_usd": 429.69,
+          "luxury_4x4_suv_npr": 167580.0,
+          "luxury_4x4_suv_usd": 1289.08
+        }
+      ]
+    },
+    {
+      "category_id": 15,
+      "category_name": "Route Distance Reference Table",
+      "trip_type": "reference",
+      "description": "Distance reference for calculating custom rates. Use Car rate formula: NRs 22/km for 1-99km, NRs 20/km for 100km+. Luxury 4x4 SUV = 3x Car rate.",
+      "routes": [
+        {
+          "sn": 1,
+          "route": "Kathmandu - Kalaiya",
+          "km_one_way": 289,
+          "km_round_trip": 578,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 13872.0,
+          "car_round_trip_usd": 106.71,
+          "luxury_4x4_suv_round_trip_npr": 41616.0,
+          "luxury_4x4_suv_round_trip_usd": 320.12
+        },
+        {
+          "sn": 2,
+          "route": "Kathmandu - Katari",
+          "km_one_way": 419,
+          "km_round_trip": 838,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 20112.0,
+          "car_round_trip_usd": 154.71,
+          "luxury_4x4_suv_round_trip_npr": 60336.0,
+          "luxury_4x4_suv_round_trip_usd": 464.12
+        },
+        {
+          "sn": 3,
+          "route": "Kathmandu - Chisapani (Karnali)",
+          "km_one_way": 575,
+          "km_round_trip": 1150,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 27600.0,
+          "car_round_trip_usd": 212.31,
+          "luxury_4x4_suv_round_trip_npr": 82800.0,
+          "luxury_4x4_suv_round_trip_usd": 636.92
+        },
+        {
+          "sn": 4,
+          "route": "Kathmandu - Kakadbhitta",
+          "km_one_way": 610,
+          "km_round_trip": 1220,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 29280.0,
+          "car_round_trip_usd": 225.23,
+          "luxury_4x4_suv_round_trip_npr": 87840.0,
+          "luxury_4x4_suv_round_trip_usd": 675.69
+        },
+        {
+          "sn": 5,
+          "route": "Kathmandu - Kumarkhoj (Jhapa)",
+          "km_one_way": 620,
+          "km_round_trip": 1240,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 29760.0,
+          "car_round_trip_usd": 228.92,
+          "luxury_4x4_suv_round_trip_npr": 89280.0,
+          "luxury_4x4_suv_round_trip_usd": 686.77
+        },
+        {
+          "sn": 6,
+          "route": "Kathmandu - Kuringhat",
+          "km_one_way": 110,
+          "km_round_trip": 220,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 5280.0,
+          "car_round_trip_usd": 40.62,
+          "luxury_4x4_suv_round_trip_npr": 15840.0,
+          "luxury_4x4_suv_round_trip_usd": 121.85
+        },
+        {
+          "sn": 7,
+          "route": "Kathmandu - Kurintar (Manakamana Cable Car)",
+          "km_one_way": 106,
+          "km_round_trip": 212,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 5088.0,
+          "car_round_trip_usd": 39.14,
+          "luxury_4x4_suv_round_trip_npr": 15264.0,
+          "luxury_4x4_suv_round_trip_usd": 117.42
+        },
+        {
+          "sn": 8,
+          "route": "Kathmandu - Kothiyaghat",
+          "km_one_way": 596,
+          "km_round_trip": 1192,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 28608.0,
+          "car_round_trip_usd": 220.06,
+          "luxury_4x4_suv_round_trip_npr": 85824.0,
+          "luxury_4x4_suv_round_trip_usd": 660.18
+        },
+        {
+          "sn": 9,
+          "route": "Kathmandu - Kodari Tatopani",
+          "km_one_way": 119,
+          "km_round_trip": 238,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 5712.0,
+          "car_round_trip_usd": 43.94,
+          "luxury_4x4_suv_round_trip_npr": 17136.0,
+          "luxury_4x4_suv_round_trip_usd": 131.82
+        },
+        {
+          "sn": 10,
+          "route": "Kathmandu - Krishnanagar",
+          "km_one_way": 365,
+          "km_round_trip": 730,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 17520.0,
+          "car_round_trip_usd": 134.77,
+          "luxury_4x4_suv_round_trip_npr": 52560.0,
+          "luxury_4x4_suv_round_trip_usd": 404.31
+        },
+        {
+          "sn": 11,
+          "route": "Kathmandu - Khopasi",
+          "km_one_way": 45,
+          "km_round_trip": 90,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 2376.0,
+          "car_round_trip_usd": 18.28,
+          "luxury_4x4_suv_round_trip_npr": 7128.0,
+          "luxury_4x4_suv_round_trip_usd": 54.83
+        },
+        {
+          "sn": 12,
+          "route": "Kathmandu - Gaighat",
+          "km_one_way": 452,
+          "km_round_trip": 904,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 21696.0,
+          "car_round_trip_usd": 166.89,
+          "luxury_4x4_suv_round_trip_npr": 65088.0,
+          "luxury_4x4_suv_round_trip_usd": 500.68
+        },
+        {
+          "sn": 13,
+          "route": "Kathmandu - Gulariya",
+          "km_one_way": 571,
+          "km_round_trip": 1142,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 27408.0,
+          "car_round_trip_usd": 210.83,
+          "luxury_4x4_suv_round_trip_npr": 82224.0,
+          "luxury_4x4_suv_round_trip_usd": 632.49
+        },
+        {
+          "sn": 14,
+          "route": "Kathmandu - Gorkha",
+          "km_one_way": 151,
+          "km_round_trip": 302,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 7248.0,
+          "car_round_trip_usd": 55.75,
+          "luxury_4x4_suv_round_trip_npr": 21744.0,
+          "luxury_4x4_suv_round_trip_usd": 167.26
+        },
+        {
+          "sn": 15,
+          "route": "Kathmandu - Gaur",
+          "km_one_way": 330,
+          "km_round_trip": 660,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 15840.0,
+          "car_round_trip_usd": 121.85,
+          "luxury_4x4_suv_round_trip_npr": 47520.0,
+          "luxury_4x4_suv_round_trip_usd": 365.54
+        },
+        {
+          "sn": 16,
+          "route": "Kathmandu - Gauringanj",
+          "km_one_way": 589,
+          "km_round_trip": 1178,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 28272.0,
+          "car_round_trip_usd": 217.48,
+          "luxury_4x4_suv_round_trip_npr": 84816.0,
+          "luxury_4x4_suv_round_trip_usd": 652.43
+        },
+        {
+          "sn": 17,
+          "route": "Kathmandu - Charikot",
+          "km_one_way": 145,
+          "km_round_trip": 290,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 6960.0,
+          "car_round_trip_usd": 53.54,
+          "luxury_4x4_suv_round_trip_npr": 20880.0,
+          "luxury_4x4_suv_round_trip_usd": 160.62
+        },
+        {
+          "sn": 18,
+          "route": "Kathmandu - Charaudi",
+          "km_one_way": 91,
+          "km_round_trip": 182,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 4804.8,
+          "car_round_trip_usd": 36.96,
+          "luxury_4x4_suv_round_trip_npr": 14414.4,
+          "luxury_4x4_suv_round_trip_usd": 110.88
+        },
+        {
+          "sn": 19,
+          "route": "Kathmandu - Chitwan",
+          "km_one_way": 145,
+          "km_round_trip": 290,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 6960.0,
+          "car_round_trip_usd": 53.54,
+          "luxury_4x4_suv_round_trip_npr": 20880.0,
+          "luxury_4x4_suv_round_trip_usd": 160.62
+        },
+        {
+          "sn": 20,
+          "route": "Kathmandu - Chitwan Island",
+          "km_one_way": 195,
+          "km_round_trip": 390,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 9360.0,
+          "car_round_trip_usd": 72.0,
+          "luxury_4x4_suv_round_trip_npr": 28080.0,
+          "luxury_4x4_suv_round_trip_usd": 216.0
+        },
+        {
+          "sn": 21,
+          "route": "Kathmandu - Chitwan - Gaighat",
+          "km_one_way": 140,
+          "km_round_trip": 280,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 6720.0,
+          "car_round_trip_usd": 51.69,
+          "luxury_4x4_suv_round_trip_npr": 20160.0,
+          "luxury_4x4_suv_round_trip_usd": 155.08
+        },
+        {
+          "sn": 22,
+          "route": "Kathmandu - Chitwan Tharu Village",
+          "km_one_way": 205,
+          "km_round_trip": 410,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 9840.0,
+          "car_round_trip_usd": 75.69,
+          "luxury_4x4_suv_round_trip_npr": 29520.0,
+          "luxury_4x4_suv_round_trip_usd": 227.08
+        },
+        {
+          "sn": 23,
+          "route": "Kathmandu - Chitwan Temple Tiger",
+          "km_one_way": 205,
+          "km_round_trip": 410,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 9840.0,
+          "car_round_trip_usd": 75.69,
+          "luxury_4x4_suv_round_trip_npr": 29520.0,
+          "luxury_4x4_suv_round_trip_usd": 227.08
+        },
+        {
+          "sn": 24,
+          "route": "Kathmandu - Chitwan Meghauli",
+          "km_one_way": 185,
+          "km_round_trip": 370,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 8880.0,
+          "car_round_trip_usd": 68.31,
+          "luxury_4x4_suv_round_trip_npr": 26640.0,
+          "luxury_4x4_suv_round_trip_usd": 204.92
+        },
+        {
+          "sn": 25,
+          "route": "Kathmandu - Chitwan (Rampur)",
+          "km_one_way": 161,
+          "km_round_trip": 322,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 7728.0,
+          "car_round_trip_usd": 59.45,
+          "luxury_4x4_suv_round_trip_npr": 23184.0,
+          "luxury_4x4_suv_round_trip_usd": 178.34
+        },
+        {
+          "sn": 26,
+          "route": "Kathmandu - Janakpur",
+          "km_one_way": 375,
+          "km_round_trip": 750,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 18000.0,
+          "car_round_trip_usd": 138.46,
+          "luxury_4x4_suv_round_trip_npr": 54000.0,
+          "luxury_4x4_suv_round_trip_usd": 415.38
+        },
+        {
+          "sn": 27,
+          "route": "Kathmandu - Jaleshwor",
+          "km_one_way": 396,
+          "km_round_trip": 792,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 19008.0,
+          "car_round_trip_usd": 146.22,
+          "luxury_4x4_suv_round_trip_npr": 57024.0,
+          "luxury_4x4_suv_round_trip_usd": 438.65
+        },
+        {
+          "sn": 28,
+          "route": "Kathmandu - Chitwan Jungle Lodge",
+          "km_one_way": 185,
+          "km_round_trip": 370,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 8880.0,
+          "car_round_trip_usd": 68.31,
+          "luxury_4x4_suv_round_trip_npr": 26640.0,
+          "luxury_4x4_suv_round_trip_usd": 204.92
+        },
+        {
+          "sn": 29,
+          "route": "Kathmandu - Jiri",
+          "km_one_way": 193,
+          "km_round_trip": 386,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 9264.0,
+          "car_round_trip_usd": 71.26,
+          "luxury_4x4_suv_round_trip_npr": 27792.0,
+          "luxury_4x4_suv_round_trip_usd": 213.78
+        },
+        {
+          "sn": 30,
+          "route": "Kathmandu - Jhapa",
+          "km_one_way": 610,
+          "km_round_trip": 1220,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 29280.0,
+          "car_round_trip_usd": 225.23,
+          "luxury_4x4_suv_round_trip_npr": 87840.0,
+          "luxury_4x4_suv_round_trip_usd": 675.69
+        },
+        {
+          "sn": 31,
+          "route": "Kathmandu - Dumre",
+          "km_one_way": 175,
+          "km_round_trip": 350,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 8400.0,
+          "car_round_trip_usd": 64.62,
+          "luxury_4x4_suv_round_trip_npr": 25200.0,
+          "luxury_4x4_suv_round_trip_usd": 193.85
+        },
+        {
+          "sn": 32,
+          "route": "Kathmandu - Tansen",
+          "km_one_way": 315,
+          "km_round_trip": 630,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 15120.0,
+          "car_round_trip_usd": 116.31,
+          "luxury_4x4_suv_round_trip_npr": 45360.0,
+          "luxury_4x4_suv_round_trip_usd": 348.92
+        },
+        {
+          "sn": 33,
+          "route": "Kathmandu - Dang",
+          "km_one_way": 445,
+          "km_round_trip": 890,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 21360.0,
+          "car_round_trip_usd": 164.31,
+          "luxury_4x4_suv_round_trip_npr": 64080.0,
+          "luxury_4x4_suv_round_trip_usd": 492.92
+        },
+        {
+          "sn": 34,
+          "route": "Kathmandu - Daman Simbhanjyang",
+          "km_one_way": 90,
+          "km_round_trip": 180,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 4752.0,
+          "car_round_trip_usd": 36.55,
+          "luxury_4x4_suv_round_trip_npr": 14256.0,
+          "luxury_4x4_suv_round_trip_usd": 109.66
+        },
+        {
+          "sn": 35,
+          "route": "Kathmandu - Dhangadhi",
+          "km_one_way": 665,
+          "km_round_trip": 1330,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 31920.0,
+          "car_round_trip_usd": 245.54,
+          "luxury_4x4_suv_round_trip_npr": 95760.0,
+          "luxury_4x4_suv_round_trip_usd": 736.62
+        },
+        {
+          "sn": 36,
+          "route": "Kathmandu - Dhangadhi - Sitagadhi - Sanfebagar",
+          "km_one_way": 904,
+          "km_round_trip": 1808,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 43392.0,
+          "car_round_trip_usd": 333.78,
+          "luxury_4x4_suv_round_trip_npr": 130176.0,
+          "luxury_4x4_suv_round_trip_usd": 1001.35
+        },
+        {
+          "sn": 37,
+          "route": "Kathmandu - Dhankuta",
+          "km_one_way": 591,
+          "km_round_trip": 1182,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 28368.0,
+          "car_round_trip_usd": 218.22,
+          "luxury_4x4_suv_round_trip_npr": 85104.0,
+          "luxury_4x4_suv_round_trip_usd": 654.65
+        },
+        {
+          "sn": 38,
+          "route": "Kathmandu - Dharan",
+          "km_one_way": 543,
+          "km_round_trip": 1086,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 26064.0,
+          "car_round_trip_usd": 200.49,
+          "luxury_4x4_suv_round_trip_npr": 78192.0,
+          "luxury_4x4_suv_round_trip_usd": 601.48
+        },
+        {
+          "sn": 39,
+          "route": "Kathmandu - Dhadingbesi",
+          "km_one_way": 92,
+          "km_round_trip": 184,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 4857.6,
+          "car_round_trip_usd": 37.37,
+          "luxury_4x4_suv_round_trip_npr": 14572.8,
+          "luxury_4x4_suv_round_trip_usd": 112.1
+        },
+        {
+          "sn": 40,
+          "route": "Kathmandu - Dhulikhel",
+          "km_one_way": 35,
+          "km_round_trip": 70,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 1848.0,
+          "car_round_trip_usd": 14.22,
+          "luxury_4x4_suv_round_trip_npr": 5544.0,
+          "luxury_4x4_suv_round_trip_usd": 42.65
+        },
+        {
+          "sn": 41,
+          "route": "Kathmandu - Dhunche",
+          "km_one_way": 130,
+          "km_round_trip": 260,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 6240.0,
+          "car_round_trip_usd": 48.0,
+          "luxury_4x4_suv_round_trip_npr": 18720.0,
+          "luxury_4x4_suv_round_trip_usd": 144.0
+        },
+        {
+          "sn": 42,
+          "route": "Kathmandu - Dhulabari - Shantinagar",
+          "km_one_way": 627,
+          "km_round_trip": 1254,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 30096.0,
+          "car_round_trip_usd": 231.51,
+          "luxury_4x4_suv_round_trip_npr": 90288.0,
+          "luxury_4x4_suv_round_trip_usd": 694.52
+        },
+        {
+          "sn": 43,
+          "route": "Kathmandu - Ghorahi - Tulsipur",
+          "km_one_way": 439,
+          "km_round_trip": 878,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 21072.0,
+          "car_round_trip_usd": 162.09,
+          "luxury_4x4_suv_round_trip_npr": 63216.0,
+          "luxury_4x4_suv_round_trip_usd": 486.28
+        },
+        {
+          "sn": 44,
+          "route": "Kathmandu - Nagarain Jatahi",
+          "km_one_way": 393,
+          "km_round_trip": 786,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 18864.0,
+          "car_round_trip_usd": 145.11,
+          "luxury_4x4_suv_round_trip_npr": 56592.0,
+          "luxury_4x4_suv_round_trip_usd": 435.32
+        },
+        {
+          "sn": 45,
+          "route": "Kathmandu - Namobuddha",
+          "km_one_way": 65,
+          "km_round_trip": 130,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 3432.0,
+          "car_round_trip_usd": 26.4,
+          "luxury_4x4_suv_round_trip_npr": 10296.0,
+          "luxury_4x4_suv_round_trip_usd": 79.2
+        },
+        {
+          "sn": 46,
+          "route": "Kathmandu - Nayapul",
+          "km_one_way": 247,
+          "km_round_trip": 494,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 11856.0,
+          "car_round_trip_usd": 91.2,
+          "luxury_4x4_suv_round_trip_npr": 35568.0,
+          "luxury_4x4_suv_round_trip_usd": 273.6
+        },
+        {
+          "sn": 47,
+          "route": "Kathmandu - Narayanghat",
+          "km_one_way": 151,
+          "km_round_trip": 302,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 7248.0,
+          "car_round_trip_usd": 55.75,
+          "luxury_4x4_suv_round_trip_npr": 21744.0,
+          "luxury_4x4_suv_round_trip_usd": 167.26
+        },
+        {
+          "sn": 48,
+          "route": "Kathmandu - Narayani Safari / Machan",
+          "km_one_way": 185,
+          "km_round_trip": 370,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 8880.0,
+          "car_round_trip_usd": 68.31,
+          "luxury_4x4_suv_round_trip_npr": 26640.0,
+          "luxury_4x4_suv_round_trip_usd": 204.92
+        },
+        {
+          "sn": 49,
+          "route": "Kathmandu - Narayanghat - Hetauda",
+          "km_one_way": 225,
+          "km_round_trip": 450,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 10800.0,
+          "car_round_trip_usd": 83.08,
+          "luxury_4x4_suv_round_trip_npr": 32400.0,
+          "luxury_4x4_suv_round_trip_usd": 249.23
+        },
+        {
+          "sn": 50,
+          "route": "Kathmandu - Nepalganj",
+          "km_one_way": 520,
+          "km_round_trip": 1040,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 24960.0,
+          "car_round_trip_usd": 192.0,
+          "luxury_4x4_suv_round_trip_npr": 74880.0,
+          "luxury_4x4_suv_round_trip_usd": 576.0
+        },
+        {
+          "sn": 51,
+          "route": "Kathmandu - Panauti",
+          "km_one_way": 41,
+          "km_round_trip": 82,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 2164.8,
+          "car_round_trip_usd": 16.65,
+          "luxury_4x4_suv_round_trip_npr": 6494.4,
+          "luxury_4x4_suv_round_trip_usd": 49.96
+        },
+        {
+          "sn": 52,
+          "route": "Kathmandu - Palanchwok Bhagawati",
+          "km_one_way": 70,
+          "km_round_trip": 140,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 3696.0,
+          "car_round_trip_usd": 28.43,
+          "luxury_4x4_suv_round_trip_npr": 11088.0,
+          "luxury_4x4_suv_round_trip_usd": 85.29
+        },
+        {
+          "sn": 53,
+          "route": "Kathmandu - Pokhara",
+          "km_one_way": 205,
+          "km_round_trip": 410,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 9840.0,
+          "car_round_trip_usd": 75.69,
+          "luxury_4x4_suv_round_trip_npr": 29520.0,
+          "luxury_4x4_suv_round_trip_usd": 227.08
+        },
+        {
+          "sn": 54,
+          "route": "Kathmandu - Pokhara - Palpa - Tansen - Lumbini - Chitwan",
+          "km_one_way": 375,
+          "km_round_trip": 750,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 18000.0,
+          "car_round_trip_usd": 138.46,
+          "luxury_4x4_suv_round_trip_npr": 54000.0,
+          "luxury_4x4_suv_round_trip_usd": 415.38
+        },
+        {
+          "sn": 55,
+          "route": "Kathmandu - Pokhara - Waling - Bhairahawa",
+          "km_one_way": 391,
+          "km_round_trip": 782,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 18768.0,
+          "car_round_trip_usd": 144.37,
+          "luxury_4x4_suv_round_trip_npr": 56304.0,
+          "luxury_4x4_suv_round_trip_usd": 433.11
+        },
+        {
+          "sn": 56,
+          "route": "Kathmandu - Fishling",
+          "km_one_way": 105,
+          "km_round_trip": 210,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 5040.0,
+          "car_round_trip_usd": 38.77,
+          "luxury_4x4_suv_round_trip_npr": 15120.0,
+          "luxury_4x4_suv_round_trip_usd": 116.31
+        },
+        {
+          "sn": 57,
+          "route": "Kathmandu - Pashupatinagar",
+          "km_one_way": 654,
+          "km_round_trip": 1308,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 31392.0,
+          "car_round_trip_usd": 241.48,
+          "luxury_4x4_suv_round_trip_npr": 94176.0,
+          "luxury_4x4_suv_round_trip_usd": 724.43
+        },
+        {
+          "sn": 58,
+          "route": "Kathmandu - Fattepur",
+          "km_one_way": 480,
+          "km_round_trip": 960,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 23040.0,
+          "car_round_trip_usd": 177.23,
+          "luxury_4x4_suv_round_trip_npr": 69120.0,
+          "luxury_4x4_suv_round_trip_usd": 531.69
+        },
+        {
+          "sn": 59,
+          "route": "Kathmandu - Baniyani",
+          "km_one_way": 630,
+          "km_round_trip": 1260,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 30240.0,
+          "car_round_trip_usd": 232.62,
+          "luxury_4x4_suv_round_trip_npr": 90720.0,
+          "luxury_4x4_suv_round_trip_usd": 697.85
+        },
+        {
+          "sn": 60,
+          "route": "Kathmandu - Bardiya",
+          "km_one_way": 580,
+          "km_round_trip": 1160,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 27840.0,
+          "car_round_trip_usd": 214.15,
+          "luxury_4x4_suv_round_trip_npr": 83520.0,
+          "luxury_4x4_suv_round_trip_usd": 642.46
+        },
+        {
+          "sn": 61,
+          "route": "Kathmandu - Bandipur",
+          "km_one_way": 160,
+          "km_round_trip": 320,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 7680.0,
+          "car_round_trip_usd": 59.08,
+          "luxury_4x4_suv_round_trip_npr": 23040.0,
+          "luxury_4x4_suv_round_trip_usd": 177.23
+        },
+        {
+          "sn": 62,
+          "route": "Kathmandu - Barahathawa",
+          "km_one_way": 428,
+          "km_round_trip": 856,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 20544.0,
+          "car_round_trip_usd": 158.03,
+          "luxury_4x4_suv_round_trip_npr": 61632.0,
+          "luxury_4x4_suv_round_trip_usd": 474.09
+        },
+        {
+          "sn": 63,
+          "route": "Kathmandu - Baglung",
+          "km_one_way": 279,
+          "km_round_trip": 558,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 13392.0,
+          "car_round_trip_usd": 103.02,
+          "luxury_4x4_suv_round_trip_npr": 40176.0,
+          "luxury_4x4_suv_round_trip_usd": 309.05
+        },
+        {
+          "sn": 64,
+          "route": "Kathmandu - Bahundangi",
+          "km_one_way": 623,
+          "km_round_trip": 1246,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 29904.0,
+          "car_round_trip_usd": 230.03,
+          "luxury_4x4_suv_round_trip_npr": 89712.0,
+          "luxury_4x4_suv_round_trip_usd": 690.09
+        },
+        {
+          "sn": 65,
+          "route": "Kathmandu - Barhabise",
+          "km_one_way": 93,
+          "km_round_trip": 186,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 4910.4,
+          "car_round_trip_usd": 37.77,
+          "luxury_4x4_suv_round_trip_npr": 14731.2,
+          "luxury_4x4_suv_round_trip_usd": 113.32
+        },
+        {
+          "sn": 66,
+          "route": "Kathmandu - Beni",
+          "km_one_way": 287,
+          "km_round_trip": 574,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 13776.0,
+          "car_round_trip_usd": 105.97,
+          "luxury_4x4_suv_round_trip_npr": 41328.0,
+          "luxury_4x4_suv_round_trip_usd": 317.91
+        },
+        {
+          "sn": 67,
+          "route": "Kathmandu - Besishahar",
+          "km_one_way": 380,
+          "km_round_trip": 760,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 18240.0,
+          "car_round_trip_usd": 140.31,
+          "luxury_4x4_suv_round_trip_npr": 54720.0,
+          "luxury_4x4_suv_round_trip_usd": 420.92
+        },
+        {
+          "sn": 68,
+          "route": "Kathmandu - Butwal",
+          "km_one_way": 271,
+          "km_round_trip": 542,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 13008.0,
+          "car_round_trip_usd": 100.06,
+          "luxury_4x4_suv_round_trip_npr": 39024.0,
+          "luxury_4x4_suv_round_trip_usd": 300.18
+        },
+        {
+          "sn": 69,
+          "route": "Kathmandu - Borderland Resort",
+          "km_one_way": 105,
+          "km_round_trip": 210,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 5040.0,
+          "car_round_trip_usd": 38.77,
+          "luxury_4x4_suv_round_trip_npr": 15120.0,
+          "luxury_4x4_suv_round_trip_usd": 116.31
+        },
+        {
+          "sn": 70,
+          "route": "Kathmandu - Bhagwanpur",
+          "km_one_way": 438,
+          "km_round_trip": 876,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 21024.0,
+          "car_round_trip_usd": 161.72,
+          "luxury_4x4_suv_round_trip_npr": 63072.0,
+          "luxury_4x4_suv_round_trip_usd": 485.17
+        },
+        {
+          "sn": 71,
+          "route": "Kathmandu - Bhairahawa",
+          "km_one_way": 287,
+          "km_round_trip": 574,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 13776.0,
+          "car_round_trip_usd": 105.97,
+          "luxury_4x4_suv_round_trip_npr": 41328.0,
+          "luxury_4x4_suv_round_trip_usd": 317.91
+        },
+        {
+          "sn": 72,
+          "route": "Kathmandu - Bhairahawa - Lumbini - Taulihawa",
+          "km_one_way": 333,
+          "km_round_trip": 666,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 15984.0,
+          "car_round_trip_usd": 122.95,
+          "luxury_4x4_suv_round_trip_npr": 47952.0,
+          "luxury_4x4_suv_round_trip_usd": 368.86
+        },
+        {
+          "sn": 73,
+          "route": "Kathmandu - Bhairahawa - Sunauli",
+          "km_one_way": 300,
+          "km_round_trip": 600,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 14400.0,
+          "car_round_trip_usd": 110.77,
+          "luxury_4x4_suv_round_trip_npr": 43200.0,
+          "luxury_4x4_suv_round_trip_usd": 332.31
+        },
+        {
+          "sn": 74,
+          "route": "Kathmandu - Bhaluwang Pyuthan",
+          "km_one_way": 430,
+          "km_round_trip": 860,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 20640.0,
+          "car_round_trip_usd": 158.77,
+          "luxury_4x4_suv_round_trip_npr": 61920.0,
+          "luxury_4x4_suv_round_trip_usd": 476.31
+        },
+        {
+          "sn": 75,
+          "route": "Kathmandu - Madhumallah Morang",
+          "km_one_way": 573,
+          "km_round_trip": 1146,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 27504.0,
+          "car_round_trip_usd": 211.57,
+          "luxury_4x4_suv_round_trip_npr": 82512.0,
+          "luxury_4x4_suv_round_trip_usd": 634.71
+        },
+        {
+          "sn": 76,
+          "route": "Kathmandu - Matihani",
+          "km_one_way": 405,
+          "km_round_trip": 810,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 19440.0,
+          "car_round_trip_usd": 149.54,
+          "luxury_4x4_suv_round_trip_npr": 58320.0,
+          "luxury_4x4_suv_round_trip_usd": 448.62
+        },
+        {
+          "sn": 77,
+          "route": "Kathmandu - Malangawa",
+          "km_one_way": 341,
+          "km_round_trip": 682,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 16368.0,
+          "car_round_trip_usd": 125.91,
+          "luxury_4x4_suv_round_trip_npr": 49104.0,
+          "luxury_4x4_suv_round_trip_usd": 377.72
+        },
+        {
+          "sn": 78,
+          "route": "Kathmandu - Mahendranagar",
+          "km_one_way": 710,
+          "km_round_trip": 1420,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 34080.0,
+          "car_round_trip_usd": 262.15,
+          "luxury_4x4_suv_round_trip_npr": 102240.0,
+          "luxury_4x4_suv_round_trip_usd": 786.46
+        },
+        {
+          "sn": 79,
+          "route": "Kathmandu - Mahottari",
+          "km_one_way": 368,
+          "km_round_trip": 736,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 17664.0,
+          "car_round_trip_usd": 135.88,
+          "luxury_4x4_suv_round_trip_npr": 52992.0,
+          "luxury_4x4_suv_round_trip_usd": 407.63
+        },
+        {
+          "sn": 80,
+          "route": "Kathmandu - Melamchi",
+          "km_one_way": 80,
+          "km_round_trip": 160,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 4224.0,
+          "car_round_trip_usd": 32.49,
+          "luxury_4x4_suv_round_trip_npr": 12672.0,
+          "luxury_4x4_suv_round_trip_usd": 97.48
+        },
+        {
+          "sn": 81,
+          "route": "Kathmandu - Mugling",
+          "km_one_way": 12,
+          "km_round_trip": 24,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 633.6,
+          "car_round_trip_usd": 4.87,
+          "luxury_4x4_suv_round_trip_npr": 1900.8,
+          "luxury_4x4_suv_round_trip_usd": 14.62
+        },
+        {
+          "sn": 82,
+          "route": "Kathmandu - Ilam - Ranke",
+          "km_one_way": 642,
+          "km_round_trip": 1284,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 30816.0,
+          "car_round_trip_usd": 237.05,
+          "luxury_4x4_suv_round_trip_npr": 92448.0,
+          "luxury_4x4_suv_round_trip_usd": 711.14
+        },
+        {
+          "sn": 83,
+          "route": "Kathmandu - Raghunathpur Dhanusa",
+          "km_one_way": 390,
+          "km_round_trip": 780,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 18720.0,
+          "car_round_trip_usd": 144.0,
+          "luxury_4x4_suv_round_trip_npr": 56160.0,
+          "luxury_4x4_suv_round_trip_usd": 432.0
+        },
+        {
+          "sn": 84,
+          "route": "Kathmandu - Rajgadha",
+          "km_one_way": 611,
+          "km_round_trip": 1222,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 29328.0,
+          "car_round_trip_usd": 225.6,
+          "luxury_4x4_suv_round_trip_npr": 87984.0,
+          "luxury_4x4_suv_round_trip_usd": 676.8
+        },
+        {
+          "sn": 85,
+          "route": "Kathmandu - Rupani Rajbiraj",
+          "km_one_way": 455,
+          "km_round_trip": 910,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 21840.0,
+          "car_round_trip_usd": 168.0,
+          "luxury_4x4_suv_round_trip_npr": 65520.0,
+          "luxury_4x4_suv_round_trip_usd": 504.0
+        },
+        {
+          "sn": 86,
+          "route": "Kathmandu - Lahan",
+          "km_one_way": 435,
+          "km_round_trip": 870,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 20880.0,
+          "car_round_trip_usd": 160.62,
+          "luxury_4x4_suv_round_trip_npr": 62640.0,
+          "luxury_4x4_suv_round_trip_usd": 481.85
+        },
+        {
+          "sn": 87,
+          "route": "Kathmandu - Letang Morang",
+          "km_one_way": 554,
+          "km_round_trip": 1108,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 26592.0,
+          "car_round_trip_usd": 204.55,
+          "luxury_4x4_suv_round_trip_npr": 79776.0,
+          "luxury_4x4_suv_round_trip_usd": 613.66
+        },
+        {
+          "sn": 88,
+          "route": "Kathmandu - Lumbini",
+          "km_one_way": 315,
+          "km_round_trip": 630,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 15120.0,
+          "car_round_trip_usd": 116.31,
+          "luxury_4x4_suv_round_trip_npr": 45360.0,
+          "luxury_4x4_suv_round_trip_usd": 348.92
+        },
+        {
+          "sn": 89,
+          "route": "Kathmandu - Bayalbas Sagarnath",
+          "km_one_way": 340,
+          "km_round_trip": 680,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 16320.0,
+          "car_round_trip_usd": 125.54,
+          "luxury_4x4_suv_round_trip_npr": 48960.0,
+          "luxury_4x4_suv_round_trip_usd": 376.62
+        },
+        {
+          "sn": 90,
+          "route": "Kathmandu - Wariyarpatti",
+          "km_one_way": 435,
+          "km_round_trip": 870,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 20880.0,
+          "car_round_trip_usd": 160.62,
+          "luxury_4x4_suv_round_trip_npr": 62640.0,
+          "luxury_4x4_suv_round_trip_usd": 481.85
+        },
+        {
+          "sn": 91,
+          "route": "Kathmandu - Waling",
+          "km_one_way": 270,
+          "km_round_trip": 540,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 12960.0,
+          "car_round_trip_usd": 99.69,
+          "luxury_4x4_suv_round_trip_npr": 38880.0,
+          "luxury_4x4_suv_round_trip_usd": 299.08
+        },
+        {
+          "sn": 92,
+          "route": "Kathmandu - Birtabazaar",
+          "km_one_way": 600,
+          "km_round_trip": 1200,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 28800.0,
+          "car_round_trip_usd": 221.54,
+          "luxury_4x4_suv_round_trip_npr": 86400.0,
+          "luxury_4x4_suv_round_trip_usd": 664.62
+        },
+        {
+          "sn": 93,
+          "route": "Kathmandu - Birganj",
+          "km_one_way": 275,
+          "km_round_trip": 550,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 13200.0,
+          "car_round_trip_usd": 101.54,
+          "luxury_4x4_suv_round_trip_npr": 39600.0,
+          "luxury_4x4_suv_round_trip_usd": 304.62
+        },
+        {
+          "sn": 94,
+          "route": "Kathmandu - Biratnagar",
+          "km_one_way": 546,
+          "km_round_trip": 1092,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 26208.0,
+          "car_round_trip_usd": 201.6,
+          "luxury_4x4_suv_round_trip_npr": 78624.0,
+          "luxury_4x4_suv_round_trip_usd": 604.8
+        },
+        {
+          "sn": 95,
+          "route": "Kathmandu - Biratnagar - Katahari",
+          "km_one_way": 550,
+          "km_round_trip": 1100,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 26400.0,
+          "car_round_trip_usd": 203.08,
+          "luxury_4x4_suv_round_trip_npr": 79200.0,
+          "luxury_4x4_suv_round_trip_usd": 609.23
+        },
+        {
+          "sn": 96,
+          "route": "Kathmandu - Budhabare",
+          "km_one_way": 612,
+          "km_round_trip": 1224,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 29376.0,
+          "car_round_trip_usd": 225.97,
+          "luxury_4x4_suv_round_trip_npr": 88128.0,
+          "luxury_4x4_suv_round_trip_usd": 677.91
+        },
+        {
+          "sn": 97,
+          "route": "Kathmandu - Shivaganj",
+          "km_one_way": 559,
+          "km_round_trip": 1118,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 26832.0,
+          "car_round_trip_usd": 206.4,
+          "luxury_4x4_suv_round_trip_npr": 80496.0,
+          "luxury_4x4_suv_round_trip_usd": 619.2
+        },
+        {
+          "sn": 98,
+          "route": "Kathmandu - Shanischare",
+          "km_one_way": 605,
+          "km_round_trip": 1210,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 29040.0,
+          "car_round_trip_usd": 223.38,
+          "luxury_4x4_suv_round_trip_npr": 87120.0,
+          "luxury_4x4_suv_round_trip_usd": 670.15
+        },
+        {
+          "sn": 99,
+          "route": "Kathmandu - Syangja",
+          "km_one_way": 272,
+          "km_round_trip": 544,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 13056.0,
+          "car_round_trip_usd": 100.43,
+          "luxury_4x4_suv_round_trip_npr": 39168.0,
+          "luxury_4x4_suv_round_trip_usd": 301.29
+        },
+        {
+          "sn": 100,
+          "route": "Kathmandu - Syabrubenshi",
+          "km_one_way": 150,
+          "km_round_trip": 300,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 7200.0,
+          "car_round_trip_usd": 55.38,
+          "luxury_4x4_suv_round_trip_npr": 21600.0,
+          "luxury_4x4_suv_round_trip_usd": 166.15
+        },
+        {
+          "sn": 101,
+          "route": "Kathmandu - Sindhuli",
+          "km_one_way": 366,
+          "km_round_trip": 732,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 17568.0,
+          "car_round_trip_usd": 135.14,
+          "luxury_4x4_suv_round_trip_npr": 52704.0,
+          "luxury_4x4_suv_round_trip_usd": 405.42
+        },
+        {
+          "sn": 102,
+          "route": "Kathmandu - Siraha",
+          "km_one_way": 415,
+          "km_round_trip": 830,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 19920.0,
+          "car_round_trip_usd": 153.23,
+          "luxury_4x4_suv_round_trip_npr": 59760.0,
+          "luxury_4x4_suv_round_trip_usd": 459.69
+        },
+        {
+          "sn": 103,
+          "route": "Kathmandu - Surkhet",
+          "km_one_way": 605,
+          "km_round_trip": 1210,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 29040.0,
+          "car_round_trip_usd": 223.38,
+          "luxury_4x4_suv_round_trip_npr": 87120.0,
+          "luxury_4x4_suv_round_trip_usd": 670.15
+        },
+        {
+          "sn": 104,
+          "route": "Kathmandu - Trishuli",
+          "km_one_way": 74,
+          "km_round_trip": 148,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 3907.2,
+          "car_round_trip_usd": 30.06,
+          "luxury_4x4_suv_round_trip_npr": 11721.6,
+          "luxury_4x4_suv_round_trip_usd": 90.17
+        },
+        {
+          "sn": 105,
+          "route": "Kathmandu - Attariya - Dadeldhura Baitadi",
+          "km_one_way": 869,
+          "km_round_trip": 1738,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 41712.0,
+          "car_round_trip_usd": 320.86,
+          "luxury_4x4_suv_round_trip_npr": 125136.0,
+          "luxury_4x4_suv_round_trip_usd": 962.58
+        },
+        {
+          "sn": 106,
+          "route": "Kathmandu - Ilam Phidim",
+          "km_one_way": 749,
+          "km_round_trip": 1498,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 35952.0,
+          "car_round_trip_usd": 276.55,
+          "luxury_4x4_suv_round_trip_npr": 107856.0,
+          "luxury_4x4_suv_round_trip_usd": 829.66
+        },
+        {
+          "sn": 107,
+          "route": "Kathmandu - Urlabari Durgapur",
+          "km_one_way": 567,
+          "km_round_trip": 1134,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 27216.0,
+          "car_round_trip_usd": 209.35,
+          "luxury_4x4_suv_round_trip_npr": 81648.0,
+          "luxury_4x4_suv_round_trip_usd": 628.06
+        },
+        {
+          "sn": 108,
+          "route": "Mugling - Pokhara",
+          "km_one_way": 190,
+          "km_round_trip": 380,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 9120.0,
+          "car_round_trip_usd": 70.15,
+          "luxury_4x4_suv_round_trip_npr": 27360.0,
+          "luxury_4x4_suv_round_trip_usd": 210.46
+        },
+        {
+          "sn": 109,
+          "route": "Dhankuta - Hile",
+          "km_one_way": 20,
+          "km_round_trip": 40,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 1056.0,
+          "car_round_trip_usd": 8.12,
+          "luxury_4x4_suv_round_trip_npr": 3168.0,
+          "luxury_4x4_suv_round_trip_usd": 24.37
+        },
+        {
+          "sn": 110,
+          "route": "Narayangarh - Kawasoti Bazaar",
+          "km_one_way": 41,
+          "km_round_trip": 82,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 2164.8,
+          "car_round_trip_usd": 16.65,
+          "luxury_4x4_suv_round_trip_npr": 6494.4,
+          "luxury_4x4_suv_round_trip_usd": 49.96
+        },
+        {
+          "sn": 111,
+          "route": "Narayangadh - Krishnanagar",
+          "km_one_way": 204,
+          "km_round_trip": 408,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 9792.0,
+          "car_round_trip_usd": 75.32,
+          "luxury_4x4_suv_round_trip_npr": 29376.0,
+          "luxury_4x4_suv_round_trip_usd": 225.97
+        },
+        {
+          "sn": 112,
+          "route": "Narayangadh - Gorkha",
+          "km_one_way": 72,
+          "km_round_trip": 144,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 3801.6,
+          "car_round_trip_usd": 29.24,
+          "luxury_4x4_suv_round_trip_npr": 11404.8,
+          "luxury_4x4_suv_round_trip_usd": 87.73
+        },
+        {
+          "sn": 113,
+          "route": "Narayangarh - Bhairahawa",
+          "km_one_way": 145,
+          "km_round_trip": 290,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 6960.0,
+          "car_round_trip_usd": 53.54,
+          "luxury_4x4_suv_round_trip_npr": 20880.0,
+          "luxury_4x4_suv_round_trip_usd": 160.62
+        },
+        {
+          "sn": 114,
+          "route": "Pokhara - Krishnanagar",
+          "km_one_way": 248,
+          "km_round_trip": 496,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 11904.0,
+          "car_round_trip_usd": 91.57,
+          "luxury_4x4_suv_round_trip_npr": 35712.0,
+          "luxury_4x4_suv_round_trip_usd": 274.71
+        },
+        {
+          "sn": 115,
+          "route": "Pokhara - Gaur",
+          "km_one_way": 318,
+          "km_round_trip": 636,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 15264.0,
+          "car_round_trip_usd": 117.42,
+          "luxury_4x4_suv_round_trip_npr": 45792.0,
+          "luxury_4x4_suv_round_trip_usd": 352.25
+        },
+        {
+          "sn": 116,
+          "route": "Pokhara - Gorkha",
+          "km_one_way": 115,
+          "km_round_trip": 230,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 5520.0,
+          "car_round_trip_usd": 42.46,
+          "luxury_4x4_suv_round_trip_npr": 16560.0,
+          "luxury_4x4_suv_round_trip_usd": 127.38
+        },
+        {
+          "sn": 117,
+          "route": "Pokhara - Janakpur",
+          "km_one_way": 368,
+          "km_round_trip": 736,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 17664.0,
+          "car_round_trip_usd": 135.88,
+          "luxury_4x4_suv_round_trip_npr": 52992.0,
+          "luxury_4x4_suv_round_trip_usd": 407.63
+        },
+        {
+          "sn": 118,
+          "route": "Pokhara - Bhairahawa - Sunauli",
+          "km_one_way": 189,
+          "km_round_trip": 378,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 9072.0,
+          "car_round_trip_usd": 69.78,
+          "luxury_4x4_suv_round_trip_npr": 27216.0,
+          "luxury_4x4_suv_round_trip_usd": 209.35
+        },
+        {
+          "sn": 119,
+          "route": "Pokhara - Narayangadh - Bhairahawa",
+          "km_one_way": 273,
+          "km_round_trip": 546,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 13104.0,
+          "car_round_trip_usd": 100.8,
+          "luxury_4x4_suv_round_trip_npr": 39312.0,
+          "luxury_4x4_suv_round_trip_usd": 302.4
+        },
+        {
+          "sn": 120,
+          "route": "Pokhara - Narayangadh - Dhangadhi",
+          "km_one_way": 675,
+          "km_round_trip": 1350,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 32400.0,
+          "car_round_trip_usd": 249.23,
+          "luxury_4x4_suv_round_trip_npr": 97200.0,
+          "luxury_4x4_suv_round_trip_usd": 747.69
+        },
+        {
+          "sn": 121,
+          "route": "Pokhara - Nepalganj - Kothiyaghat",
+          "km_one_way": 494,
+          "km_round_trip": 988,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 23712.0,
+          "car_round_trip_usd": 182.4,
+          "luxury_4x4_suv_round_trip_npr": 71136.0,
+          "luxury_4x4_suv_round_trip_usd": 547.2
+        },
+        {
+          "sn": 122,
+          "route": "Pokhara - Butwal",
+          "km_one_way": 163,
+          "km_round_trip": 326,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 7824.0,
+          "car_round_trip_usd": 60.18,
+          "luxury_4x4_suv_round_trip_npr": 23472.0,
+          "luxury_4x4_suv_round_trip_usd": 180.55
+        },
+        {
+          "sn": 123,
+          "route": "Pokhara - Besishahar (Dumre)",
+          "km_one_way": 111,
+          "km_round_trip": 222,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 5328.0,
+          "car_round_trip_usd": 40.98,
+          "luxury_4x4_suv_round_trip_npr": 15984.0,
+          "luxury_4x4_suv_round_trip_usd": 122.95
+        },
+        {
+          "sn": 124,
+          "route": "Pokhara - Waling - Tulsipur",
+          "km_one_way": 335,
+          "km_round_trip": 670,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 16080.0,
+          "car_round_trip_usd": 123.69,
+          "luxury_4x4_suv_round_trip_npr": 48240.0,
+          "luxury_4x4_suv_round_trip_usd": 371.08
+        },
+        {
+          "sn": 125,
+          "route": "Pokhara - Baglung",
+          "km_one_way": 77,
+          "km_round_trip": 154,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 4065.6,
+          "car_round_trip_usd": 31.27,
+          "luxury_4x4_suv_round_trip_npr": 12196.8,
+          "luxury_4x4_suv_round_trip_usd": 93.82
+        },
+        {
+          "sn": 126,
+          "route": "Pokhara - Syangja - Bhairahawa - Lumbini",
+          "km_one_way": 211,
+          "km_round_trip": 422,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 10128.0,
+          "car_round_trip_usd": 77.91,
+          "luxury_4x4_suv_round_trip_npr": 30384.0,
+          "luxury_4x4_suv_round_trip_usd": 233.72
+        },
+        {
+          "sn": 127,
+          "route": "Pokhara - Syangja - Dhangadhi",
+          "km_one_way": 591,
+          "km_round_trip": 1182,
+          "car_rate_per_km_npr": 24.0,
+          "car_round_trip_npr": 28368.0,
+          "car_round_trip_usd": 218.22,
+          "luxury_4x4_suv_round_trip_npr": 85104.0,
+          "luxury_4x4_suv_round_trip_usd": 654.65
+        },
+        {
+          "sn": 128,
+          "route": "Lumbini - Tilaurakot",
+          "km_one_way": 50,
+          "km_round_trip": 100,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 2640.0,
+          "car_round_trip_usd": 20.31,
+          "luxury_4x4_suv_round_trip_npr": 7920.0,
+          "luxury_4x4_suv_round_trip_usd": 60.92
+        },
+        {
+          "sn": 129,
+          "route": "Abu Khaireni - Gorkha",
+          "km_one_way": 13,
+          "km_round_trip": 26,
+          "car_rate_per_km_npr": 26.4,
+          "car_round_trip_npr": 686.4,
+          "car_round_trip_usd": 5.28,
+          "luxury_4x4_suv_round_trip_npr": 2059.2,
+          "luxury_4x4_suv_round_trip_usd": 15.84
+        }
+      ]
+    }
+  ],
+  "surcharges": {
+    "ac_included": {
+      "description": "20% A/C surcharge already included in all rates",
+      "applied": true
+    },
+    "night_charge": {
+      "description": "After 8:00 PM - 50% extra (NOT included, apply if needed)",
+      "multiplier": 1.5,
+      "applied": false
+    },
+    "rough_road": {
+      "description": "Gully, gravel and hilly road - 25% extra (NOT included, apply if needed)",
+      "multiplier": 1.25,
+      "applied": false
+    },
+    "cancellation": {
+      "description": "Cancellation of booked trip",
+      "multiplier": 0.25,
+      "note": "25% of trip cost"
+    }
+  }
+}

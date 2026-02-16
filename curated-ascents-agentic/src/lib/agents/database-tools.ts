@@ -103,11 +103,12 @@ export async function searchRates(params: {
             eq(transportation.isActive, true),
             destination ? or(
               ilike(transportation.routeFrom, `%${destination}%`),
-              ilike(transportation.routeTo, `%${destination}%`)
+              ilike(transportation.routeTo, `%${destination}%`),
+              ilike(transportation.routeDescription, `%${destination}%`)
             ) : undefined
           )
         )
-        .limit(10);
+        .limit(20);
 
       results.push(...transportResults.map(r => ({
         id: r.id,
@@ -118,9 +119,11 @@ export async function searchRates(params: {
         capacity: r.capacity,
         routeFrom: r.routeFrom,
         routeTo: r.routeTo,
+        routeDescription: r.routeDescription,
         distanceKm: r.distanceKm,
         durationHours: r.durationHours,
         destination: `${r.routeFrom} → ${r.routeTo}`,
+        notes: r.notes,
         inclusions: r.inclusions,
         exclusions: r.exclusions,
       })));
