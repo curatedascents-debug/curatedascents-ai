@@ -656,6 +656,7 @@ export const miscellaneousServices = pgTable('miscellaneous_services', {
 
 export const packages = pgTable('packages', {
   id: serial('id').primaryKey(),
+  slug: text('slug').unique(),
   supplierId: integer('supplier_id').references(() => suppliers.id),
   name: text('name').notNull(),
   packageType: text('package_type').notNull(),

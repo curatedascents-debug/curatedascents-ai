@@ -87,12 +87,16 @@ export const TOOL_DEFINITIONS = [
     type: "function",
     function: {
       name: "search_packages",
-      description: `Search for travel packages including treks, tours, and expeditions.
-      
-      IMPORTANT: If specific package not found, provide approximate pricing based on similar packages.`,
+      description: `Search for curated travel packages, treks, tours, and expeditions. Returns day-by-day itineraries when available.
+
+      IMPORTANT: Always search packages FIRST before building from individual components. If a curated itinerary is found, present the day-by-day plan. Use calculate_quote with serviceType 'package' and the package serviceId for pricing.`,
       parameters: {
         type: "object",
         properties: {
+          destination: {
+            type: "string",
+            description: "Destination text search — matches country, region, or package name (e.g., 'Nepal', 'Bhutan', 'Ladakh', 'Everest')",
+          },
           packageType: {
             type: "string",
             enum: [

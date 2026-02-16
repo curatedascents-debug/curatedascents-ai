@@ -233,9 +233,11 @@ export async function GET() {
     ).returning();
     console.log(`Inserted ${insertedMisc.length} miscellaneous services`);
 
-    // 13. Seed Packages
-    const insertedPackages = await db.insert(packages).values(
-      samplePackages.map(p => ({
+    // 13. Seed Packages (upsert on slug)
+    let packageCount = 0;
+    for (const p of samplePackages) {
+      await db.insert(packages).values({
+        slug: (p as any).slug,
         name: p.name,
         packageType: p.packageType,
         country: p.country,
@@ -247,16 +249,42 @@ export async function GET() {
         groupSizeMin: p.groupSizeMin,
         groupSizeMax: p.groupSizeMax,
         itinerarySummary: p.itinerarySummary,
+        itineraryDetailed: (p as any).itineraryDetailed,
         costPrice: p.costPrice?.toString(),
         sellPrice: p.sellPrice?.toString(),
         singleSupplement: p.singleSupplement?.toString(),
         inclusions: p.inclusions,
         exclusions: p.exclusions,
         isFixedDeparture: p.isFixedDeparture,
-        departureDates: p.departureDates,
-      }))
-    ).returning();
-    console.log(`Inserted ${insertedPackages.length} packages`);
+        departureDates: (p as any).departureDates,
+      }).onConflictDoUpdate({
+        target: packages.slug,
+        set: {
+          name: p.name,
+          packageType: p.packageType,
+          country: p.country,
+          region: p.region,
+          durationDays: p.durationDays,
+          durationNights: p.durationNights,
+          difficulty: p.difficulty,
+          maxAltitude: p.maxAltitude,
+          groupSizeMin: p.groupSizeMin,
+          groupSizeMax: p.groupSizeMax,
+          itinerarySummary: p.itinerarySummary,
+          itineraryDetailed: (p as any).itineraryDetailed,
+          costPrice: p.costPrice?.toString(),
+          sellPrice: p.sellPrice?.toString(),
+          singleSupplement: p.singleSupplement?.toString(),
+          inclusions: p.inclusions,
+          exclusions: p.exclusions,
+          isFixedDeparture: p.isFixedDeparture,
+          departureDates: (p as any).departureDates,
+          updatedAt: new Date(),
+        },
+      });
+      packageCount++;
+    }
+    console.log(`Upserted ${packageCount} packages`);
 
     // 14. Seed Blog Categories
     const blogCategoryData = [
@@ -488,7 +516,7 @@ export async function GET() {
         helicopterCharter: insertedHeliCharter.length,
         permitsFees: insertedPermits.length,
         miscellaneousServices: insertedMisc.length,
-        packages: insertedPackages.length,
+        packages: packageCount,
         blogCategories: insertedBlogCategories.length,
         blogPosts: insertedBlogPosts.length,
       },
@@ -496,7 +524,7 @@ export async function GET() {
              insertedRates.length + insertedTransport.length + insertedGuides.length +
              insertedPorters.length + insertedFlights.length + insertedHeliSharing.length +
              insertedHeliCharter.length + insertedPermits.length + insertedMisc.length +
-             insertedPackages.length + insertedBlogCategories.length + insertedBlogPosts.length,
+             packageCount + insertedBlogCategories.length + insertedBlogPosts.length,
     };
 
     return NextResponse.json(summary);

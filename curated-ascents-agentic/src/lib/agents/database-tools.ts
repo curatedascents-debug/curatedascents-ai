@@ -323,9 +323,13 @@ export async function searchRates(params: {
         groupSizeMin: r.groupSizeMin,
         groupSizeMax: r.groupSizeMax,
         itinerarySummary: r.itinerarySummary,
+        itineraryDetailed: r.itineraryDetailed,
+        isFixedDeparture: r.isFixedDeparture,
+        departureDates: r.departureDates,
         inclusions: r.inclusions,
         exclusions: r.exclusions,
         destination: r.region || r.country,
+        pricingNote: `Use calculate_quote with serviceType 'package' and serviceId ${r.id} to get pricing`,
       })));
     }
 
