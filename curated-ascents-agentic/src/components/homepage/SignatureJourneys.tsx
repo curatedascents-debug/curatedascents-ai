@@ -30,22 +30,22 @@ const journeys = [
   },
   {
     id: "india",
-    title: "Palace & Tiger",
-    subtitle: "12 Days — Rajasthan & Ranthambore",
+    title: "Himalayan Explorer",
+    subtitle: "12 Days — Delhi to Ladakh",
     description:
-      "Heritage palace hotels, private tiger safaris, Ayurvedic wellness, and the Golden Triangle with a personal historian guide.",
+      "From the spiritual Ganges to the high passes of Ladakh. Ashram yoga in Rishikesh, ancient Buddhist monasteries, and the turquoise expanse of Pangong Lake.",
     price: "From $3,800 per person",
     itinerarySlug: "12-day-india-himalayan-explorer",
     image: "/uploads/media/india/landscape/udaipur-rajasthan-india-17d99ac2.webp",
-    alt: "Udaipur Lake Palace in Rajasthan, India",
+    alt: "Mountain landscape in the Indian Himalayas",
     country: "India",
   },
   {
     id: "tibet",
     title: "Roof of the World",
-    subtitle: "12 Days — Tibet & Nepal",
+    subtitle: "8 Days — Tibet",
     description:
-      "Lhasa to Everest North Face. Ancient monasteries, high-altitude passes, and the journey of a lifetime along the Friendship Highway.",
+      "Lhasa to Everest North Face. The Potala Palace, sacred monasteries, high-altitude passes, and the journey of a lifetime across the Tibetan Plateau.",
     price: "From $5,500 per person",
     itinerarySlug: "8-day-tibet-sacred-lands",
     image: "/uploads/media/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
