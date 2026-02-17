@@ -19,7 +19,7 @@ export default function FounderSection() {
           <AnimateOnScroll direction="left" className="lg:col-span-2">
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-luxury-gold/20">
               <Image
-                src="/uploads/media/nepal/landscape/everest-region-everest-view-hotel-eed54c67.webp"
+                src="/uploads/media/nepal/people/kiran_pokhrel_photo_formal-caec398d.webp"
                 alt="Kiran Pokhrel — Founder of CuratedAscents"
                 fill
                 priority
