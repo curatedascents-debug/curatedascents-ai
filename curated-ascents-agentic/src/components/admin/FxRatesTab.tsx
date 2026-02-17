@@ -299,7 +299,6 @@ export default function FxRatesTab() {
                 <tr className="bg-slate-800 text-left">
                   <th className="px-4 py-3 text-slate-300 font-medium">Code</th>
                   <th className="px-4 py-3 text-slate-300 font-medium">Name</th>
-                  <th className="px-4 py-3 text-slate-300 font-medium">Sort Order</th>
                 </tr>
               </thead>
               <tbody>
@@ -307,12 +306,11 @@ export default function FxRatesTab() {
                   <tr key={c.id} className="border-t border-slate-700 hover:bg-slate-800/50">
                     <td className="px-4 py-3 text-white font-medium font-mono">{c.code}</td>
                     <td className="px-4 py-3 text-slate-300">{c.name}</td>
-                    <td className="px-4 py-3 text-slate-400">{c.sortOrder}</td>
                   </tr>
                 ))}
                 {currencies.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="px-4 py-8 text-center text-slate-500">
+                    <td colSpan={2} className="px-4 py-8 text-center text-slate-500">
                       No currencies configured. Refresh rates to seed currencies.
                     </td>
                   </tr>
