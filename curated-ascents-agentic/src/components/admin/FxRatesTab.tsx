@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { RefreshCw, TrendingUp, DollarSign, Globe } from "lucide-react";
+import { useState, useEffect, Fragment } from "react";
+import { RefreshCw, TrendingUp, DollarSign, Globe, ChevronDown, ChevronRight } from "lucide-react";
 
 type SubTab = "daily" | "historical" | "currencies";
 
@@ -30,6 +30,7 @@ export default function FxRatesTab() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [historyDays, setHistoryDays] = useState(30);
+  const [expandedDate, setExpandedDate] = useState<number | null>(null);
 
   useEffect(() => {
     loadData();
@@ -156,10 +157,8 @@ export default function FxRatesTab() {
               <thead>
                 <tr className="bg-slate-800 text-left">
                   <th className="px-4 py-3 text-slate-300 font-medium">Currency</th>
-                  <th className="px-4 py-3 text-slate-300 font-medium">Symbol</th>
                   <th className="px-4 py-3 text-slate-300 font-medium">Rate (1 USD =)</th>
                   <th className="px-4 py-3 text-slate-300 font-medium">Inverse (1 X = USD)</th>
-                  <th className="px-4 py-3 text-slate-300 font-medium">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -168,27 +167,17 @@ export default function FxRatesTab() {
                   return (
                     <tr key={code} className="border-t border-slate-700 hover:bg-slate-800/50">
                       <td className="px-4 py-3">
-                        <span className="text-white font-medium">{code}</span>
+                        <span className="text-white font-medium font-mono">{code}</span>
                         {cur && <span className="text-slate-400 ml-2">{cur.name}</span>}
                       </td>
-                      <td className="px-4 py-3 text-slate-300">{cur?.symbol || "—"}</td>
                       <td className="px-4 py-3 text-emerald-400 font-mono">{Number(rate).toFixed(4)}</td>
                       <td className="px-4 py-3 text-blue-400 font-mono">{(1 / Number(rate)).toFixed(6)}</td>
-                      <td className="px-4 py-3">
-                        {cur ? (
-                          <span className={`px-2 py-0.5 rounded text-xs ${cur.isActive ? "bg-green-900/50 text-green-400" : "bg-red-900/50 text-red-400"}`}>
-                            {cur.isActive ? "Active" : "Inactive"}
-                          </span>
-                        ) : (
-                          <span className="text-slate-500 text-xs">—</span>
-                        )}
-                      </td>
                     </tr>
                   );
                 })}
                 {rateEntries.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                    <td colSpan={3} className="px-4 py-8 text-center text-slate-500">
                       No rates available. Click &quot;Refresh Rates&quot; to fetch latest.
                     </td>
                   </tr>
@@ -218,12 +207,14 @@ export default function FxRatesTab() {
             ))}
           </div>
           <div className="text-sm text-slate-400 mb-4">
-            Showing {dailyRates.length} snapshots over last {historyDays} days
+            Showing {dailyRates.length} snapshots over last {historyDays} days.
+            Click a row to expand all rates for that date.
           </div>
           <div className="overflow-x-auto rounded-lg border border-slate-700 max-h-[600px] overflow-y-auto">
             <table className="w-full text-sm">
-              <thead className="sticky top-0">
+              <thead className="sticky top-0 z-10">
                 <tr className="bg-slate-800 text-left">
+                  <th className="px-4 py-3 text-slate-300 font-medium w-8"></th>
                   <th className="px-4 py-3 text-slate-300 font-medium">Date</th>
                   <th className="px-4 py-3 text-slate-300 font-medium">Base</th>
                   <th className="px-4 py-3 text-slate-300 font-medium">Currencies</th>
@@ -234,25 +225,58 @@ export default function FxRatesTab() {
                 {dailyRates.map((dr) => {
                   const rates = dr.rates as Record<string, number>;
                   const count = Object.keys(rates).length;
-                  const preview = Object.entries(rates)
-                    .slice(0, 4)
-                    .map(([code, rate]) => `${code}: ${Number(rate).toFixed(2)}`)
-                    .join(", ");
+                  const isExpanded = expandedDate === dr.id;
+                  const sortedRates = Object.entries(rates).sort(([a], [b]) => a.localeCompare(b));
+
                   return (
-                    <tr key={dr.id} className="border-t border-slate-700 hover:bg-slate-800/50">
-                      <td className="px-4 py-3 text-white font-mono">{dr.rateDate}</td>
-                      <td className="px-4 py-3 text-emerald-400">{dr.baseCurrency}</td>
-                      <td className="px-4 py-3 text-slate-300">
-                        <span className="text-slate-500">{count} rates</span>
-                        <span className="ml-2 text-xs text-slate-500">{preview}...</span>
-                      </td>
-                      <td className="px-4 py-3 text-slate-400">{dr.source || "—"}</td>
-                    </tr>
+                    <Fragment key={dr.id}>
+                      <tr
+                        className="border-t border-slate-700 hover:bg-slate-800/50 cursor-pointer"
+                        onClick={() => setExpandedDate(isExpanded ? null : dr.id)}
+                      >
+                        <td className="px-4 py-3 text-slate-400">
+                          {isExpanded ? (
+                            <ChevronDown className="w-4 h-4" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4" />
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-white font-mono">{dr.rateDate}</td>
+                        <td className="px-4 py-3 text-emerald-400">{dr.baseCurrency}</td>
+                        <td className="px-4 py-3 text-slate-300">
+                          <span className="text-white font-medium">{count}</span>
+                          <span className="text-slate-500 ml-1">currencies</span>
+                        </td>
+                        <td className="px-4 py-3 text-slate-400">{dr.source || "—"}</td>
+                      </tr>
+                      {isExpanded && (
+                        <tr>
+                          <td colSpan={5} className="bg-slate-800/30 px-4 py-3">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                              {sortedRates.map(([code, rate]) => {
+                                const cur = currencyMap.get(code);
+                                return (
+                                  <div key={code} className="bg-slate-800 rounded-lg px-3 py-2">
+                                    <div className="flex items-baseline justify-between">
+                                      <span className="text-white font-mono font-medium text-xs">{code}</span>
+                                      <span className="text-emerald-400 font-mono text-xs">{Number(rate).toFixed(4)}</span>
+                                    </div>
+                                    {cur && (
+                                      <div className="text-slate-500 text-[10px] mt-0.5 truncate">{cur.name}</div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
                   );
                 })}
                 {dailyRates.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-8 text-center text-slate-500">
+                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
                       No historical data for this period.
                     </td>
                   </tr>
@@ -267,7 +291,7 @@ export default function FxRatesTab() {
       {subTab === "currencies" && (
         <div>
           <div className="text-sm text-slate-400 mb-4">
-            {currencies.length} supported currencies ({currencies.filter((c) => c.isActive).length} active)
+            {currencies.length} supported currencies
           </div>
           <div className="overflow-x-auto rounded-lg border border-slate-700">
             <table className="w-full text-sm">
@@ -275,9 +299,7 @@ export default function FxRatesTab() {
                 <tr className="bg-slate-800 text-left">
                   <th className="px-4 py-3 text-slate-300 font-medium">Code</th>
                   <th className="px-4 py-3 text-slate-300 font-medium">Name</th>
-                  <th className="px-4 py-3 text-slate-300 font-medium">Symbol</th>
                   <th className="px-4 py-3 text-slate-300 font-medium">Sort Order</th>
-                  <th className="px-4 py-3 text-slate-300 font-medium">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -285,18 +307,12 @@ export default function FxRatesTab() {
                   <tr key={c.id} className="border-t border-slate-700 hover:bg-slate-800/50">
                     <td className="px-4 py-3 text-white font-medium font-mono">{c.code}</td>
                     <td className="px-4 py-3 text-slate-300">{c.name}</td>
-                    <td className="px-4 py-3 text-slate-300">{c.symbol}</td>
                     <td className="px-4 py-3 text-slate-400">{c.sortOrder}</td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 rounded text-xs ${c.isActive ? "bg-green-900/50 text-green-400" : "bg-red-900/50 text-red-400"}`}>
-                        {c.isActive ? "Active" : "Inactive"}
-                      </span>
-                    </td>
                   </tr>
                 ))}
                 {currencies.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                    <td colSpan={3} className="px-4 py-8 text-center text-slate-500">
                       No currencies configured. Refresh rates to seed currencies.
                     </td>
                   </tr>
