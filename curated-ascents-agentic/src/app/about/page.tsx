@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { MapPin, Phone, Mail, Compass, Cpu, HeartHandshake } from "lucide-react";
+import { MapPin, Phone, Mail, Compass, Cpu, HeartHandshake, Linkedin } from "lucide-react";
 import ChatButton from "@/components/homepage/ChatButton";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://curated-ascents-agentic.vercel.app";
@@ -174,24 +174,57 @@ export default function AboutPage() {
 
       {/* The CuratedAscents Story */}
       <section className="py-16 sm:py-20 bg-luxury-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-luxury-navy mb-10 leading-tight">
             From Trail to Technology: A 29-Year Journey
           </h2>
 
           <div className="space-y-12">
-            {/* Section 1 */}
-            <div>
-              <p className="text-luxury-charcoal/80 leading-relaxed text-lg">
-                In 1996, Kiran Pokhrel stepped onto his first Himalayan trail and never truly left.
-                What began as an instinct — a pull toward the world&apos;s most dramatic landscapes
-                — became a career spanning nearly three decades. Working with international brands
-                including TUI, Kuoni Travel, SAGA Holidays, Adventure World Australia, and
-                Geographical Tours, Kiran built an encyclopaedic knowledge of Nepal, Bhutan, Tibet,
-                and India: not from brochures, but from thousands of miles walked, hundreds of
-                supplier relationships nurtured, and an intimate understanding of what separates an
-                adequate Himalayan experience from an extraordinary one.
-              </p>
+            {/* Section 1 — with founder photo */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
+              {/* Founder portrait */}
+              <div className="lg:col-span-1">
+                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-luxury-gold/20">
+                  <Image
+                    src="/uploads/media/nepal/people/kiran_pokhrel_photo_formal-caec398d.webp"
+                    alt="Kiran Pokhrel — Founder of CuratedAscents"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                </div>
+                <div className="mt-4 text-center">
+                  <h3 className="font-serif text-xl font-bold text-luxury-navy">
+                    Kiran Pokhrel
+                  </h3>
+                  <p className="text-luxury-charcoal/60 text-sm mt-1">
+                    Founder &amp; Expedition Architect
+                  </p>
+                  <a
+                    href="https://www.linkedin.com/in/kiranpokhrel"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 mt-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors text-sm"
+                  >
+                    <Linkedin className="w-4 h-4" />
+                    <span>Connect on LinkedIn</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Opening text */}
+              <div className="lg:col-span-2">
+                <p className="text-luxury-charcoal/80 leading-relaxed text-lg">
+                  In 1996, Kiran Pokhrel stepped onto his first Himalayan trail and never truly left.
+                  What began as an instinct — a pull toward the world&apos;s most dramatic landscapes
+                  — became a career spanning nearly three decades. Working with international brands
+                  including TUI, Kuoni Travel, SAGA Holidays, Adventure World Australia, and
+                  Geographical Tours, Kiran built an encyclopaedic knowledge of Nepal, Bhutan, Tibet,
+                  and India: not from brochures, but from thousands of miles walked, hundreds of
+                  supplier relationships nurtured, and an intimate understanding of what separates an
+                  adequate Himalayan experience from an extraordinary one.
+                </p>
+              </div>
             </div>
 
             {/* Section 2 */}
