@@ -2,11 +2,12 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Twitter } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Twitter, ChevronRight } from "lucide-react";
 import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 import { socialLinks } from "@/lib/constants/social-links";
 import { useChatContext } from "./ChatContext";
+import { getSubRegionsByCountry } from "@/lib/content/destinations-content";
 
 const experienceLinks = [
   { label: "Everest Region", message: "Tell me about Everest Region trips" },
@@ -136,18 +137,36 @@ export default function Footer() {
             {/* Destinations Column */}
             <motion.div variants={fadeInUp}>
               <h3 className="text-white font-medium mb-4">Destinations</h3>
-              <ul className="space-y-3">
-                {destinationLinks.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-white/50 hover:text-luxury-gold transition-colors text-sm"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <div className="space-y-4">
+                {destinationLinks.map((link) => {
+                  const subRegions = getSubRegionsByCountry(link.href.split("/").pop() || "");
+                  return (
+                    <div key={link.label}>
+                      <Link
+                        href={link.href}
+                        className="text-white/70 hover:text-luxury-gold transition-colors text-sm font-medium"
+                      >
+                        {link.label}
+                      </Link>
+                      {subRegions.length > 0 && (
+                        <ul className="mt-1.5 ml-2 space-y-1">
+                          {subRegions.map((sr) => (
+                            <li key={sr.slug}>
+                              <Link
+                                href={`/destinations/${link.href.split("/").pop()}/${sr.slug}`}
+                                className="text-white/40 hover:text-luxury-gold transition-colors text-xs flex items-center gap-1"
+                              >
+                                <ChevronRight className="w-3 h-3" />
+                                {sr.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </motion.div>
 
             {/* Company Column */}

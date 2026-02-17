@@ -12,12 +12,12 @@ export default function StaticPageLayout({ children }: StaticPageLayoutProps) {
       <nav className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <CuratedAscentsLogo className="text-emerald-400" size={28} />
+            <CuratedAscentsLogo className="text-luxury-gold" size={28} />
             <span className="text-lg font-serif font-bold text-white">CuratedAscents</span>
           </Link>
           <Link
             href="/"
-            className="text-sm text-slate-400 hover:text-emerald-400 transition-colors"
+            className="text-sm text-slate-400 hover:text-luxury-gold transition-colors"
           >
             &larr; Back to Home
           </Link>

@@ -12,7 +12,9 @@ import {
   Luggage,
   Heart,
   MapPin,
+  ArrowRight,
 } from "lucide-react";
+import { getSubRegionsByCountry } from "@/lib/content/destinations-content";
 
 interface DestinationData {
   slug: string;
@@ -326,6 +328,43 @@ export default async function DestinationDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {/* Explore Sub-Regions */}
+      {(() => {
+        const subRegions = getSubRegionsByCountry(dest.slug);
+        if (subRegions.length === 0) return null;
+        return (
+          <section className="py-12 sm:py-16 bg-luxury-white">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-luxury-navy mb-3 text-center">
+                Explore {dest.name}
+              </h2>
+              <p className="text-luxury-charcoal/60 text-center mb-8 max-w-2xl mx-auto">
+                Discover the distinct regions and experiences that make {dest.name} extraordinary.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {subRegions.map((sr) => (
+                  <Link
+                    key={sr.slug}
+                    href={`/destinations/${dest.slug}/${sr.slug}`}
+                    className="group flex items-center justify-between p-5 bg-luxury-cream rounded-xl border border-luxury-mist hover:border-luxury-gold/40 transition-all duration-300"
+                  >
+                    <div>
+                      <h3 className="font-serif font-bold text-luxury-navy group-hover:text-luxury-gold transition-colors">
+                        {sr.name}
+                      </h3>
+                      <p className="text-luxury-charcoal/50 text-sm mt-1">
+                        {sr.metaDescription.slice(0, 80)}...
+                      </p>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-luxury-gold/40 group-hover:text-luxury-gold group-hover:translate-x-1 transition-all flex-shrink-0 ml-3" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Getting There & Around */}
       <section className="py-12 sm:py-16 bg-luxury-white">
