@@ -343,24 +343,24 @@ export default function AboutPage() {
           <h2 className="font-serif text-2xl sm:text-3xl font-bold text-luxury-navy mb-8">
             Where to Find Us
           </h2>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-luxury-charcoal/70">
-            <div className="flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-luxury-gold flex-shrink-0" />
-              <span>4498 Voyageur Way, Carmel, IN 46074, USA</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-luxury-charcoal/70">
+            <div className="flex flex-col items-center gap-2">
+              <MapPin className="w-6 h-6 text-luxury-gold" />
+              <span className="text-sm text-center">4498 Voyageur Way,<br />Carmel, IN 46074, USA</span>
             </div>
             <a
               href="tel:+17155054964"
-              className="flex items-center gap-3 hover:text-luxury-gold transition-colors"
+              className="flex flex-col items-center gap-2 hover:text-luxury-gold transition-colors"
             >
-              <Phone className="w-5 h-5 text-luxury-gold flex-shrink-0" />
-              <span>+1-715-505-4964</span>
+              <Phone className="w-6 h-6 text-luxury-gold" />
+              <span className="text-sm">+1-715-505-4964</span>
             </a>
             <a
               href="mailto:hello@curatedascents.com"
-              className="flex items-center gap-3 hover:text-luxury-gold transition-colors"
+              className="flex flex-col items-center gap-2 hover:text-luxury-gold transition-colors"
             >
-              <Mail className="w-5 h-5 text-luxury-gold flex-shrink-0" />
-              <span>hello@curatedascents.com</span>
+              <Mail className="w-6 h-6 text-luxury-gold" />
+              <span className="text-sm">hello@curatedascents.com</span>
             </a>
           </div>
         </div>
