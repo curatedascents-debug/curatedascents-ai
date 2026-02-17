@@ -25,7 +25,7 @@ const destinationLinks = [
 ];
 
 const companyLinks = [
-  { label: "About Us", href: "#about" },
+  { label: "About Us", href: "/about" },
   { label: "Testimonials", href: "#testimonials" },
   { label: "Press", href: "#press" },
   { label: "Careers", href: "mailto:careers@curatedascents.com" },

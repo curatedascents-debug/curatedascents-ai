@@ -12,7 +12,7 @@ const navLinks = [
   { label: "Itineraries", href: "/itineraries", isExternal: true },
   { label: "Destinations", href: "/destinations", isExternal: true, hasDropdown: true },
   { label: "Blog", href: "/blog", isExternal: true },
-  { label: "About", href: "#about" },
+  { label: "About", href: "/about", isExternal: true },
 ];
 
 const destinationDropdown = [

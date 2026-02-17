@@ -3,7 +3,7 @@ import { LuxuryHomepage } from "@/components/homepage";
 
 const OG_TITLE = "CuratedAscents \u2014 Private Luxury Expeditions Across the Himalayas";
 const OG_DESCRIPTION =
-  "AI-powered bespoke travel across Nepal, Bhutan, Tibet & India. 28 years of expertise, now at your fingertips.";
+  "AI-powered bespoke travel across Nepal, Bhutan, Tibet & India. 29 years of expertise, now at your fingertips.";
 const OG_IMAGE = "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1200&h=630&fit=crop&q=80";
 
 export const metadata: Metadata = {

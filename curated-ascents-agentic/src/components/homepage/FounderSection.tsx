@@ -1,67 +1,102 @@
 import Image from "next/image";
+import { Linkedin } from "lucide-react";
 import AnimateOnScroll from "./AnimateOnScroll";
 import ChatButton from "./ChatButton";
 
 const stats = [
-  { value: "28+", label: "Years", sublabel: "Destination Expertise" },
-  { value: "4", label: "Countries", sublabel: "Nepal \u00B7 India \u00B7 Bhutan \u00B7 Tibet" },
-  { value: "500+", label: "Expeditions", sublabel: "Crafted" },
+  { value: "29+", label: "Years in Himalayan Travel" },
+  { value: "4", label: "Countries Mastered" },
+  { value: "15+", label: "Years Enterprise Tech" },
+  { value: "2", label: "Travel Companies Founded" },
 ];
 
 export default function FounderSection() {
   return (
     <section id="about" className="section-padding bg-luxury-cream overflow-hidden">
       <div className="container-luxury">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Image side */}
-          <AnimateOnScroll direction="left">
-            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16 items-start">
+          {/* Left column — Photo + Name */}
+          <AnimateOnScroll direction="left" className="lg:col-span-2">
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-luxury-gold/20">
               <Image
-                src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80"
-                alt="Mountain expedition guide on a Himalayan trail"
+                src="/uploads/media/nepal/landscape/everest-region-everest-view-hotel-eed54c67.webp"
+                alt="Kiran Pokhrel — Founder of CuratedAscents"
                 fill
-                loading="lazy"
+                priority
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
+                sizes="(max-width: 768px) 100vw, 40vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-tr from-luxury-navy/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-luxury-navy/60 via-transparent to-transparent" />
+            </div>
+            <div className="mt-6 text-center lg:text-left">
+              <h3 className="font-serif text-2xl font-bold text-luxury-navy">
+                Kiran Pokhrel
+              </h3>
+              <p className="text-luxury-charcoal/60 text-sm mt-1">
+                Founder &amp; Expedition Architect
+              </p>
+              <a
+                href="https://www.linkedin.com/in/kiranpokhrel"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 mt-3 text-luxury-gold hover:text-luxury-gold/80 transition-colors text-sm"
+              >
+                <Linkedin className="w-4 h-4" />
+                <span>Connect on LinkedIn</span>
+              </a>
             </div>
           </AnimateOnScroll>
 
-          {/* Content side */}
-          <div>
+          {/* Right column — Bio */}
+          <div className="lg:col-span-3">
             <AnimateOnScroll staggerIndex={0}>
               <span className="inline-block text-luxury-gold text-sm font-medium tracking-[0.25em] uppercase mb-4">
-                28 Years of Expertise
+                The Person Behind The Platform
               </span>
-
-              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-luxury-navy mb-6 leading-tight">
-                Your Journey, Guided by Deep Destination Knowledge
+              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-luxury-navy mb-8 leading-tight">
+                29 Years of Himalayan Mastery
               </h2>
             </AnimateOnScroll>
 
             <AnimateOnScroll staggerIndex={1}>
-              <div className="space-y-4 mb-8">
+              <div className="space-y-5 mb-10">
                 <p className="text-luxury-charcoal/80 leading-relaxed">
-                  CuratedAscents was born from nearly three decades of walking the trails, negotiating the permits,
-                  and building relationships with the finest local partners across the Himalayas and Indian subcontinent.
+                  My first Himalayan journey was in 1996. Not as a tourist with a checklist, but as
+                  someone who fell irreversibly in love with a landscape that humbles everyone who
+                  enters it. In the three decades since, I&apos;ve built relationships with local
+                  communities, vetted every lodge and guide personally, and developed an intimate
+                  understanding of what makes each region extraordinary. Nepal, Bhutan, Tibet, and
+                  India are not destinations I sell — they are places I know deeply.
                 </p>
                 <p className="text-luxury-charcoal/80 leading-relaxed">
-                  From luxury lodges in Bhutan&apos;s Paro Valley to heritage palaces in Rajasthan, from Everest Base
-                  Camp to the monasteries of Lhasa — our expertise isn&apos;t from a brochure. It&apos;s from 28 years
-                  of boots on the ground, combined with cutting-edge AI technology to craft your perfect expedition.
+                  But knowing a place deeply isn&apos;t enough. After founding two Nepal-based travel
+                  companies — E-tour Channel (2008) and Nepal Adventure Trail (2022) — I spent 15
+                  years in enterprise IT consulting, delivering complex technology solutions for
+                  Expedia, United Airlines, American Airlines, Travelport, Hilton, and American
+                  Express Global Business Travel. I saw firsthand how luxury travel was held back by
+                  outdated systems: travellers waiting days for quotes, agents manually searching
+                  fragmented supplier inventories, pricing that couldn&apos;t adapt to real-time demand.
+                </p>
+                <p className="text-luxury-charcoal/80 leading-relaxed">
+                  CuratedAscents exists because I refused to accept that trade-off. I built an
+                  AI-powered Expedition Architect that searches across 10 service types and builds
+                  personalised quotes in minutes, not days. But behind every algorithm is three
+                  decades of knowing which helicopter pilot is safest in the Khumbu, which Bhutanese
+                  guide brings history alive at Tiger&apos;s Nest, and which Ladakhi homestay will
+                  change the way you see the world. Technology makes us fast. Expertise makes us right.
                 </p>
               </div>
             </AnimateOnScroll>
 
             {/* Stats row */}
             <AnimateOnScroll staggerIndex={2}>
-              <div className="grid grid-cols-3 gap-6 mb-8 py-6 border-y border-luxury-mist">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 py-6 border-y border-luxury-mist mb-8">
                 {stats.map((stat) => (
                   <div key={stat.label}>
-                    <p className="font-serif text-2xl sm:text-3xl font-bold text-luxury-navy">{stat.value}</p>
-                    <p className="text-luxury-charcoal text-sm font-medium">{stat.label}</p>
-                    <p className="text-luxury-charcoal/60 text-xs mt-0.5">{stat.sublabel}</p>
+                    <p className="font-serif text-2xl sm:text-3xl font-bold text-luxury-navy">
+                      {stat.value}
+                    </p>
+                    <p className="text-luxury-charcoal/60 text-sm mt-1">{stat.label}</p>
                   </div>
                 ))}
               </div>
@@ -69,9 +104,17 @@ export default function FounderSection() {
 
             {/* CTA */}
             <AnimateOnScroll staggerIndex={3}>
-              <ChatButton className="px-8 py-4 bg-luxury-gold text-luxury-navy font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300 hover:shadow-lg hover:shadow-luxury-gold/25">
-                Start a Conversation
-              </ChatButton>
+              <div className="flex flex-wrap items-center gap-4">
+                <ChatButton className="px-8 py-4 bg-luxury-gold text-luxury-navy font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300 hover:shadow-lg hover:shadow-luxury-gold/25">
+                  Start a Conversation
+                </ChatButton>
+                <a
+                  href="/about"
+                  className="px-8 py-4 border border-luxury-navy/20 text-luxury-navy font-medium rounded-full hover:border-luxury-navy/40 transition-all duration-300 text-sm"
+                >
+                  Read the Full Story
+                </a>
+              </div>
             </AnimateOnScroll>
           </div>
         </div>
