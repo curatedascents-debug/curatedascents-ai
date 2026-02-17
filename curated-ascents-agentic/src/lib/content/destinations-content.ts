@@ -240,9 +240,9 @@ Upper Mustang is not just a trek — it is a journey through time to a world tha
       { name: "Annapurna Circuit Luxury", slug: "annapurna-circuit-luxury", duration: "16 days" },
     ],
     luxuryAccommodations: [
-      { name: "Lo Manthang Royal House", description: "Restored heritage property within the walled city offering authentic Mustangi hospitality", priceRange: "$150–250/night" },
-      { name: "Luxury Tented Camps", description: "Private expedition-style camps with heated tents, gourmet dining, and hot showers", priceRange: "$300–500/night" },
-      { name: "Kagbeni Heritage Lodge", description: "Comfortable lodge at the gateway to Upper Mustang with panoramic valley views", priceRange: "$120–200/night" },
+      { name: "Shinta Mani Mustang", description: "Bensley Collection ultra-luxury lodge by Bill Bensley — 29 suites with private balconies, spa, and curated cultural excursions in the heart of Mustang", priceRange: "$1,500–3,000/night" },
+      { name: "Lo Mustang", description: "Boutique heritage lodge in Lo Manthang's walled city with restored medieval architecture, rooftop terrace, and locally sourced Mustangi cuisine", priceRange: "$250–450/night" },
+      { name: "Luxury Tented Camps", description: "Private expedition-style camps with heated tents, gourmet dining, hot showers, and panoramic canyon views", priceRange: "$300–500/night" },
     ],
     relatedDestinations: [
       { name: "Annapurna", country: "nepal", slug: "annapurna" },
