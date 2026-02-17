@@ -35,6 +35,7 @@ const supportLinks = [
   { label: "FAQs", href: "/faq" },
   { label: "Travel Insurance", href: "/faq#travel-insurance" },
   { label: "Visa Information", href: "/faq#visa-information" },
+  { label: "Cancellation Policy", href: "/cancellation-policy" },
   { label: "Terms & Conditions", href: "/terms" },
 ];
 

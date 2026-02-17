@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, CreditCard, Building2, Banknote, ShieldCheck, Info } from "lucide-react";
+import TrustBadgeStrip from "@/components/TrustBadgeStrip";
 
 interface QuoteItem {
   id: number;
@@ -122,6 +123,48 @@ export default function QuoteDetailPage() {
           ))}
         </div>
       )}
+
+      {/* Payment Methods */}
+      <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+        <h3 className="text-white font-semibold text-sm mb-3">Accepted Payment Methods</h3>
+        <div className="space-y-3">
+          <div className="flex items-start gap-3">
+            <CreditCard className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-slate-300 text-sm font-medium">Credit / Debit Card</p>
+              <p className="text-slate-500 text-xs">Visa, MasterCard, Amex via Stripe</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <Building2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-slate-300 text-sm font-medium">Bank Transfer (SWIFT)</p>
+              <p className="text-slate-500 text-xs">International wire transfer &mdash; 3-5 business days</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <Banknote className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-slate-300 text-sm font-medium">Cash on Arrival</p>
+              <p className="text-slate-500 text-xs">Remaining balance in USD &mdash; arranged at booking</p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 pt-3 border-t border-slate-700/50 flex items-start gap-2">
+          <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+          <p className="text-slate-500 text-xs leading-relaxed">
+            <span className="text-slate-400 font-medium">Payment Protection:</span> Card payments are processed
+            by Stripe (PCI DSS Level 1 certified). Your card details are never stored on our servers. Disputes
+            can be raised through your card issuer.{" "}
+            <a href="/cancellation-policy" className="text-emerald-400 hover:text-emerald-300">View cancellation policy</a>
+          </p>
+        </div>
+      </div>
+
+      {/* Trust Badge Strip */}
+      <div className="bg-slate-800/30 border border-slate-700/30 rounded-2xl">
+        <TrustBadgeStrip variant="dark" />
+      </div>
 
       {/* Inclusions / Exclusions */}
       {quote.inclusionsSummary && (

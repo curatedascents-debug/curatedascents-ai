@@ -193,7 +193,7 @@ export default function QuoteDocument({ quote, items }: QuoteDocumentProps) {
             </View>
           </View>
           <Text style={styles.paymentNote}>
-            Payment can be made via bank transfer or credit card. Details will be provided upon confirmation.
+            Payment accepted via credit card (Stripe), bank transfer (SWIFT), or cash on arrival (balance only, arranged at booking).
           </Text>
         </View>
 
@@ -244,6 +244,11 @@ export default function QuoteDocument({ quote, items }: QuoteDocumentProps) {
             This quote is subject to availability. Prices may vary based on season, exchange rates, and group size.
             Valid for {quote.validUntil ? `until ${formatDate(quote.validUntil)}` : "14 days from issue date"}.
           </Text>
+          <Link src="https://curated-ascents-agentic.vercel.app/cancellation-policy">
+            <Text style={{ fontSize: 7, color: "#10b981", marginTop: 4 }}>
+              View full Cancellation &amp; Refund Policy
+            </Text>
+          </Link>
         </View>
       </Page>
     </Document>

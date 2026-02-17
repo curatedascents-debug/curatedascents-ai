@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
+import TrustBadgeStrip from "@/components/TrustBadgeStrip";
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -148,7 +149,11 @@ function PaymentSuccessContent() {
           </Link>
         </div>
 
-        <p className="mt-8 text-sm text-slate-500">
+        <div className="mt-6 border-t border-slate-700/50 pt-4">
+          <TrustBadgeStrip variant="dark" />
+        </div>
+
+        <p className="mt-4 text-sm text-slate-500">
           Questions? Contact us at <a href="mailto:support@curatedascents.com" className="text-emerald-400 hover:underline">support@curatedascents.com</a>
         </p>
       </div>

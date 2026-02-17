@@ -62,11 +62,19 @@ export default function TermsPage() {
         </Section>
 
         <Section title="4. Cancellation Policy">
+          <p>
+            Our full cancellation and refund policy, including tiered refund schedules, force majeure
+            provisions, and amendment terms, is available on our dedicated{" "}
+            <a href="/cancellation-policy" className="text-emerald-400 hover:text-emerald-300">
+              Cancellation &amp; Refund Policy
+            </a>{" "}
+            page. Key points:
+          </p>
           <ul>
-            <li><strong>90+ days before departure:</strong> Full refund minus $200 administrative fee</li>
-            <li><strong>60-89 days:</strong> 50% refund of total trip cost</li>
-            <li><strong>30-59 days:</strong> 25% refund of total trip cost</li>
-            <li><strong>Less than 30 days:</strong> No refund</li>
+            <li><strong>60+ days before departure:</strong> Full refund minus $250 administrative fee per person</li>
+            <li><strong>30-59 days:</strong> 50% refund of total trip cost</li>
+            <li><strong>15-29 days:</strong> 25% refund of total trip cost</li>
+            <li><strong>Less than 15 days:</strong> No refund</li>
           </ul>
           <p>
             All cancellations must be made in writing via email to hello@curatedascents.com.
