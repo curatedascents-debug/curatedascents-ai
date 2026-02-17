@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { db } from "@/db";
 import { blogPosts, packages } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { getAllSubRegionParams } from "@/lib/content/destinations-content";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://curated-ascents-agentic.vercel.app";
 
@@ -33,6 +34,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.8,
+    })),
+    ...getAllSubRegionParams().map(({ country, slug }) => ({
+      url: `${BASE_URL}/destinations/${country}/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.75,
     })),
     {
       url: `${BASE_URL}/itineraries`,

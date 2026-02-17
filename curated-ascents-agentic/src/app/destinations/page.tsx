@@ -1,7 +1,8 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Calendar, Compass } from "lucide-react";
+import { MapPin, Calendar, Compass, ArrowRight } from "lucide-react";
+import { getSubRegionsByCountry } from "@/lib/content/destinations-content";
 
 export const metadata: Metadata = {
   title: "Destinations | CuratedAscents - Luxury Himalayan Adventures",
@@ -90,8 +91,8 @@ export default function DestinationsPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-16">
             {destinations.map((dest, idx) => (
+              <div key={dest.slug}>
               <Link
-                key={dest.slug}
                 href={`/destinations/${dest.slug}`}
                 className="group block"
               >
@@ -155,6 +156,27 @@ export default function DestinationsPage() {
                   </div>
                 </article>
               </Link>
+
+              {/* Sub-region links */}
+              {(() => {
+                const subRegions = getSubRegionsByCountry(dest.slug);
+                if (subRegions.length === 0) return null;
+                return (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {subRegions.map((sr) => (
+                      <Link
+                        key={sr.slug}
+                        href={`/destinations/${dest.slug}/${sr.slug}`}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-luxury-cream/80 rounded-full text-xs text-luxury-charcoal hover:text-luxury-gold hover:bg-luxury-gold/10 transition-colors border border-luxury-mist"
+                      >
+                        {sr.name}
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
+                    ))}
+                  </div>
+                );
+              })()}
+              </div>
             ))}
           </div>
         </div>

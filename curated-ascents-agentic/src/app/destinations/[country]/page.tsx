@@ -5,9 +5,6 @@ import { notFound } from "next/navigation";
 import {
   ChevronLeft,
   Calendar,
-  Sun,
-  Users,
-  DollarSign,
   Shield,
   Wallet,
   Phone,
@@ -202,19 +199,19 @@ const destinationData: Record<string, DestinationData> = {
   },
 };
 
-const slugs = ["nepal", "bhutan", "tibet", "india"];
+const countrySlugs = ["nepal", "bhutan", "tibet", "india"];
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ country: string }>;
 }
 
 export async function generateStaticParams() {
-  return slugs.map((slug) => ({ slug }));
+  return countrySlugs.map((country) => ({ country }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const dest = destinationData[slug];
+  const { country } = await params;
+  const dest = destinationData[country];
   if (!dest) return { title: "Destination Not Found | CuratedAscents" };
 
   return {
@@ -231,8 +228,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function DestinationDetailPage({ params }: PageProps) {
-  const { slug } = await params;
-  const dest = destinationData[slug];
+  const { country } = await params;
+  const dest = destinationData[country];
 
   if (!dest) {
     notFound();

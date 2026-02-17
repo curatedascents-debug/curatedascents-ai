@@ -10,9 +10,49 @@ import { useChatContext } from "./ChatContext";
 const navLinks = [
   { label: "Journeys", href: "#signature-journeys" },
   { label: "Itineraries", href: "/itineraries", isExternal: true },
-  { label: "Destinations", href: "/destinations", isExternal: true },
+  { label: "Destinations", href: "/destinations", isExternal: true, hasDropdown: true },
   { label: "Blog", href: "/blog", isExternal: true },
   { label: "About", href: "#about" },
+];
+
+const destinationDropdown = [
+  {
+    country: "Nepal",
+    slug: "nepal",
+    subRegions: [
+      { name: "Everest Region", slug: "everest-region" },
+      { name: "Annapurna", slug: "annapurna" },
+      { name: "Chitwan", slug: "chitwan" },
+      { name: "Pokhara", slug: "pokhara" },
+      { name: "Upper Mustang", slug: "upper-mustang" },
+    ],
+  },
+  {
+    country: "Bhutan",
+    slug: "bhutan",
+    subRegions: [
+      { name: "Paro Valley", slug: "paro-valley" },
+      { name: "Thimphu", slug: "thimphu" },
+      { name: "Punakha", slug: "punakha" },
+    ],
+  },
+  {
+    country: "India",
+    slug: "india",
+    subRegions: [
+      { name: "Ladakh", slug: "ladakh" },
+      { name: "Sikkim", slug: "sikkim" },
+      { name: "Darjeeling", slug: "darjeeling" },
+    ],
+  },
+  {
+    country: "Tibet",
+    slug: "tibet",
+    subRegions: [
+      { name: "Lhasa", slug: "lhasa" },
+      { name: "Everest North Face", slug: "everest-north-face" },
+    ],
+  },
 ];
 
 export default function Navigation() {
@@ -73,7 +113,53 @@ export default function Navigation() {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-8">
               {navLinks.map((link) =>
-                link.isExternal ? (
+                link.hasDropdown ? (
+                  <div key={link.label} className="relative group/dest">
+                    <a
+                      href={link.href}
+                      className="text-white/70 hover:text-white transition-colors link-underline"
+                    >
+                      {link.label}
+                    </a>
+                    {/* Dropdown */}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover/dest:opacity-100 group-hover/dest:visible transition-all duration-200 z-50">
+                      <div className="bg-luxury-navy/95 backdrop-blur-md border border-luxury-gold/10 rounded-xl shadow-2xl p-6 min-w-[480px]">
+                        <div className="grid grid-cols-4 gap-6">
+                          {destinationDropdown.map((group) => (
+                            <div key={group.slug}>
+                              <a
+                                href={`/destinations/${group.slug}`}
+                                className="text-luxury-gold text-xs font-semibold tracking-[0.15em] uppercase hover:text-luxury-gold/80 transition-colors"
+                              >
+                                {group.country}
+                              </a>
+                              <ul className="mt-2 space-y-1.5">
+                                {group.subRegions.map((sr) => (
+                                  <li key={sr.slug}>
+                                    <a
+                                      href={`/destinations/${group.slug}/${sr.slug}`}
+                                      className="text-sm text-white/60 hover:text-white transition-colors block py-0.5"
+                                    >
+                                      {sr.name}
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-4 pt-3 border-t border-luxury-gold/10">
+                          <a
+                            href="/destinations"
+                            className="text-xs text-luxury-gold/60 hover:text-luxury-gold transition-colors"
+                          >
+                            View All Destinations &rarr;
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : link.isExternal ? (
                   <a
                     key={link.label}
                     href={link.href}
