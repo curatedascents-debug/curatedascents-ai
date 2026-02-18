@@ -21,6 +21,10 @@ import CustomizeButton from "./CustomizeButton";
 import FlightFinder from "@/components/flights/FlightFinder";
 import { findItineraryImage } from "@/lib/media/media-service";
 
+function formatPackageType(type: string): string {
+  return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export const dynamic = "force-dynamic";
 
 interface PageProps {
@@ -129,8 +133,8 @@ export default async function ItineraryDetailPage({ params }: PageProps) {
                 {pkg.country}
               </span>
               <span className="text-luxury-cream/40">|</span>
-              <span className="text-luxury-cream/60 text-sm capitalize">
-                {pkg.packageType}
+              <span className="text-luxury-cream/60 text-sm">
+                {formatPackageType(pkg.packageType || "")}
               </span>
             </div>
             <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">

@@ -737,6 +737,52 @@ const ITINERARY_STOP_WORDS = new Set([
   "experience", "ultimate", "classic", "premium", "exclusive",
 ]);
 
+// Curated Unsplash photos for itinerary fallback (permanent photo IDs)
+const UNSPLASH_ITINERARY_PHOTOS: Record<string, string> = {
+  // Nepal regions
+  everest: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&h=600&fit=crop",
+  annapurna: "https://images.unsplash.com/photo-1585938389612-a552a28d6914?w=800&h=600&fit=crop",
+  langtang: "https://images.unsplash.com/photo-1486911278844-a81c5267e227?w=800&h=600&fit=crop",
+  manaslu: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop",
+  mustang: "https://images.unsplash.com/photo-1570804485046-1d876c777648?w=800&h=600&fit=crop",
+  kanchenjunga: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=800&h=600&fit=crop",
+  makalu: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&h=600&fit=crop",
+  dolpo: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800&h=600&fit=crop",
+  solukhumbu: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&h=600&fit=crop",
+  khumbu: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&h=600&fit=crop",
+  "ganesh himal": "https://images.unsplash.com/photo-1486911278844-a81c5267e227?w=800&h=600&fit=crop",
+  helambu: "https://images.unsplash.com/photo-1486911278844-a81c5267e227?w=800&h=600&fit=crop",
+  chitwan: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&h=600&fit=crop",
+  pokhara: "https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=800&h=600&fit=crop",
+  kathmandu: "https://images.unsplash.com/photo-1558799401-1dcba79834c2?w=800&h=600&fit=crop",
+  lumbini: "https://images.unsplash.com/photo-1558799401-1dcba79834c2?w=800&h=600&fit=crop",
+  // Bhutan regions
+  paro: "https://images.unsplash.com/photo-1553856622-d1b352e9a211?w=800&h=600&fit=crop",
+  thimphu: "https://images.unsplash.com/photo-1553856622-d1b352e9a211?w=800&h=600&fit=crop",
+  bumthang: "https://images.unsplash.com/photo-1553856622-d1b352e9a211?w=800&h=600&fit=crop",
+  punakha: "https://images.unsplash.com/photo-1553856622-d1b352e9a211?w=800&h=600&fit=crop",
+  lunana: "https://images.unsplash.com/photo-1553856622-d1b352e9a211?w=800&h=600&fit=crop",
+  // Tibet regions
+  lhasa: "https://images.unsplash.com/photo-1503641926155-5b64e0441c88?w=800&h=600&fit=crop",
+  "western tibet": "https://images.unsplash.com/photo-1503641926155-5b64e0441c88?w=800&h=600&fit=crop",
+  tingri: "https://images.unsplash.com/photo-1503641926155-5b64e0441c88?w=800&h=600&fit=crop",
+  // India regions
+  ladakh: "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&h=600&fit=crop",
+  rajasthan: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800&h=600&fit=crop",
+  kerala: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&h=600&fit=crop",
+  delhi: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&h=600&fit=crop",
+  agra: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&h=600&fit=crop",
+  jaipur: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800&h=600&fit=crop",
+  uttarakhand: "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&h=600&fit=crop",
+  sikkim: "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&h=600&fit=crop",
+  darjeeling: "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&h=600&fit=crop",
+  // Country-level fallbacks
+  nepal: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&h=600&fit=crop",
+  bhutan: "https://images.unsplash.com/photo-1553856622-d1b352e9a211?w=800&h=600&fit=crop",
+  tibet: "https://images.unsplash.com/photo-1503641926155-5b64e0441c88?w=800&h=600&fit=crop",
+  india: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800&h=600&fit=crop",
+};
+
 /**
  * Find a relevant image for an itinerary using a cascading search strategy.
  * Does NOT increment usage counts (listing page loads all ~46 at once).
@@ -755,22 +801,28 @@ export async function findItineraryImage(params: {
   };
   const orderClause = [desc(mediaLibrary.featured), asc(mediaLibrary.usageCount), sql`RANDOM()`];
 
-  // Strategy 1: Match region in destination, filename, or title
+  // Country filter condition (reused in strategies 1 & 2)
+  const countryFilter = params.country
+    ? eq(mediaLibrary.country, params.country.toLowerCase())
+    : undefined;
+
+  // Strategy 1: Match region in destination, filename, or title (with country filter)
   if (params.region) {
     const regionTerm = `%${params.region}%`;
+    const regionConditions = [
+      eq(mediaLibrary.active, true),
+      or(
+        ilike(mediaLibrary.destination, regionTerm),
+        ilike(mediaLibrary.filename, regionTerm),
+        ilike(mediaLibrary.title, regionTerm)
+      ),
+    ];
+    if (countryFilter) regionConditions.push(countryFilter);
+
     const byRegion = await db
       .select(selectCols)
       .from(mediaLibrary)
-      .where(
-        and(
-          eq(mediaLibrary.active, true),
-          or(
-            ilike(mediaLibrary.destination, regionTerm),
-            ilike(mediaLibrary.filename, regionTerm),
-            ilike(mediaLibrary.title, regionTerm)
-          )
-        )
-      )
+      .where(and(...regionConditions))
       .orderBy(...orderClause)
       .limit(1);
 
@@ -782,7 +834,7 @@ export async function findItineraryImage(params: {
     }
   }
 
-  // Strategy 2: Extract keywords from name and search each
+  // Strategy 2: Extract keywords from name and search each (with country filter)
   const keywords = params.name
     .split(/[\s\-–—]+/)
     .map((w) => w.replace(/[^a-zA-Z]/g, "").toLowerCase())
@@ -790,19 +842,20 @@ export async function findItineraryImage(params: {
 
   for (const keyword of keywords) {
     const term = `%${keyword}%`;
+    const keywordConditions = [
+      eq(mediaLibrary.active, true),
+      or(
+        ilike(mediaLibrary.destination, term),
+        ilike(mediaLibrary.filename, term),
+        ilike(mediaLibrary.title, term)
+      ),
+    ];
+    if (countryFilter) keywordConditions.push(countryFilter);
+
     const byKeyword = await db
       .select(selectCols)
       .from(mediaLibrary)
-      .where(
-        and(
-          eq(mediaLibrary.active, true),
-          or(
-            ilike(mediaLibrary.destination, term),
-            ilike(mediaLibrary.filename, term),
-            ilike(mediaLibrary.title, term)
-          )
-        )
-      )
+      .where(and(...keywordConditions))
       .orderBy(...orderClause)
       .limit(1);
 
@@ -834,6 +887,35 @@ export async function findItineraryImage(params: {
         altText: byCountry[0].altText || byCountry[0].title || params.country,
       };
     }
+  }
+
+  // Strategy 4: Unsplash fallback — curated photos by region/keyword/country
+  const regionKey = params.region?.toLowerCase();
+  if (regionKey && UNSPLASH_ITINERARY_PHOTOS[regionKey]) {
+    return {
+      cdnUrl: UNSPLASH_ITINERARY_PHOTOS[regionKey],
+      altText: params.region || params.name,
+    };
+  }
+  // Try matching keywords against Unsplash map keys
+  for (const keyword of keywords) {
+    const matchKey = Object.keys(UNSPLASH_ITINERARY_PHOTOS).find(
+      (k) => k.includes(keyword) || keyword.includes(k)
+    );
+    if (matchKey) {
+      return {
+        cdnUrl: UNSPLASH_ITINERARY_PHOTOS[matchKey],
+        altText: params.name,
+      };
+    }
+  }
+  // Country-level Unsplash fallback
+  const countryKey = params.country?.toLowerCase();
+  if (countryKey && UNSPLASH_ITINERARY_PHOTOS[countryKey]) {
+    return {
+      cdnUrl: UNSPLASH_ITINERARY_PHOTOS[countryKey],
+      altText: params.country || params.name,
+    };
   }
 
   return null;

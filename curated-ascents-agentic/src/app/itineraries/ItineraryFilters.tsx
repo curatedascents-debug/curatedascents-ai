@@ -2,6 +2,10 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 
+function formatPackageType(type: string): string {
+  return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 interface Props {
   countries: string[];
   types: string[];
@@ -71,13 +75,13 @@ export default function ItineraryFilters({ countries, types, activeCountry, acti
             <button
               key={t}
               onClick={() => setFilter("type", t.toLowerCase())}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium capitalize transition-colors ${
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                 activeType.toLowerCase() === t.toLowerCase()
                   ? "bg-luxury-gold text-luxury-navy"
                   : "bg-luxury-cream text-luxury-charcoal/60 hover:bg-luxury-mist"
               }`}
             >
-              {t}
+              {formatPackageType(t)}
             </button>
           ))}
         </div>

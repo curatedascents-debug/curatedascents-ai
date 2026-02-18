@@ -8,6 +8,10 @@ import { Clock, Mountain, Users, Calendar } from "lucide-react";
 import ItineraryFilters from "./ItineraryFilters";
 import { findItineraryImage } from "@/lib/media/media-service";
 
+function formatPackageType(type: string): string {
+  return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -173,8 +177,8 @@ export default async function ItinerariesPage({
                           <span className="px-2 py-0.5 bg-luxury-navy/80 backdrop-blur-sm text-white text-[10px] font-medium rounded-full">
                             {pkg.country}
                           </span>
-                          <span className="px-2 py-0.5 bg-luxury-gold/80 backdrop-blur-sm text-luxury-navy text-[10px] font-medium rounded-full capitalize">
-                            {pkg.packageType}
+                          <span className="px-2 py-0.5 bg-luxury-gold/80 backdrop-blur-sm text-luxury-navy text-[10px] font-medium rounded-full">
+                            {formatPackageType(pkg.packageType || "")}
                           </span>
                         </div>
                       </div>
