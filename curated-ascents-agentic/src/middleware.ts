@@ -25,8 +25,8 @@ export async function middleware(request: NextRequest) {
     return handleAgencyRoutes(request, pathname);
   }
 
-  // Handle admin routes
-  if (pathname.startsWith("/admin")) {
+  // Handle admin routes (both pages and API)
+  if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
     return handleAdminRoutes(request, pathname);
   }
 
@@ -336,11 +336,24 @@ function handleAdminRoutes(
   request: NextRequest,
   pathname: string
 ): NextResponse {
+  const isApiRoute = pathname.startsWith("/api/admin");
+
+  // Allow admin auth API routes without authentication
+  if (pathname.startsWith("/api/admin/auth")) {
+    return NextResponse.next();
+  }
+
   // Only protect /admin routes (except /admin/login)
   if (pathname !== "/admin/login") {
     const sessionCookie = request.cookies.get(ADMIN_COOKIE_NAME);
 
     if (!sessionCookie?.value) {
+      if (isApiRoute) {
+        return NextResponse.json(
+          { error: "Not authenticated" },
+          { status: 401 }
+        );
+      }
       // No session - redirect to login
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("from", pathname);
@@ -350,6 +363,12 @@ function handleAdminRoutes(
     // Verify the session token
     const expectedToken = generateAdminToken(process.env.ADMIN_PASSWORD || "");
     if (sessionCookie.value !== expectedToken) {
+      if (isApiRoute) {
+        return NextResponse.json(
+          { error: "Invalid session" },
+          { status: 401 }
+        );
+      }
       // Invalid session - redirect to login
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("from", pathname);
@@ -389,5 +408,5 @@ function generateAdminToken(password: string): string {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/agency/:path*", "/api/agency/:path*", "/supplier/:path*", "/api/supplier/:path*", "/portal/:path*", "/api/portal/:path*"],
+  matcher: ["/admin/:path*", "/api/admin/:path*", "/agency/:path*", "/api/agency/:path*", "/supplier/:path*", "/api/supplier/:path*", "/portal/:path*", "/api/portal/:path*"],
 };

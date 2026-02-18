@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { hotels, suppliers, destinations } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
+import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
 
 // GET all hotels with supplier info
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const auth = verifyAdminSession(req);
+  if (!auth.authenticated) return adminUnauthorizedResponse(auth.error);
+
   try {
     const result = await db
       .select({
@@ -47,6 +51,9 @@ export async function GET() {
 
 // POST - Create new hotel
 export async function POST(req: NextRequest) {
+  const auth = verifyAdminSession(req);
+  if (!auth.authenticated) return adminUnauthorizedResponse(auth.error);
+
   try {
     const body = await req.json();
 

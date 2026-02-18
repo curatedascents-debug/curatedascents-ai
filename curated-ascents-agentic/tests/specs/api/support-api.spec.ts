@@ -1,26 +1,47 @@
 import { test, expect } from '@playwright/test';
-import { API_ROUTES } from '../../fixtures/test-data.fixture';
+import { API_ROUTES, TEST_ADMIN } from '../../fixtures/test-data.fixture';
+import { generateAdminToken } from '../../fixtures/auth.fixture';
 
 test.describe('Support Tickets API @api @admin', () => {
-  test('GET /api/admin/support/tickets returns data', async ({ request, baseURL }) => {
+  const adminCookie = () => {
+    const token = generateAdminToken(
+      TEST_ADMIN.password,
+      process.env.ADMIN_SESSION_SECRET || 'curated-ascents-default-secret'
+    );
+    return `admin_session=${token}`;
+  };
+
+  test('GET /api/admin/support/tickets requires auth', async ({ request, baseURL }) => {
     const response = await request.get(`${baseURL}${API_ROUTES.adminSupportTickets}`);
+    expect(response.status()).toBe(401);
+  });
+
+  test('GET /api/admin/support/tickets returns data', async ({ request, baseURL }) => {
+    const response = await request.get(`${baseURL}${API_ROUTES.adminSupportTickets}`, {
+      headers: { Cookie: adminCookie() },
+    });
     expect(response.ok()).toBeTruthy();
     const data = await response.json();
     expect(data).toBeDefined();
   });
 
   test('GET tickets with status filter', async ({ request, baseURL }) => {
-    const response = await request.get(`${baseURL}${API_ROUTES.adminSupportTickets}?status=open`);
+    const response = await request.get(`${baseURL}${API_ROUTES.adminSupportTickets}?status=open`, {
+      headers: { Cookie: adminCookie() },
+    });
     expect(response.ok()).toBeTruthy();
   });
 
   test('GET tickets with pagination', async ({ request, baseURL }) => {
-    const response = await request.get(`${baseURL}${API_ROUTES.adminSupportTickets}?limit=5&offset=0`);
+    const response = await request.get(`${baseURL}${API_ROUTES.adminSupportTickets}?limit=5&offset=0`, {
+      headers: { Cookie: adminCookie() },
+    });
     expect(response.ok()).toBeTruthy();
   });
 
   test('POST tickets with missing fields returns error', async ({ request, baseURL }) => {
     const response = await request.post(`${baseURL}${API_ROUTES.adminSupportTickets}`, {
+      headers: { Cookie: adminCookie() },
       data: {},
     });
     expect([400, 500]).toContain(response.status());
@@ -28,6 +49,7 @@ test.describe('Support Tickets API @api @admin', () => {
 
   test('POST tickets with valid data', async ({ request, baseURL }) => {
     const response = await request.post(`${baseURL}${API_ROUTES.adminSupportTickets}`, {
+      headers: { Cookie: adminCookie() },
       data: {
         clientId: 1,
         subject: 'E2E Test Ticket',
@@ -42,6 +64,7 @@ test.describe('Support Tickets API @api @admin', () => {
 
   test('POST tickets validates required subject field', async ({ request, baseURL }) => {
     const response = await request.post(`${baseURL}${API_ROUTES.adminSupportTickets}`, {
+      headers: { Cookie: adminCookie() },
       data: { clientId: 1, description: 'Missing subject field' },
     });
     expect([400, 500]).toContain(response.status());

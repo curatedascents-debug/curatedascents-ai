@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { invoices, clients, bookings } from "@/db/schema";
 import { eq, desc, sql, and, gte, lte } from "drizzle-orm";
 import { createInvoiceFromBooking } from "@/lib/financial/invoice-engine";
+import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,9 @@ export const dynamic = "force-dynamic";
  * List all invoices with filters
  */
 export async function GET(req: NextRequest) {
+  const auth = verifyAdminSession(req);
+  if (!auth.authenticated) return adminUnauthorizedResponse(auth.error);
+
   try {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
@@ -115,6 +119,9 @@ export async function GET(req: NextRequest) {
  * Create new invoice from booking
  */
 export async function POST(req: NextRequest) {
+  const auth = verifyAdminSession(req);
+  if (!auth.authenticated) return adminUnauthorizedResponse(auth.error);
+
   try {
     const body = await req.json();
     const {

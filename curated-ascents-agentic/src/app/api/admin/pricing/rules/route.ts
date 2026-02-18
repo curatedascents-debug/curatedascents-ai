@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { pricingRules, destinations, suppliers } from "@/db/schema";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { createPricingRule, RuleType, AdjustmentType } from "@/lib/pricing/pricing-engine";
+import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,9 @@ export const dynamic = "force-dynamic";
  * List all pricing rules
  */
 export async function GET(req: NextRequest) {
+  const auth = verifyAdminSession(req);
+  if (!auth.authenticated) return adminUnauthorizedResponse(auth.error);
+
   try {
     const { searchParams } = new URL(req.url);
     const ruleType = searchParams.get("ruleType");
@@ -107,6 +111,9 @@ export async function GET(req: NextRequest) {
  * Create a new pricing rule
  */
 export async function POST(req: NextRequest) {
+  const auth = verifyAdminSession(req);
+  if (!auth.authenticated) return adminUnauthorizedResponse(auth.error);
+
   try {
     const body = await req.json();
     const {

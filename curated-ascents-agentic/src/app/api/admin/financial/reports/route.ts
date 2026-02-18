@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFinancialSummary } from "@/lib/financial/invoice-engine";
+import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,9 @@ export const dynamic = "force-dynamic";
  * Get financial reports and summaries
  */
 export async function GET(req: NextRequest) {
+  const auth = verifyAdminSession(req);
+  if (!auth.authenticated) return adminUnauthorizedResponse(auth.error);
+
   try {
     const { searchParams } = new URL(req.url);
     const period = searchParams.get("period") || "month"; // day, week, month, quarter, year

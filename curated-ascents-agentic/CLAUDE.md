@@ -50,7 +50,7 @@ Tag-specific: `test:admin`, `test:portal`, `test:agency`, `test:auth`, `test:api
 - Uses system Chrome (`channel: 'chrome'`) for macOS 11 compatibility
 - Chat mocks must return `{ message, role }` (NOT `{ response }`)
 - Email capture modal triggers after 2nd user message — dismiss via `skipEmailCapture()`
-- Admin API endpoints have NO inline auth — middleware only protects page routes
+- Admin API endpoints have dual auth: middleware (`/api/admin/:path*`) + inline `verifyAdminSession()` on critical routes (rates, suppliers, clients, bookings, invoices, payments, pricing, hotels, quotes, financial)
 
 ## Environment Variables
 
@@ -155,7 +155,7 @@ Homepage uses a **"donut" pattern**: `ChatProvider` (client) wraps the page; `{c
 
 ## Key Patterns & Conventions
 
-- **Admin APIs** don't check auth inline — middleware handles it
+- **Admin APIs** have dual auth: middleware protects all `/api/admin/*` routes + inline `verifyAdminSession()` on critical endpoints for defense-in-depth
 - **Cron jobs**: verify `CRON_SECRET` via `Authorization: Bearer` header, `export const dynamic = "force-dynamic"`
 - **Email**: `sendEmail()` from `@/lib/email/send-email.ts`, templates in `src/lib/email/templates/`
 - **Chat state**: `useChatContext()` from `ChatContext.tsx` — no prop drilling

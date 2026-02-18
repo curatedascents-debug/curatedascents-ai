@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { eq } from "drizzle-orm";
-import { 
-  hotels, 
-  hotelRoomRates, 
-  transportation, 
+import {
+  hotels,
+  hotelRoomRates,
+  transportation,
   guides,
   porters,
   flightsDomestic,
@@ -12,11 +12,15 @@ import {
   helicopterCharter,
   permitsFees,
   packages,
-  miscellaneousServices 
+  miscellaneousServices
 } from "@/db/schema";
+import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
 
 // Get all rates with FULL details (for admin)
 export async function GET(req: NextRequest) {
+  const auth = verifyAdminSession(req);
+  if (!auth.authenticated) return adminUnauthorizedResponse(auth.error);
+
   try {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get("category");

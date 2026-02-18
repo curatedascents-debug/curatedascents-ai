@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { payments, invoices, clients } from "@/db/schema";
 import { eq, desc, sql, and, gte, lte } from "drizzle-orm";
 import { recordPayment, PaymentMethod } from "@/lib/financial/invoice-engine";
+import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,9 @@ export const dynamic = "force-dynamic";
  * List all payments with filters
  */
 export async function GET(req: NextRequest) {
+  const auth = verifyAdminSession(req);
+  if (!auth.authenticated) return adminUnauthorizedResponse(auth.error);
+
   try {
     const { searchParams } = new URL(req.url);
     const invoiceId = searchParams.get("invoiceId");
@@ -120,6 +124,9 @@ export async function GET(req: NextRequest) {
  * Record a new payment
  */
 export async function POST(req: NextRequest) {
+  const auth = verifyAdminSession(req);
+  if (!auth.authenticated) return adminUnauthorizedResponse(auth.error);
+
   try {
     const body = await req.json();
     const {

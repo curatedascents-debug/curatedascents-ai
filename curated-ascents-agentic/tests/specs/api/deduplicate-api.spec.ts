@@ -1,9 +1,25 @@
 import { test, expect } from '@playwright/test';
-import { API_ROUTES } from '../../fixtures/test-data.fixture';
+import { API_ROUTES, TEST_ADMIN } from '../../fixtures/test-data.fixture';
+import { generateAdminToken } from '../../fixtures/auth.fixture';
 
 test.describe('Deduplicate API @api @admin', () => {
-  test('GET /api/admin/deduplicate returns preview with summary', async ({ request, baseURL }) => {
+  const adminCookie = () => {
+    const token = generateAdminToken(
+      TEST_ADMIN.password,
+      process.env.ADMIN_SESSION_SECRET || 'curated-ascents-default-secret'
+    );
+    return `admin_session=${token}`;
+  };
+
+  test('GET /api/admin/deduplicate requires auth', async ({ request, baseURL }) => {
     const response = await request.get(`${baseURL}${API_ROUTES.adminDeduplicate}`);
+    expect(response.status()).toBe(401);
+  });
+
+  test('GET /api/admin/deduplicate returns preview with summary', async ({ request, baseURL }) => {
+    const response = await request.get(`${baseURL}${API_ROUTES.adminDeduplicate}`, {
+      headers: { Cookie: adminCookie() },
+    });
     expect(response.ok()).toBeTruthy();
     const data = await response.json();
     expect(data.mode).toBe('preview');
@@ -14,7 +30,9 @@ test.describe('Deduplicate API @api @admin', () => {
   });
 
   test('Preview summary has expected fields', async ({ request, baseURL }) => {
-    const response = await request.get(`${baseURL}${API_ROUTES.adminDeduplicate}`);
+    const response = await request.get(`${baseURL}${API_ROUTES.adminDeduplicate}`, {
+      headers: { Cookie: adminCookie() },
+    });
     const data = await response.json();
     const { summary } = data;
     expect(typeof summary.tablesScanned).toBe('number');
@@ -25,7 +43,9 @@ test.describe('Deduplicate API @api @admin', () => {
   });
 
   test('Preview scans all 16 tables', async ({ request, baseURL }) => {
-    const response = await request.get(`${baseURL}${API_ROUTES.adminDeduplicate}`);
+    const response = await request.get(`${baseURL}${API_ROUTES.adminDeduplicate}`, {
+      headers: { Cookie: adminCookie() },
+    });
     const data = await response.json();
     expect(data.tables.length).toBe(16);
     for (const entry of data.tables) {
@@ -35,8 +55,15 @@ test.describe('Deduplicate API @api @admin', () => {
     }
   });
 
-  test('POST /api/admin/deduplicate returns execute mode', async ({ request, baseURL }) => {
+  test('POST /api/admin/deduplicate requires auth', async ({ request, baseURL }) => {
     const response = await request.post(`${baseURL}${API_ROUTES.adminDeduplicate}`);
+    expect(response.status()).toBe(401);
+  });
+
+  test('POST /api/admin/deduplicate returns execute mode', async ({ request, baseURL }) => {
+    const response = await request.post(`${baseURL}${API_ROUTES.adminDeduplicate}`, {
+      headers: { Cookie: adminCookie() },
+    });
     expect(response.ok()).toBeTruthy();
     const data = await response.json();
     expect(data.mode).toBe('execute');
@@ -45,7 +72,9 @@ test.describe('Deduplicate API @api @admin', () => {
   });
 
   test('Preview has no errors', async ({ request, baseURL }) => {
-    const response = await request.get(`${baseURL}${API_ROUTES.adminDeduplicate}`);
+    const response = await request.get(`${baseURL}${API_ROUTES.adminDeduplicate}`, {
+      headers: { Cookie: adminCookie() },
+    });
     const data = await response.json();
     expect(data.summary.errors).toBe(0);
     for (const entry of data.tables) {

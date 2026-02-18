@@ -6,6 +6,7 @@ import React from "react";
 import { sendEmail } from "@/lib/email/send-email";
 import BookingConfirmationEmail from "@/lib/email/templates/booking-confirmation";
 import AdminNotificationEmail from "@/lib/email/templates/admin-notification";
+import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
 
 // Disable caching for this route
 export const dynamic = "force-dynamic";
@@ -13,7 +14,10 @@ export const revalidate = 0;
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "curatedascents@gmail.com";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const auth = verifyAdminSession(req);
+  if (!auth.authenticated) return adminUnauthorizedResponse(auth.error);
+
   try {
     const result = await db
       .select({
@@ -47,6 +51,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = verifyAdminSession(req);
+  if (!auth.authenticated) return adminUnauthorizedResponse(auth.error);
+
   try {
     const body = await req.json();
     const { quoteId } = body;
