@@ -3,13 +3,15 @@
 import { useState, useMemo } from "react";
 import { Info, ExternalLink, Plane } from "lucide-react";
 import { GATEWAY_AIRPORTS, type GatewayCountry } from "@/lib/constants/gateway-airports";
+import { GATEWAY_CODES } from "@/lib/constants/world-airports";
 import { buildFlightSearchUrls } from "@/lib/utils/flight-url-builder";
+import AirportSearch from "./AirportSearch";
 
 interface FlightFinderProps {
   defaultDestination?: string;
 }
 
-const allAirports = (Object.entries(GATEWAY_AIRPORTS) as [GatewayCountry, typeof GATEWAY_AIRPORTS[GatewayCountry]][]).flatMap(
+const allGatewayAirports = (Object.entries(GATEWAY_AIRPORTS) as [GatewayCountry, typeof GATEWAY_AIRPORTS[GatewayCountry]][]).flatMap(
   ([country, data]) =>
     data.airports.map((a) => ({
       ...a,
@@ -30,15 +32,17 @@ export default function FlightFinder({ defaultDestination }: FlightFinderProps) 
 
   const today = new Date().toISOString().split("T")[0];
 
-  const selectedAirport = useMemo(
-    () => allAirports.find((a) => a.code === destinationCode),
+  const isGateway = GATEWAY_CODES.has(destinationCode);
+
+  const selectedGatewayAirport = useMemo(
+    () => allGatewayAirports.find((a) => a.code === destinationCode),
     [destinationCode]
   );
 
   const urls = useMemo(
     () =>
       buildFlightSearchUrls(
-        origin.toUpperCase(),
+        origin,
         destinationCode,
         departureDate || undefined,
         returnDate || undefined
@@ -67,30 +71,22 @@ export default function FlightFinder({ defaultDestination }: FlightFinderProps) 
             {/* From */}
             <div>
               <label className="block text-luxury-cream/70 text-sm mb-1.5">From</label>
-              <input
-                type="text"
+              <AirportSearch
                 value={origin}
-                onChange={(e) => setOrigin(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
-                placeholder="e.g. JFK"
-                maxLength={3}
-                className="w-full bg-white/10 border border-luxury-gold/20 rounded-lg px-4 py-2.5 text-white placeholder:text-luxury-cream/30 focus:outline-none focus:border-luxury-gold/50 transition-colors"
+                onChange={setOrigin}
+                placeholder="Type city (e.g. New York)"
               />
             </div>
 
             {/* To */}
             <div>
               <label className="block text-luxury-cream/70 text-sm mb-1.5">To</label>
-              <select
+              <AirportSearch
                 value={destinationCode}
-                onChange={(e) => setDestinationCode(e.target.value)}
-                className="w-full bg-white/10 border border-luxury-gold/20 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-luxury-gold/50 transition-colors appearance-none"
-              >
-                {allAirports.map((a) => (
-                  <option key={a.code} value={a.code} className="bg-luxury-navy text-white">
-                    {a.label}
-                  </option>
-                ))}
-              </select>
+                onChange={setDestinationCode}
+                placeholder="Type city or select destination"
+                showGatewayFirst
+              />
             </div>
 
             {/* Departure */}
@@ -141,16 +137,25 @@ export default function FlightFinder({ defaultDestination }: FlightFinderProps) 
           </div>
 
           {/* Info Strip */}
-          {selectedAirport && (
+          {destinationCode && (
             <div className="bg-luxury-gold/10 rounded-xl px-5 py-4">
               <div className="flex items-start gap-3">
                 <Info className="w-5 h-5 text-luxury-gold flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-luxury-cream/80 space-y-1">
-                  <p>{selectedAirport.notes}</p>
-                  <p className="text-luxury-cream/60">
-                    <span className="text-luxury-gold">Typical airlines:</span>{" "}
-                    {selectedAirport.typicalAirlines.join(", ")}
-                  </p>
+                  {isGateway && selectedGatewayAirport ? (
+                    <>
+                      <p>{selectedGatewayAirport.notes}</p>
+                      <p className="text-luxury-cream/60">
+                        <span className="text-luxury-gold">Typical airlines:</span>{" "}
+                        {selectedGatewayAirport.typicalAirlines.join(", ")}
+                      </p>
+                    </>
+                  ) : (
+                    <p>
+                      This is not a direct Himalayan gateway — you may need connecting flights to
+                      reach your final destination.
+                    </p>
+                  )}
                   <p className="text-luxury-cream/50 text-xs mt-2">
                     International flights are not included in CuratedAscents packages.
                   </p>
