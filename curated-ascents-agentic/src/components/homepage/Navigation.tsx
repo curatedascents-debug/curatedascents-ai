@@ -20,6 +20,7 @@ const destinationDropdown = [
     country: "Nepal",
     slug: "nepal",
     subRegions: [
+      { name: "Kathmandu Valley", slug: "kathmandu" },
       { name: "Everest Region", slug: "everest-region" },
       { name: "Annapurna", slug: "annapurna" },
       { name: "Chitwan", slug: "chitwan" },

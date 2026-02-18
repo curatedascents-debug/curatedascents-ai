@@ -32,7 +32,12 @@ const destinations = [
     description:
       "Home to Mount Everest and eight of the world's fourteen 8,000m peaks, Nepal offers unparalleled trekking, ancient temples, and vibrant culture.",
     heroImage: "/uploads/media/nepal/landscape/everest-region-everest-view-hotel-eed54c67.webp",
-    highlights: ["Everest Base Camp", "Annapurna Circuit", "Kathmandu Valley", "Chitwan Safari"],
+    highlights: [
+      { label: "Everest Base Camp", href: "/destinations/nepal/everest-region" },
+      { label: "Annapurna Circuit", href: "/destinations/nepal/annapurna" },
+      { label: "Kathmandu Valley", href: "/destinations/nepal/kathmandu" },
+      { label: "Chitwan Safari", href: "/destinations/nepal/chitwan" },
+    ],
     bestTime: "Oct-Nov, Mar-Apr",
   },
   {
@@ -42,7 +47,11 @@ const destinations = [
     description:
       "The world's last Himalayan kingdom measures success by Gross National Happiness. Pristine forests, ancient dzongs, and deeply preserved Buddhist culture await.",
     heroImage: "/uploads/media/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917.webp",
-    highlights: ["Tiger's Nest Monastery", "Punakha Dzong", "Gangtey Valley", "Traditional Festivals"],
+    highlights: [
+      { label: "Tiger's Nest", href: "/destinations/bhutan/paro-valley" },
+      { label: "Punakha Dzong", href: "/destinations/bhutan/punakha" },
+      { label: "Thimphu", href: "/destinations/bhutan/thimphu" },
+    ],
     bestTime: "Mar-May, Sep-Nov",
   },
   {
@@ -52,7 +61,10 @@ const destinations = [
     description:
       "Perched on the highest plateau on Earth, Tibet offers a profound journey through ancient Buddhist culture, sacred lakes, and otherworldly landscapes.",
     heroImage: "/uploads/media/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
-    highlights: ["Potala Palace", "Mount Kailash", "Everest North Base Camp", "Namtso Lake"],
+    highlights: [
+      { label: "Potala Palace", href: "/destinations/tibet/lhasa" },
+      { label: "Everest North Face", href: "/destinations/tibet/everest-north-face" },
+    ],
     bestTime: "Apr-Jun, Sep-Oct",
   },
   {
@@ -62,7 +74,12 @@ const destinations = [
     description:
       "From the royal palaces of Rajasthan to the Himalayan monasteries of Ladakh and the tranquil backwaters of Kerala, India offers extraordinary diversity.",
     heroImage: "/uploads/media/india/landscape/jaipur-rajasthan-india-e33d82ba.webp",
-    highlights: ["Ladakh Monasteries", "Rajasthan Palaces", "Kerala Backwaters", "Golden Triangle"],
+    highlights: [
+      { label: "Ladakh", href: "/destinations/india/ladakh" },
+      { label: "Rajasthan", href: "/destinations/india/rajasthan" },
+      { label: "Kerala", href: "/destinations/india/kerala" },
+      { label: "Darjeeling", href: "/destinations/india/darjeeling" },
+    ],
     bestTime: "Oct-Mar",
   },
 ];
@@ -87,7 +104,7 @@ export default function DestinationsPage() {
       </section>
 
       {/* Destination Cards */}
-      <section className="py-16 sm:py-20">
+      <section className="py-16 sm:py-20 bg-luxury-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-16">
             {destinations.map((dest, idx) => (
@@ -126,30 +143,30 @@ export default function DestinationsPage() {
                     <h2 className="font-serif text-3xl sm:text-4xl font-bold text-luxury-navy mt-2 mb-4 group-hover:text-luxury-gold transition-colors">
                       {dest.name}
                     </h2>
-                    <p className="text-luxury-charcoal/60 leading-relaxed mb-6">
+                    <p className="text-luxury-charcoal/80 leading-relaxed mb-6">
                       {dest.description}
                     </p>
 
-                    {/* Highlights */}
+                    {/* Highlights — linked to sub-region pages */}
                     <div className="flex flex-wrap gap-2 mb-4">
                       {dest.highlights.map((h) => (
                         <span
-                          key={h}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-luxury-cream rounded-full text-xs text-luxury-charcoal"
+                          key={h.label}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-luxury-cream rounded-full text-xs text-luxury-charcoal font-medium"
                         >
                           <Compass className="w-3 h-3 text-luxury-gold" />
-                          {h}
+                          {h.label}
                         </span>
                       ))}
                     </div>
 
-                    <div className="flex items-center gap-4 text-sm text-luxury-charcoal/50">
+                    <div className="flex items-center gap-4 text-sm text-luxury-charcoal/60">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-4 h-4 text-luxury-gold" />
                         Best: {dest.bestTime}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4 text-luxury-gold" />
+                      <span className="flex items-center gap-1 text-luxury-gold font-medium">
+                        <MapPin className="w-4 h-4" />
                         View Full Guide &rarr;
                       </span>
                     </div>
@@ -162,7 +179,10 @@ export default function DestinationsPage() {
                 const subRegions = getSubRegionsByCountry(dest.slug);
                 if (subRegions.length === 0) return null;
                 return (
-                  <div className="mt-4 flex flex-wrap gap-2">
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    <span className="text-xs text-luxury-charcoal/40 font-medium uppercase tracking-wider self-center mr-1">
+                      Explore:
+                    </span>
                     {subRegions.map((sr) => (
                       <Link
                         key={sr.slug}

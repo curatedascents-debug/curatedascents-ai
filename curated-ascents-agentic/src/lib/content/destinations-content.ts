@@ -1,6 +1,6 @@
 /**
  * Sub-Region Destination Content
- * Static content for 16 sub-region destination pages
+ * Static content for 17 sub-region destination pages
  */
 
 export interface SubRegionDestination {
@@ -22,7 +22,55 @@ export interface SubRegionDestination {
 }
 
 export const subRegionDestinations: SubRegionDestination[] = [
-  // ─── Nepal (5) ──────────────────────────────────────────────────────────────
+  // ─── Nepal (6) ──────────────────────────────────────────────────────────────
+  {
+    slug: "kathmandu",
+    country: "nepal",
+    countryName: "Nepal",
+    name: "Kathmandu Valley",
+    heroImage: "/uploads/media/nepal/landscape/kathmandu-durbar-square1-939a394f.webp",
+    metaTitle: "Kathmandu Valley Luxury Travel | CuratedAscents",
+    metaDescription: "Explore Kathmandu Valley in luxury. Seven UNESCO World Heritage Sites, ancient temples, vibrant bazaars, and boutique hotels in Nepal's cultural heart.",
+    keywords: ["kathmandu luxury travel", "kathmandu valley", "nepal capital", "durbar square", "pashupatinath", "boudhanath stupa", "swayambhunath"],
+    content: `Kathmandu Valley is the cultural and spiritual epicentre of Nepal — a compact bowl of ancient cities, sacred temples, and living traditions that has captivated travellers for centuries. The valley contains seven UNESCO World Heritage Sites within a radius of just 15 kilometres, making it one of the densest concentrations of cultural and architectural masterpieces anywhere on Earth. Three former royal capitals — Kathmandu, Patan, and Bhaktapur — each preserve extraordinary Durbar Squares lined with intricately carved medieval palaces and pagoda temples.
+
+The city of Kathmandu itself is a sensory kaleidoscope. The narrow lanes of the old town, known as Ason, bustle with market traders, cyclists, and pilgrims heading to Durbar Square's magnificent collection of Malla-era palaces and temples. The Kumari Bahal, residence of the living goddess Kumari, and the towering Taleju Temple are architectural jewels that have survived centuries of earthquakes and renewal.
+
+Boudhanath Stupa, one of the largest Buddhist stupas in the world, dominates the eastern skyline. Encircled by monasteries and prayer wheel walls, the stupa draws Tibetan Buddhist pilgrims who circumambulate its base at dawn and dusk, spinning prayer wheels and chanting mantras. The surrounding neighbourhood is Kathmandu's Tibetan quarter, with rooftop restaurants, thangka workshops, and incense-filled gompa temples.
+
+Pashupatinath Temple, Nepal's holiest Hindu site, sprawls along the banks of the sacred Bagmati River. This UNESCO World Heritage temple complex is a vast collection of pagodas, ashrams, and cremation ghats where Hindu cremation rituals are performed openly — a profound and confronting encounter with Nepal's spiritual traditions. Nearby Swayambhunath (the "Monkey Temple") crowns a hilltop west of the city, its all-seeing eyes of Buddha gazing across the valley.
+
+Patan (Lalitpur), the valley's second city, is Nepal's artistic capital. Patan Museum, housed in a restored Malla palace, is widely considered the finest museum in the Himalayan region. The surrounding Durbar Square, denser and better preserved than Kathmandu's, is a masterclass in Newari architecture. The city's metalworkers, woodcarvers, and stone sculptors continue traditions that date back over a thousand years.
+
+Bhaktapur, the most medieval of the three cities, feels like stepping back in time. Its Durbar Square, the Nyatapola Temple (Nepal's tallest pagoda), and the labyrinthine lanes of the old town — where pottery squares, weaving workshops, and ancient water spouts function as they have for centuries — offer the most immersive cultural experience in the valley. Boutique hotels in restored Newari townhouses provide an intimate base from which to explore.
+
+Luxury hotels in Kathmandu range from heritage properties in the old town to hilltop retreats with panoramic valley views. The city's dining scene has evolved remarkably, with restaurants serving Newari feasts, modern Nepali cuisine, and international fare in atmospheric settings. Kathmandu typically bookends a Nepal journey — two to three days allows visitors to absorb the valley's extraordinary cultural wealth before or after Himalayan adventures.`,
+    highlights: [
+      { title: "Durbar Squares", description: "Three UNESCO-listed royal squares in Kathmandu, Patan, and Bhaktapur with medieval Malla-era architecture", icon: "palace" },
+      { title: "Boudhanath Stupa", description: "One of the world's largest Buddhist stupas surrounded by monasteries and Tibetan pilgrims", icon: "temple" },
+      { title: "Pashupatinath Temple", description: "Nepal's holiest Hindu site with sacred cremation ghats along the Bagmati River", icon: "temple" },
+      { title: "Patan Museum", description: "The finest museum in the Himalayas housed in a restored Malla palace", icon: "heritage" },
+      { title: "Bhaktapur", description: "The most perfectly preserved medieval city in Nepal with Nyatapola Temple", icon: "fortress" },
+      { title: "Newari Cuisine", description: "Discover the rich culinary traditions of the valley's indigenous Newar people", icon: "dining" },
+    ],
+    bestTimeToVisit: "October–November for clear skies and festival season (Dashain, Tihar); March–April for spring warmth and Holi celebrations",
+    sampleItineraries: [
+      { name: "Kathmandu Valley Cultural Tour", slug: "kathmandu-valley-cultural-tour", duration: "5 days" },
+      { name: "Everest Base Camp Luxury Trek", slug: "everest-base-camp-luxury-trek", duration: "14 days" },
+      { name: "Nepal Helicopter Tour", slug: "nepal-helicopter-tour", duration: "5 days" },
+    ],
+    luxuryAccommodations: [
+      { name: "Dwarika's Hotel", description: "Legendary heritage hotel with restored 13th-century woodcarvings, spa, and Newari cultural immersion", priceRange: "$350–600/night" },
+      { name: "Hyatt Regency Kathmandu", description: "Spacious resort set in a Buddhist monastery grounds with panoramic valley views", priceRange: "$250–450/night" },
+      { name: "Kantipur Temple House", description: "Boutique hotel in a restored Newari townhouse in the heart of old Kathmandu", priceRange: "$150–300/night" },
+    ],
+    relatedDestinations: [
+      { name: "Everest Region", country: "nepal", slug: "everest-region" },
+      { name: "Pokhara", country: "nepal", slug: "pokhara" },
+      { name: "Chitwan", country: "nepal", slug: "chitwan" },
+    ],
+    chatPrompt: "I'd like to explore Kathmandu Valley's temples and culture in luxury. Can you plan an itinerary?",
+  },
   {
     slug: "everest-region",
     country: "nepal",
