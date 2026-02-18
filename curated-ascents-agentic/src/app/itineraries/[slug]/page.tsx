@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import CustomizeButton from "./CustomizeButton";
 import FlightFinder from "@/components/flights/FlightFinder";
+import { findItineraryImage } from "@/lib/media/media-service";
 
 export const dynamic = "force-dynamic";
 
@@ -87,7 +88,12 @@ export default async function ItineraryDetailPage({ params }: PageProps) {
   const highlights = detailed?.highlights || [];
   const route = detailed?.route || "";
   const bestMonths = detailed?.bestMonths || "";
-  const heroImage = countryImages[pkg.country || "Nepal"] || countryImages.Nepal;
+  const dynamicImage = await findItineraryImage({
+    name: pkg.name,
+    country: pkg.country || undefined,
+    region: pkg.region || undefined,
+  });
+  const heroImage = dynamicImage?.cdnUrl || countryImages[pkg.country || "Nepal"] || countryImages.Nepal;
   const sellPrice = pkg.sellPrice ? parseFloat(pkg.sellPrice) : 0;
   const inclusions = pkg.inclusions?.split("\n").filter(Boolean) || [];
   const exclusions = pkg.exclusions?.split("\n").filter(Boolean) || [];

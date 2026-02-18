@@ -6,6 +6,7 @@ import { packages } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { Clock, Mountain, Users, Calendar } from "lucide-react";
 import ItineraryFilters from "./ItineraryFilters";
+import { findItineraryImage } from "@/lib/media/media-service";
 
 export const dynamic = "force-dynamic";
 
@@ -82,6 +83,23 @@ export default async function ItinerariesPage({
   const countries = [...new Set(allPackages.map((p) => p.country).filter(Boolean))] as string[];
   const types = [...new Set(allPackages.map((p) => p.packageType).filter(Boolean))] as string[];
 
+  // Fetch dynamic images from media library for all filtered packages
+  const imageResults = await Promise.all(
+    filtered.map((pkg) =>
+      findItineraryImage({
+        name: pkg.name,
+        country: pkg.country || undefined,
+        region: pkg.region || undefined,
+      })
+    )
+  );
+  const imageMap = new Map<number, string>();
+  filtered.forEach((pkg, i) => {
+    if (imageResults[i]?.cdnUrl) {
+      imageMap.set(pkg.id, imageResults[i].cdnUrl);
+    }
+  });
+
   return (
     <>
       {/* Hero */}
@@ -122,7 +140,7 @@ export default async function ItinerariesPage({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filtered.map((pkg) => {
                 const detailed = pkg.itineraryDetailed as { bestMonths?: string; highlights?: string[] } | null;
-                const heroImage = countryImages[pkg.country || "Nepal"] || countryImages.Nepal;
+                const heroImage = imageMap.get(pkg.id) || countryImages[pkg.country || "Nepal"] || countryImages.Nepal;
                 const price = pkg.sellPrice ? parseFloat(pkg.sellPrice) : 0;
 
                 return (

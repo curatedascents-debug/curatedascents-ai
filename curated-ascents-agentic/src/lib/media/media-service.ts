@@ -9,7 +9,7 @@ import {
   mediaCollections,
   mediaCollectionItems,
 } from "@/db/schema";
-import { eq, and, ilike, desc, asc, sql, count } from "drizzle-orm";
+import { eq, and, or, ilike, desc, asc, sql, count } from "drizzle-orm";
 import {
   uploadMedia as uploadPipeline,
   deleteMedia as deleteFromStorage,
@@ -724,6 +724,116 @@ export async function findBlogFeaturedImage(params: {
       altText: anyFeatured[0].altText || anyFeatured[0].title || "CuratedAscents",
       mediaId: anyFeatured[0].id,
     };
+  }
+
+  return null;
+}
+
+// ─── Itinerary Image Finder ──────────────────────────────────────────────────
+
+const ITINERARY_STOP_WORDS = new Set([
+  "luxury", "trek", "tour", "circuit", "the", "and", "of", "in", "to", "a",
+  "with", "for", "expedition", "journey", "adventure", "package", "trip",
+  "experience", "ultimate", "classic", "premium", "exclusive",
+]);
+
+/**
+ * Find a relevant image for an itinerary using a cascading search strategy.
+ * Does NOT increment usage counts (listing page loads all ~46 at once).
+ */
+export async function findItineraryImage(params: {
+  name: string;
+  country?: string;
+  region?: string;
+}): Promise<{ cdnUrl: string; altText: string } | null> {
+  const selectCols = {
+    id: mediaLibrary.id,
+    cdnUrl: mediaLibrary.cdnUrl,
+    altText: mediaLibrary.altText,
+    title: mediaLibrary.title,
+    filename: mediaLibrary.filename,
+  };
+  const orderClause = [desc(mediaLibrary.featured), asc(mediaLibrary.usageCount), sql`RANDOM()`];
+
+  // Strategy 1: Match region in destination, filename, or title
+  if (params.region) {
+    const regionTerm = `%${params.region}%`;
+    const byRegion = await db
+      .select(selectCols)
+      .from(mediaLibrary)
+      .where(
+        and(
+          eq(mediaLibrary.active, true),
+          or(
+            ilike(mediaLibrary.destination, regionTerm),
+            ilike(mediaLibrary.filename, regionTerm),
+            ilike(mediaLibrary.title, regionTerm)
+          )
+        )
+      )
+      .orderBy(...orderClause)
+      .limit(1);
+
+    if (byRegion.length > 0) {
+      return {
+        cdnUrl: byRegion[0].cdnUrl,
+        altText: byRegion[0].altText || byRegion[0].title || params.region,
+      };
+    }
+  }
+
+  // Strategy 2: Extract keywords from name and search each
+  const keywords = params.name
+    .split(/[\s\-–—]+/)
+    .map((w) => w.replace(/[^a-zA-Z]/g, "").toLowerCase())
+    .filter((w) => w.length > 2 && !ITINERARY_STOP_WORDS.has(w));
+
+  for (const keyword of keywords) {
+    const term = `%${keyword}%`;
+    const byKeyword = await db
+      .select(selectCols)
+      .from(mediaLibrary)
+      .where(
+        and(
+          eq(mediaLibrary.active, true),
+          or(
+            ilike(mediaLibrary.destination, term),
+            ilike(mediaLibrary.filename, term),
+            ilike(mediaLibrary.title, term)
+          )
+        )
+      )
+      .orderBy(...orderClause)
+      .limit(1);
+
+    if (byKeyword.length > 0) {
+      return {
+        cdnUrl: byKeyword[0].cdnUrl,
+        altText: byKeyword[0].altText || byKeyword[0].title || keyword,
+      };
+    }
+  }
+
+  // Strategy 3: Country match — least-used image for that country
+  if (params.country) {
+    const byCountry = await db
+      .select(selectCols)
+      .from(mediaLibrary)
+      .where(
+        and(
+          eq(mediaLibrary.active, true),
+          eq(mediaLibrary.country, params.country.toLowerCase())
+        )
+      )
+      .orderBy(...orderClause)
+      .limit(1);
+
+    if (byCountry.length > 0) {
+      return {
+        cdnUrl: byCountry[0].cdnUrl,
+        altText: byCountry[0].altText || byCountry[0].title || params.country,
+      };
+    }
   }
 
   return null;
