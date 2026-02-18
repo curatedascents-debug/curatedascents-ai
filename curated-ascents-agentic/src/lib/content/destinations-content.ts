@@ -1,6 +1,6 @@
 /**
  * Sub-Region Destination Content
- * Static content for 14 sub-region destination pages
+ * Static content for 16 sub-region destination pages
  */
 
 export interface SubRegionDestination {
@@ -392,7 +392,7 @@ Luxury lodges in the Punakha Valley offer some of Bhutan's most refined accommod
     chatPrompt: "I'm interested in visiting Punakha and seeing the famous dzong. Can you create a luxury Bhutan itinerary?",
   },
 
-  // ─── India (3) ──────────────────────────────────────────────────────────────
+  // ─── India (5) ──────────────────────────────────────────────────────────────
   {
     slug: "ladakh",
     country: "india",
@@ -527,6 +527,97 @@ The town's dining and accommodation have evolved considerably. Heritage hotels r
       { name: "Pokhara", country: "nepal", slug: "pokhara" },
     ],
     chatPrompt: "I'd love a luxury tea estate experience in Darjeeling. Can you plan an itinerary with mountain views?",
+  },
+
+  {
+    slug: "rajasthan",
+    country: "india",
+    countryName: "India",
+    name: "Rajasthan",
+    heroImage: "/uploads/media/india/landscape/udaipur-rajasthan-india-17d99ac2.webp",
+    metaTitle: "Rajasthan Luxury Travel | CuratedAscents",
+    metaDescription: "Experience royal Rajasthan in luxury. Magnificent palaces, desert safaris, vibrant bazaars, and heritage hotels in India's most colourful state.",
+    keywords: ["rajasthan luxury travel", "jaipur luxury hotel", "udaipur palace", "jaisalmer desert safari", "rajasthan heritage hotel", "golden triangle india"],
+    content: `Rajasthan is India at its most magnificent — a land of warrior kings, desert fortresses, and palaces so opulent they seem conjured from a fairy tale. Stretching across northwestern India from the Thar Desert to the Aravalli Hills, this vast state delivers a sensory experience unlike anywhere else on Earth. Every city is a different shade: Jaipur the Pink City, Jodhpur the Blue City, Udaipur the White City, Jaisalmer the Golden City. Together they form a route through India's most extraordinary cultural landscape.
+
+Jaipur, the state capital, sets the tone with the Hawa Mahal (Palace of Winds), the Amber Fort perched on a Rajput hilltop, and the City Palace complex where the royal family still resides. The city's bazaars overflow with gemstones, block-printed textiles, and traditional Rajasthani jewellery — a paradise for discerning shoppers. Luxury hotels within converted palaces allow guests to sleep like maharajas, with private butlers, rooftop dining, and views over the old walled city.
+
+Udaipur, often called the Venice of the East, floats around a series of interconnected lakes framed by the Aravalli Hills. The Lake Palace, a white marble confection appearing to hover on Lake Pichola, is one of the world's most romantic hotels. The City Palace, a sprawling complex of courtyards, towers, and terraces, is the largest in Rajasthan and offers panoramic views that have inspired artists for centuries.
+
+Jaisalmer rises from the Thar Desert like a golden mirage. Its living fort — one of the few in the world still inhabited — contains havelis decorated with intricate stone latticework that filters sunlight into geometric patterns. Desert camps in the surrounding dunes offer luxury safari experiences: camel rides at sunset, Rajasthani folk music under star-filled skies, and dawn balloon flights over the sand sea.
+
+Ranthambore, Rajasthan's premier wildlife destination, combines Bengal tiger safaris with the romantic ruins of a thousand-year-old fort. Private jeep safaris led by expert naturalists offer some of India's best chances of spotting the elusive tiger in its natural habitat. Luxury lodges on the park's periphery blend seamlessly into the landscape.
+
+A luxury Rajasthan journey typically spans eight to twelve days, connecting Jaipur, Jodhpur, Udaipur, and Jaisalmer by private car with a driver-guide. The heritage hotel network — converted forts, palaces, and havelis — ensures that every overnight stay is an experience in itself. This is India's golden circuit: a journey through history, colour, and royal grandeur that no amount of photography can adequately capture.`,
+    highlights: [
+      { title: "Amber Fort", description: "Explore the magnificent hilltop fortress overlooking Jaipur with its mirror palace and courtyards", icon: "fortress" },
+      { title: "Lake Palace Udaipur", description: "Visit the iconic white marble palace floating on Lake Pichola — one of the world's most romantic hotels", icon: "palace" },
+      { title: "Jaisalmer Fort", description: "Walk through the living golden fort rising from the Thar Desert, still home to 3,000 residents", icon: "fortress" },
+      { title: "Desert Safari", description: "Luxury tented camps in the Thar Desert with camel rides, folk music, and star-lit dining", icon: "camp" },
+      { title: "Ranthambore Tigers", description: "Private jeep safaris in search of Bengal tigers amid ancient fort ruins", icon: "wildlife" },
+      { title: "Palace Hotels", description: "Sleep in converted royal palaces with private butlers, rooftop dining, and heritage splendour", icon: "heritage" },
+    ],
+    bestTimeToVisit: "October–March for cool, comfortable weather; November–February ideal for desert camping and tiger safaris",
+    sampleItineraries: [
+      { name: "Golden Triangle Luxury", slug: "golden-triangle-luxury", duration: "8 days" },
+      { name: "Rajasthan Royal Heritage", slug: "rajasthan-royal-heritage", duration: "12 days" },
+    ],
+    luxuryAccommodations: [
+      { name: "Taj Lake Palace, Udaipur", description: "Iconic white marble palace floating on Lake Pichola with world-class dining and spa", priceRange: "$600–1,200/night" },
+      { name: "Rambagh Palace, Jaipur", description: "Former residence of the Maharaja of Jaipur, now a Taj luxury hotel with 78 acres of gardens", priceRange: "$500–1,000/night" },
+      { name: "Suján Rajmahal Palace, Jaipur", description: "Boutique palace hotel with 16 individually designed rooms blending heritage and contemporary art", priceRange: "$400–800/night" },
+    ],
+    relatedDestinations: [
+      { name: "Ladakh", country: "india", slug: "ladakh" },
+      { name: "Kerala", country: "india", slug: "kerala" },
+      { name: "Darjeeling", country: "india", slug: "darjeeling" },
+    ],
+    chatPrompt: "I'd love a luxury Rajasthan tour — palaces, desert safaris, and tiger spotting. Can you plan an itinerary?",
+  },
+  {
+    slug: "kerala",
+    country: "india",
+    countryName: "India",
+    name: "Kerala",
+    heroImage: "/uploads/media/india/landscape/rajasthan-india-60507acf.webp",
+    metaTitle: "Kerala Luxury Travel | CuratedAscents",
+    metaDescription: "Discover Kerala in luxury. Tranquil backwaters, Ayurvedic retreats, spice plantations, and pristine beaches in India's tropical paradise.",
+    keywords: ["kerala luxury travel", "kerala backwaters", "ayurveda kerala", "munnar tea estate", "alleppey houseboat", "india wellness retreat"],
+    content: `Kerala, India's tropical southwestern coast, is a lush ribbon of palm-fringed waterways, misty hill stations, and golden beaches that has earned the title "God's Own Country." Stretching between the Western Ghats and the Arabian Sea, this slender state packs extraordinary diversity into its compact geography — from the cool tea plantations of Munnar to the languid backwaters of Alleppey and the Ayurvedic traditions that have drawn wellness seekers for millennia.
+
+The Kerala backwaters are the state's most iconic experience. A network of 1,500 kilometres of interconnected canals, rivers, lakes, and lagoons, this watery labyrinth supports entire communities of fishermen, farmers, and toddy tappers. Luxury houseboats — converted traditional kettuvallam rice barges — cruise these waterways in supreme comfort, with private chefs preparing fresh seafood, local delicacies, and tropical fruit as the lush countryside glides past. An overnight houseboat journey from Alleppey is the quintessential Kerala experience.
+
+Munnar, in the Western Ghats at 1,600m, offers a refreshing contrast. Endless carpets of tea plantations cascade across rolling hills in every shade of green, punctuated by colonial-era bungalows and waterfalls. Luxury tea estate stays immerse guests in the tea-making process — morning walks through the gardens, visits to the factory, and afternoon tastings of some of India's finest high-grown teas. The surrounding Eravikulam National Park is home to the endangered Nilgiri tahr and offers gentle trekking through pristine shola forests.
+
+Kerala's Ayurvedic tradition is the most authentic in India. Luxury Ayurvedic resorts along the coast and in the hill country offer personalised wellness programmes developed by Vaidyas (traditional physicians) using techniques refined over 5,000 years. Treatments combine herbal medicines, therapeutic oils, yoga, and meditation in a holistic approach that addresses mind, body, and spirit. Programmes range from three-day introductions to three-week intensive detoxifications.
+
+The Malabar Coast's beaches — particularly those around Kovalam and Varkala — offer the relaxation that bookends a Kerala journey. Clifftop restaurants, beachside spas, and boutique hotels provide a setting far removed from India's more commercial beach destinations. Fort Kochi, with its Chinese fishing nets, colonial architecture, and emerging art scene, adds cultural depth.
+
+Periyar Wildlife Sanctuary, in the cardamom hills near Thekkady, offers boat safaris on a lake surrounded by pristine tropical forest. Wild elephants, gaur, and sambar deer are regularly spotted, while guided spice plantation walks reveal the origin of the cardamom, pepper, cinnamon, and cloves that once made this region the spice capital of the world.`,
+    highlights: [
+      { title: "Backwater Cruises", description: "Cruise the palm-fringed canals on a luxury houseboat with private chef and crew", icon: "boat" },
+      { title: "Munnar Tea Estates", description: "Stay on a heritage tea plantation in the misty Western Ghats with factory visits and tastings", icon: "tea" },
+      { title: "Ayurvedic Retreats", description: "Experience 5,000-year-old wellness traditions at world-class Ayurvedic resorts", icon: "spa" },
+      { title: "Fort Kochi", description: "Explore the historic port town with Chinese fishing nets, colonial churches, and art galleries", icon: "heritage" },
+      { title: "Periyar Wildlife", description: "Boat safari through tropical forest spotting wild elephants, gaur, and exotic birds", icon: "wildlife" },
+      { title: "Spice Plantations", description: "Walk through cardamom, pepper, and cinnamon gardens in the aromatic hill country", icon: "flower" },
+    ],
+    bestTimeToVisit: "September–March for dry season; October–November for post-monsoon lushness; January–March for beach weather",
+    sampleItineraries: [
+      { name: "Kerala Backwaters Luxury", slug: "kerala-backwaters-luxury", duration: "8 days" },
+      { name: "Golden Triangle Luxury", slug: "golden-triangle-luxury", duration: "8 days" },
+    ],
+    luxuryAccommodations: [
+      { name: "Kumarakom Lake Resort", description: "Heritage luxury resort on Vembanad Lake with private pool villas and Ayurvedic spa", priceRange: "$300–600/night" },
+      { name: "CGH Earth Spice Village, Thekkady", description: "Eco-luxury cottages amid a working spice plantation near Periyar Wildlife Sanctuary", priceRange: "$200–400/night" },
+      { name: "Taj Malabar Resort & Spa, Kochi", description: "Heritage waterfront hotel overlooking Kochi harbour with pool, spa, and colonial charm", priceRange: "$250–500/night" },
+    ],
+    relatedDestinations: [
+      { name: "Rajasthan", country: "india", slug: "rajasthan" },
+      { name: "Darjeeling", country: "india", slug: "darjeeling" },
+      { name: "Sikkim", country: "india", slug: "sikkim" },
+    ],
+    chatPrompt: "I'd love to experience Kerala's backwaters and Ayurvedic retreats in luxury. Can you create an itinerary?",
   },
 
   // ─── Tibet (2) ──────────────────────────────────────────────────────────────
