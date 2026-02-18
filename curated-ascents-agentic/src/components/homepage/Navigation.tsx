@@ -43,6 +43,8 @@ const destinationDropdown = [
       { name: "Ladakh", slug: "ladakh" },
       { name: "Sikkim", slug: "sikkim" },
       { name: "Darjeeling", slug: "darjeeling" },
+      { name: "Rajasthan", slug: "rajasthan" },
+      { name: "Kerala", slug: "kerala" },
     ],
   },
   {
