@@ -25,10 +25,11 @@ const trustBadges = [
     ),
   },
   {
-    label: "ASTA Member",
+    label: "Verified Business",
     icon: (
       <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16 4L20 12H28L22 17L24 26L16 21L8 26L10 17L4 12H12L16 4Z" stroke="#C9A96E" strokeWidth="1.5" strokeLinejoin="round"/>
+        <path d="M16 4L27 9V16C27 22.5 22.5 27.5 16 29.5C9.5 27.5 5 22.5 5 16V9L16 4Z" stroke="#C9A96E" strokeWidth="1.5" strokeLinejoin="round"/>
+        <path d="M11 16L14.5 19.5L21 13" stroke="#C9A96E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
   },

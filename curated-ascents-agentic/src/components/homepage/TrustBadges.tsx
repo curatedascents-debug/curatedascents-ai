@@ -2,12 +2,13 @@ import AnimateOnScroll from "./AnimateOnScroll";
 
 const badges = [
   {
-    title: "ASTA Member",
-    description: "American Society of Travel Advisors",
+    title: "29 Years Experience",
+    description: "Himalayan expertise since 1996",
     icon: (
       <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="18" cy="18" r="14" stroke="#C9A96E" strokeWidth="1.5"/>
-        <path d="M18 7L21 14H28L22.5 18.5L24.5 26L18 22L11.5 26L13.5 18.5L8 14H15L18 7Z" stroke="#C9A96E" strokeWidth="1.5" strokeLinejoin="round"/>
+        <path d="M8 28L18 8L28 28H8Z" stroke="#C9A96E" strokeWidth="1.5" strokeLinejoin="round"/>
+        <path d="M13 28L18 18L23 28" stroke="#C9A96E" strokeWidth="1.5" strokeLinejoin="round"/>
+        <line x1="18" y1="18" x2="18" y2="8" stroke="#C9A96E" strokeWidth="1.5"/>
       </svg>
     ),
   },
