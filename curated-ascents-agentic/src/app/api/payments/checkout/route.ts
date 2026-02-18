@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createCheckoutSession, createPaymentLink } from "@/lib/stripe/payment-service";
 import { rateLimit, rateLimitResponse } from "@/lib/rate-limiter";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -59,13 +60,6 @@ export async function POST(req: NextRequest) {
       });
     }
   } catch (error) {
-    console.error("Error creating checkout:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to create checkout",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return handleApiError(error, "payments-checkout");
   }
 }

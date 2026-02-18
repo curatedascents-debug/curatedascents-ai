@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { bookings, paymentMilestones, quotes } from "@/db/schema";
 import { eq, desc, sql } from "drizzle-orm";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -61,7 +62,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ bookings: results });
   } catch (error) {
-    console.error("Bookings error:", error);
-    return NextResponse.json({ error: "Failed to load bookings" }, { status: 500 });
+    return handleApiError(error, "portal-bookings");
   }
 }

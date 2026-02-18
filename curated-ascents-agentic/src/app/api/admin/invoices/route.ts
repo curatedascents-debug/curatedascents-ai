@@ -4,6 +4,7 @@ import { invoices, clients, bookings } from "@/db/schema";
 import { eq, desc, sql, and, gte, lte } from "drizzle-orm";
 import { createInvoiceFromBooking } from "@/lib/financial/invoice-engine";
 import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -106,11 +107,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error fetching invoices:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch invoices" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-invoices-get");
   }
 }
 
@@ -162,10 +159,6 @@ export async function POST(req: NextRequest) {
       message: `Invoice ${result.invoiceNumber} created successfully`,
     });
   } catch (error) {
-    console.error("Error creating invoice:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to create invoice" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-invoices-post");
   }
 }

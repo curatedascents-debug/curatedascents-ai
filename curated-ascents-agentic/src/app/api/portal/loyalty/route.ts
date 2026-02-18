@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { loyaltyAccounts, loyaltyTransactions } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -61,7 +62,6 @@ export async function GET(request: Request) {
       referralCode: account.referralCode,
     });
   } catch (error) {
-    console.error("Loyalty error:", error);
-    return NextResponse.json({ error: "Failed to load loyalty" }, { status: 500 });
+    return handleApiError(error, "portal-loyalty");
   }
 }

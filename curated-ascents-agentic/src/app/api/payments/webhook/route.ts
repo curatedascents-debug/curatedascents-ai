@@ -10,6 +10,7 @@ import {
   handleCheckoutSessionExpired,
   handlePaymentFailed,
 } from "@/lib/stripe/payment-service";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -102,10 +103,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("Error processing webhook:", error);
-    return NextResponse.json(
-      { error: "Webhook processing failed" },
-      { status: 500 }
-    );
+    return handleApiError(error, "stripe-webhook");
   }
 }

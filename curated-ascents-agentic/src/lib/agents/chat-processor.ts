@@ -21,6 +21,10 @@ import { eq } from "drizzle-orm";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
+const DEEPSEEK_TIMEOUT_MS = 30_000; // 30 second timeout
+
+const BRANDED_FALLBACK_MESSAGE =
+  "Our Expedition Architect is momentarily unavailable. Please try again, or call us at +1-715-505-4964 for immediate assistance.";
 
 // ─── PRICING SANITISER ──────────────────────────────────────────────────────
 const SENSITIVE_FIELDS = [
@@ -366,29 +370,44 @@ export async function processChatMessage(
     ];
 
     // ── Initial API call ────────────────────────────────────────────────────
-    let response = await fetch(DEEPSEEK_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: apiMessages,
-        tools: TOOL_DEFINITIONS,
-        tool_choice: "auto",
-        temperature: 0.7,
-        max_tokens: source === "whatsapp" ? 1500 : 2000, // Shorter for WhatsApp
-      }),
-    });
+    let response: Response;
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), DEEPSEEK_TIMEOUT_MS);
+
+      response = await fetch(DEEPSEEK_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "deepseek-chat",
+          messages: apiMessages,
+          tools: TOOL_DEFINITIONS,
+          tool_choice: "auto",
+          temperature: 0.7,
+          max_tokens: source === "whatsapp" ? 1500 : 2000,
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+    } catch (fetchError) {
+      const isTimeout = fetchError instanceof DOMException && fetchError.name === "AbortError";
+      console.error(`[${source}] DeepSeek ${isTimeout ? "timeout" : "fetch error"}:`, fetchError);
+      return {
+        success: true,
+        response: BRANDED_FALLBACK_MESSAGE,
+      };
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("DeepSeek API error:", errorText);
+      console.error(`[${source}] DeepSeek API error (${response.status}):`, errorText);
       return {
-        success: false,
-        response: "",
-        error: "Failed to get AI response",
+        success: true,
+        response: BRANDED_FALLBACK_MESSAGE,
       };
     }
 
@@ -448,25 +467,40 @@ export async function processChatMessage(
       apiMessages.push(assistantMessage);
       apiMessages.push(...toolResults);
 
-      response = await fetch(DEEPSEEK_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "deepseek-chat",
-          messages: apiMessages,
-          tools: TOOL_DEFINITIONS,
-          tool_choice: "auto",
-          temperature: 0.7,
-          max_tokens: source === "whatsapp" ? 1500 : 2000,
-        }),
-      });
+      try {
+        const loopController = new AbortController();
+        const loopTimeout = setTimeout(() => loopController.abort(), DEEPSEEK_TIMEOUT_MS);
+
+        response = await fetch(DEEPSEEK_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: apiMessages,
+            tools: TOOL_DEFINITIONS,
+            tool_choice: "auto",
+            temperature: 0.7,
+            max_tokens: source === "whatsapp" ? 1500 : 2000,
+          }),
+          signal: loopController.signal,
+        });
+
+        clearTimeout(loopTimeout);
+      } catch (fetchError) {
+        const isTimeout = fetchError instanceof DOMException && fetchError.name === "AbortError";
+        console.error(`[${source}] DeepSeek tool-loop ${isTimeout ? "timeout" : "fetch error"}:`, fetchError);
+        return {
+          success: true,
+          response: BRANDED_FALLBACK_MESSAGE,
+        };
+      }
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("DeepSeek API error in tool loop:", errorText);
+        console.error(`[${source}] DeepSeek API error in tool loop (${response.status}):`, errorText);
         break;
       }
 
@@ -519,9 +553,8 @@ export async function processChatMessage(
   } catch (error) {
     console.error(`[${source}] Chat processing error:`, error);
     return {
-      success: false,
-      response: "",
-      error: error instanceof Error ? error.message : "Unknown error",
+      success: true,
+      response: BRANDED_FALLBACK_MESSAGE,
     };
   }
 }

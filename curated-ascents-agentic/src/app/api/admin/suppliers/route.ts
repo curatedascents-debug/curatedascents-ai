@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { suppliers } from "@/db/schema";
 import { desc } from "drizzle-orm";
 import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
+import { handleApiError } from "@/lib/api/error-handler";
 
 // GET all suppliers
 export async function GET(req: NextRequest) {
@@ -20,11 +21,7 @@ export async function GET(req: NextRequest) {
       suppliers: result,
     });
   } catch (error) {
-    console.error("Error fetching suppliers:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch suppliers" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-suppliers-get");
   }
 }
 
@@ -114,13 +111,6 @@ export async function POST(req: NextRequest) {
       supplier: result[0],
     });
   } catch (error) {
-    console.error("Error creating supplier:", error);
-    return NextResponse.json(
-      { 
-        error: "Failed to create supplier",
-        details: error instanceof Error ? error.message : "Unknown error"
-      },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-suppliers-post");
   }
 }

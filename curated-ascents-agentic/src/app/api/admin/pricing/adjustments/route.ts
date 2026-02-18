@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { priceAdjustments, pricingRules, quotes, bookings } from "@/db/schema";
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
 import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -138,10 +139,6 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error fetching price adjustments:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch price adjustments" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-pricing-adjustments-get");
   }
 }

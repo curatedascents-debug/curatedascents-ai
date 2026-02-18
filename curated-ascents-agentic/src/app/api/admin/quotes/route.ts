@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { quotes, quoteItems, clients } from "@/db/schema";
 import { desc, eq, sql } from "drizzle-orm";
 import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export async function GET(req: NextRequest) {
   const auth = verifyAdminSession(req);
@@ -36,8 +37,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: true, quotes: result });
   } catch (error) {
-    console.error("Error fetching quotes:", error);
-    return NextResponse.json({ error: "Failed to fetch quotes" }, { status: 500 });
+    return handleApiError(error, "admin-quotes-get");
   }
 }
 
@@ -123,10 +123,6 @@ export async function POST(req: NextRequest) {
       quote,
     });
   } catch (error) {
-    console.error("Error creating quote:", error);
-    return NextResponse.json(
-      { error: "Failed to create quote", details: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-quotes-post");
   }
 }

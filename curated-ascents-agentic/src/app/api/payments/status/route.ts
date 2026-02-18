@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getCheckoutSessionStatus } from "@/lib/stripe/payment-service";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -34,13 +35,6 @@ export async function GET(req: NextRequest) {
       ...status,
     });
   } catch (error) {
-    console.error("Error getting payment status:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to get payment status",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return handleApiError(error, "payments-status");
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFinancialSummary } from "@/lib/financial/invoice-engine";
 import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -126,10 +127,6 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error generating financial report:", error);
-    return NextResponse.json(
-      { error: "Failed to generate financial report" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-financial-reports-get");
   }
 }

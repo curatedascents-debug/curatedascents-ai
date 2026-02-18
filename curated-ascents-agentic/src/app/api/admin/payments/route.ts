@@ -4,6 +4,7 @@ import { payments, invoices, clients } from "@/db/schema";
 import { eq, desc, sql, and, gte, lte } from "drizzle-orm";
 import { recordPayment, PaymentMethod } from "@/lib/financial/invoice-engine";
 import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -111,11 +112,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error fetching payments:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch payments" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-payments-get");
   }
 }
 
@@ -179,10 +176,6 @@ export async function POST(req: NextRequest) {
       message: `Payment ${result.paymentNumber} recorded successfully`,
     });
   } catch (error) {
-    console.error("Error recording payment:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to record payment" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-payments-post");
   }
 }

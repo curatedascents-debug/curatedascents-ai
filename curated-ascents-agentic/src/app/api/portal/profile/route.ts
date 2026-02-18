@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { clients } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -29,8 +30,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(client);
   } catch (error) {
-    console.error("Profile error:", error);
-    return NextResponse.json({ error: "Failed to load profile" }, { status: 500 });
+    return handleApiError(error, "portal-profile-get");
   }
 }
 
@@ -54,7 +54,6 @@ export async function PUT(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Profile update error:", error);
-    return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });
+    return handleApiError(error, "portal-profile-update");
   }
 }

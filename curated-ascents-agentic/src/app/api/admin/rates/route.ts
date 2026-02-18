@@ -15,6 +15,7 @@ import {
   miscellaneousServices
 } from "@/db/schema";
 import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
+import { handleApiError } from "@/lib/api/error-handler";
 
 // Get all rates with FULL details (for admin)
 export async function GET(req: NextRequest) {
@@ -159,11 +160,7 @@ export async function GET(req: NextRequest) {
       rates: results 
     });
   } catch (error) {
-    console.error("Error fetching rates:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch rates" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-rates-get");
   }
 }
 

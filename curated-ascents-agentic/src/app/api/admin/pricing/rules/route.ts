@@ -4,6 +4,7 @@ import { pricingRules, destinations, suppliers } from "@/db/schema";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { createPricingRule, RuleType, AdjustmentType } from "@/lib/pricing/pricing-engine";
 import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -98,11 +99,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error fetching pricing rules:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch pricing rules" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-pricing-rules-get");
   }
 }
 
@@ -201,10 +198,6 @@ export async function POST(req: NextRequest) {
       message: `Pricing rule "${name}" created successfully`,
     });
   } catch (error) {
-    console.error("Error creating pricing rule:", error);
-    return NextResponse.json(
-      { error: "Failed to create pricing rule" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-pricing-rules-post");
   }
 }

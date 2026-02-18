@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { hotels, suppliers, destinations } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
+import { handleApiError } from "@/lib/api/error-handler";
 
 // GET all hotels with supplier info
 export async function GET(req: NextRequest) {
@@ -41,11 +42,7 @@ export async function GET(req: NextRequest) {
       hotels: result,
     });
   } catch (error) {
-    console.error("Error fetching hotels:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch hotels" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-hotels-get");
   }
 }
 
@@ -81,10 +78,6 @@ export async function POST(req: NextRequest) {
       hotel: result[0],
     });
   } catch (error) {
-    console.error("Error creating hotel:", error);
-    return NextResponse.json(
-      { error: "Failed to create hotel" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-hotels-post");
   }
 }

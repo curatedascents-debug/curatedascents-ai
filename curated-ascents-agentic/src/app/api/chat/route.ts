@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { processChatMessage, isAIConfigured } from "@/lib/agents/chat-processor";
 import { rateLimit, rateLimitResponse } from "@/lib/rate-limiter";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export async function POST(req: NextRequest) {
   // Rate limit: 20 requests/minute per IP
@@ -56,10 +57,6 @@ export async function POST(req: NextRequest) {
       role: "assistant",
     });
   } catch (error) {
-    console.error("Chat API error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return handleApiError(error, "chat-api");
   }
 }

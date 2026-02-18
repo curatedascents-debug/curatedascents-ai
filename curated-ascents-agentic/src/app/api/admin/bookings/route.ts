@@ -7,6 +7,7 @@ import { sendEmail } from "@/lib/email/send-email";
 import BookingConfirmationEmail from "@/lib/email/templates/booking-confirmation";
 import AdminNotificationEmail from "@/lib/email/templates/admin-notification";
 import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
+import { handleApiError } from "@/lib/api/error-handler";
 
 // Disable caching for this route
 export const dynamic = "force-dynamic";
@@ -45,8 +46,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: true, bookings: result });
   } catch (error) {
-    console.error("Error fetching bookings:", error);
-    return NextResponse.json({ error: "Failed to fetch bookings" }, { status: 500 });
+    return handleApiError(error, "admin-bookings-get");
   }
 }
 
@@ -280,10 +280,6 @@ export async function POST(req: NextRequest) {
       emailStatus,
     });
   } catch (error) {
-    console.error("Error creating booking:", error);
-    return NextResponse.json(
-      { error: "Failed to create booking", details: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-bookings-post");
   }
 }

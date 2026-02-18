@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAgingReport } from "@/lib/financial/invoice-engine";
 import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -89,11 +90,7 @@ export async function GET(req: NextRequest) {
       generatedAt: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Error generating aging report:", error);
-    return NextResponse.json(
-      { error: "Failed to generate aging report" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-financial-aging-get");
   }
 }
 

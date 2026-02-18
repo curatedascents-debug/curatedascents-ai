@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { clients } from "@/db/schema";
 import { desc, sql } from "drizzle-orm";
 import { verifyAdminSession, adminUnauthorizedResponse } from "@/lib/auth/admin-api-auth";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export async function GET(req: NextRequest) {
   const auth = verifyAdminSession(req);
@@ -27,8 +28,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: true, clients: result });
   } catch (error) {
-    console.error("Error fetching clients:", error);
-    return NextResponse.json({ error: "Failed to fetch clients" }, { status: 500 });
+    return handleApiError(error, "admin-clients-get");
   }
 }
 
@@ -55,10 +55,6 @@ export async function POST(req: NextRequest) {
       client: result[0],
     });
   } catch (error) {
-    console.error("Error creating client:", error);
-    return NextResponse.json(
-      { error: "Failed to create client", details: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    );
+    return handleApiError(error, "admin-clients-post");
   }
 }
