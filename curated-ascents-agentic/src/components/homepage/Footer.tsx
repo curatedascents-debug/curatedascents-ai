@@ -60,10 +60,10 @@ export default function Footer() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-8"
           >
             {/* Brand Column */}
-            <motion.div variants={fadeInUp} className="md:col-span-2 lg:col-span-1">
+            <motion.div variants={fadeInUp} className="md:col-span-2 lg:col-span-2">
               <Link href="/" className="flex items-center gap-2.5 mb-1">
                 <CuratedAscentsLogo className="text-luxury-gold" size={28} />
                 <span className="text-lg font-serif font-bold text-white">
