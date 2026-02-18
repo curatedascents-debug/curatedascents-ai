@@ -425,8 +425,11 @@ export async function saveConversationMessage(
       timestamp: new Date().toISOString(),
     });
 
-    // Keep last 100 messages
-    const trimmedHistory = history.slice(-100);
+    // Keep last 50 messages and purge entries older than 90 days
+    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+    const trimmedHistory = history
+      .filter((msg: { timestamp?: string }) => !msg.timestamp || msg.timestamp > ninetyDaysAgo)
+      .slice(-50);
 
     await db
       .update(clients)
@@ -845,12 +848,13 @@ export function buildPersonalizedSystemPrompt(
 ): string {
   let prompt = basePrompt;
 
-  // Add client context section
+  // Add client context section (PII-safe: only first name, no email/phone/passport)
   if (clientProfile) {
+    const firstName = clientProfile.name?.split(" ")[0] || "a returning client";
     prompt += `\n\n## CLIENT CONTEXT
-You are speaking with ${clientProfile.name || "a returning client"}.`;
+You are speaking with ${firstName}.`;
 
-    // Add location and currency context
+    // Add location and currency context (non-PII)
     if (clientProfile.country) {
       prompt += `\n- Location: ${clientProfile.country}`;
     }

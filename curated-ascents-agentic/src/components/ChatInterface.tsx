@@ -327,8 +327,14 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
               <h3 className="text-lg font-bold text-white mb-3">
                 Let's personalize your experience
               </h3>
-              <p className="text-slate-300 text-sm mb-4">
+              <p className="text-slate-300 text-sm mb-2">
                 Share your details to save our conversation.
+              </p>
+              <p className="text-slate-500 text-xs mb-4">
+                Your information is encrypted and never shared with third parties.{" "}
+                <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-300 transition-colors">
+                  Privacy Policy
+                </a>
               </p>
 
               {personalizeSuccess ? (
@@ -573,8 +579,14 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
             <h3 className="text-xl font-bold text-white mb-4">
               Let's personalize your experience
             </h3>
-            <p className="text-slate-300 mb-6">
+            <p className="text-slate-300 mb-3">
               Share your details so I can create a tailored itinerary and save our conversation.
+            </p>
+            <p className="text-slate-500 text-sm mb-6">
+              Your information is encrypted and never shared with third parties.{" "}
+              <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-300 transition-colors">
+                Privacy Policy
+              </a>
             </p>
 
             {/* ── NEW: success state shown for ~1.4s before dialog closes ── */}

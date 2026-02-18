@@ -2,7 +2,7 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { createHash, randomInt } from "crypto";
 
-const JWT_EXPIRY = "30d";
+const JWT_EXPIRY = "7d";
 const COOKIE_NAME = "customer_session";
 
 export interface CustomerSessionPayload {
@@ -65,8 +65,8 @@ export async function setCustomerSessionCookie(token: string): Promise<void> {
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 30, // 30 days
+    sameSite: "strict",
+    maxAge: 60 * 60 * 24 * 7, // 7 days
     path: "/",
   });
 }
