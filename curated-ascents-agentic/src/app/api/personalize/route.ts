@@ -11,10 +11,17 @@ import {
   getOrCreateLeadScore,
   recordLeadEvent,
 } from "@/lib/lead-intelligence/scoring-engine";
+import { rateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "curatedascents@gmail.com";
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 10 requests per minute per IP
+  const limit = rateLimit(req, { window: 60, max: 10, identifier: "personalize" });
+  if (!limit.success) {
+    return rateLimitResponse(limit);
+  }
+
   try {
     const { name, email } = await req.json();
 

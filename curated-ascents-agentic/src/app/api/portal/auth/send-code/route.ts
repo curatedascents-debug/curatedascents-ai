@@ -1,14 +1,21 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { clients, customerVerificationCodes } from "@/db/schema";
 import { eq, and, gte } from "drizzle-orm";
 import { generateVerificationCode, hashCode } from "@/lib/auth/customer-auth";
 import { sendEmail } from "@/lib/email/send-email";
 import VerificationCodeEmail from "@/lib/email/templates/verification-code";
+import { rateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // Rate limit: 5 requests per 15 minutes per IP
+  const limit = rateLimit(request, { window: 900, max: 5, identifier: "send-code" });
+  if (!limit.success) {
+    return rateLimitResponse(limit, "Too many verification requests. Please wait before trying again.");
+  }
+
   try {
     const { email } = await request.json();
 

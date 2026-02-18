@@ -5,10 +5,17 @@ import { eq } from "drizzle-orm";
 import React from "react";
 import { sendEmail } from "@/lib/email/send-email";
 import AdminNotificationEmail from "@/lib/email/templates/admin-notification";
+import { rateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "curatedascents@gmail.com";
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 3 requests per hour per IP
+  const limit = rateLimit(req, { window: 3600, max: 3, identifier: "callback" });
+  if (!limit.success) {
+    return rateLimitResponse(limit, "You\u2019ve already submitted a callback request. We\u2019ll be in touch soon.");
+  }
+
   try {
     const { name, email, preferredTime, message } = await req.json();
 

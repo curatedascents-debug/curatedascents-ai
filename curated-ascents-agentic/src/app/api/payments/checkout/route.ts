@@ -5,11 +5,18 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createCheckoutSession, createPaymentLink } from "@/lib/stripe/payment-service";
+import { rateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 
 export const dynamic = "force-dynamic";
 
 // POST /api/payments/checkout - Create a checkout session or payment link
 export async function POST(req: NextRequest) {
+  // Rate limit: 10 requests per hour per IP
+  const limit = rateLimit(req, { window: 3600, max: 10, identifier: "checkout" });
+  if (!limit.success) {
+    return rateLimitResponse(limit, "Too many payment requests. Please try again later.");
+  }
+
   try {
     const body = await req.json();
     const { milestoneId, type = "checkout", successUrl, cancelUrl } = body;

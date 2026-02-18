@@ -134,6 +134,18 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
         }),
       });
 
+      if (response.status === 429) {
+        const errorData = await response.json().catch(() => ({}));
+        setMessages([
+          ...newMessages,
+          {
+            role: "assistant",
+            content: errorData.error || "Our expedition architect is taking a brief rest. Please try again in a moment, or call us at +1-715-505-4964.",
+          },
+        ]);
+        return;
+      }
+
       if (!response.ok) throw new Error("Failed to get response");
 
       const data = await response.json();
