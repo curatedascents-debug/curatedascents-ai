@@ -242,6 +242,12 @@ export default function AboutPage() {
                 He knows what happens when a helicopter can&apos;t fly due to weather at Lukla, when
                 monsoon timing shifts unexpectedly, or when a permit application stalls in Lhasa.
               </p>
+              <p className="text-luxury-charcoal/80 leading-relaxed mt-4">
+                Kiran is also an MICE tourism expert who has successfully operated incentive groups
+                for high-profile companies such as NISKO, Harel Insurance, General Motors, and the
+                Urologists Conference in Nepal — delivering creative theme dinners, team-building
+                games, and curated programs designed to engage corporate participants.
+              </p>
             </div>
 
             {/* Section 3 */}
