@@ -18,6 +18,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import CustomizeButton from "./CustomizeButton";
+import FlightFinder from "@/components/flights/FlightFinder";
 
 export const dynamic = "force-dynamic";
 
@@ -376,6 +377,11 @@ export default async function ItineraryDetailPage({ params }: PageProps) {
           </div>
         </section>
       )}
+
+      {/* Flight Finder */}
+      <FlightFinder defaultDestination={
+        pkg.country ? ({ Nepal: "nepal", Bhutan: "bhutan", Tibet: "tibet", India: "india" } as Record<string, string>)[pkg.country] || "nepal" : "nepal"
+      } />
 
       {/* Bottom CTA */}
       <section className="bg-luxury-navy py-16">

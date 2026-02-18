@@ -14,6 +14,7 @@ import {
   checkSupplierConfirmations,
   getTripBriefing,
   searchPhotos,
+  suggestFlightSearch,
 } from "./database-tools";
 import { researchExternalRates } from "./fallback-rate-research";
 import {
@@ -367,6 +368,14 @@ export async function executeToolCall(
           limit: args.limit as number | undefined,
         }));
 
+      case "suggest_flight_search":
+        return JSON.stringify(await suggestFlightSearch({
+          origin_code: args.origin_code as string | undefined,
+          destination_country: args.destination_country as string,
+          departure_date: args.departure_date as string | undefined,
+          return_date: args.return_date as string | undefined,
+        }));
+
       default:
         return JSON.stringify({
           error: `Unknown tool: ${toolName}`,
@@ -394,6 +403,7 @@ export async function executeToolCall(
             "get_dynamic_price",
             "check_pricing_promotions",
             "search_photos",
+            "suggest_flight_search",
           ],
         });
     }

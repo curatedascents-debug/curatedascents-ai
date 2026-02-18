@@ -778,4 +778,36 @@ export const TOOL_DEFINITIONS = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "suggest_flight_search",
+      description:
+        "Generate flight search links when a traveler asks about getting to their destination, flight costs, or how to reach Nepal/Bhutan/India/Tibet.",
+      parameters: {
+        type: "object",
+        properties: {
+          origin_code: {
+            type: "string",
+            description:
+              "Departure airport IATA code if mentioned (e.g., JFK). Empty string if unknown.",
+          },
+          destination_country: {
+            type: "string",
+            enum: ["nepal", "bhutan", "india", "tibet"],
+            description: "Target destination country",
+          },
+          departure_date: {
+            type: "string",
+            description: "YYYY-MM-DD if known",
+          },
+          return_date: {
+            type: "string",
+            description: "YYYY-MM-DD if known",
+          },
+        },
+        required: ["destination_country"],
+      },
+    },
+  },
 ];

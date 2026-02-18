@@ -25,6 +25,8 @@ import {
   tripBriefings
 } from '@/db/schema';
 import { eq, ilike, and, gte, lte, or, sql, desc } from 'drizzle-orm';
+import { GATEWAY_AIRPORTS, type GatewayCountry } from '@/lib/constants/gateway-airports';
+import { buildFlightSearchUrls } from '@/lib/utils/flight-url-builder';
 
 // Tool 1: Search rates across all service types
 export async function searchRates(params: {
@@ -1132,4 +1134,35 @@ export async function searchPhotos(params: {
     console.error('Error searching photos:', error);
     return { error: 'Photo search failed', photos: [] };
   }
+}
+
+// Tool: Suggest flight search links
+export async function suggestFlightSearch(params: {
+  origin_code?: string;
+  destination_country: string;
+  departure_date?: string;
+  return_date?: string;
+}) {
+  const country = params.destination_country as GatewayCountry;
+  const countryData = GATEWAY_AIRPORTS[country];
+  if (!countryData) {
+    return { error: `Unknown destination country: ${params.destination_country}` };
+  }
+
+  const airport = countryData.airports[0];
+  const origin = params.origin_code?.toUpperCase() || "";
+  const urls = buildFlightSearchUrls(origin, airport.code, params.departure_date, params.return_date);
+
+  return {
+    gatewayAirport: {
+      code: airport.code,
+      name: airport.name,
+      city: airport.city,
+    },
+    googleFlightsUrl: urls.google,
+    skyscannerUrl: urls.skyscanner,
+    typicalAirlines: airport.typicalAirlines,
+    notes: airport.notes,
+    reminder: "International flights are not included in CuratedAscents packages. These links open third-party search engines for the traveler to compare and book independently.",
+  };
 }

@@ -24,6 +24,7 @@ import TrustStrip from "./TrustStrip";
 import TrustBadges from "./TrustBadges";
 import FinalCTA from "./FinalCTA";
 import Footer from "./Footer";
+import FlightFinder from "../flights/FlightFinder";
 
 export default function LuxuryHomepage() {
   return (
@@ -60,6 +61,12 @@ export default function LuxuryHomepage() {
 
           {/* Testimonials */}
           <TestimonialsSection />
+
+          {/* Gold divider */}
+          <div className="section-divider my-0" />
+
+          {/* Flight Finder */}
+          <FlightFinder />
 
           {/* Trust Strip */}
           <TrustStrip />
