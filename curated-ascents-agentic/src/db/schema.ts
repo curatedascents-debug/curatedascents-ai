@@ -3319,3 +3319,31 @@ export const priceAlerts = pgTable('price_alerts', {
   index('price_alerts_hotel_idx').on(table.hotelId),
   index('price_alerts_created_idx').on(table.createdAt),
 ]);
+
+// ============================================
+// CHAT SAFETY LOGS
+// ============================================
+
+export const chatSafetyLogs = pgTable('chat_safety_logs', {
+  id: serial('id').primaryKey(),
+
+  eventType: text('event_type').notNull(), // input_blocked, input_flagged, output_violation, cost_leak_redacted
+  severity: text('severity').notNull(), // high, medium, low
+  label: text('label').notNull(), // injection_override, role_manipulation, cost_disclosure, etc.
+
+  userMessage: text('user_message'), // truncated to 500 chars
+  aiResponse: text('ai_response'), // truncated to 500 chars for output violations
+  matchedPattern: text('matched_pattern'),
+
+  clientId: integer('client_id').references(() => clients.id),
+  ipAddress: text('ip_address'),
+  source: text('source').default('web'), // web, whatsapp
+
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => [
+  index('chat_safety_event_type_idx').on(table.eventType),
+  index('chat_safety_severity_idx').on(table.severity),
+  index('chat_safety_created_idx').on(table.createdAt),
+  index('chat_safety_client_idx').on(table.clientId),
+]);
