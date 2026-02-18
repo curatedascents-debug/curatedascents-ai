@@ -2,12 +2,11 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Twitter, ChevronRight } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Twitter } from "lucide-react";
 import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 import { socialLinks } from "@/lib/constants/social-links";
 import { useChatContext } from "./ChatContext";
-import { getSubRegionsByCountry } from "@/lib/content/destinations-content";
 
 const experienceLinks = [
   { label: "Everest Region", message: "Tell me about Everest Region trips" },
@@ -26,9 +25,10 @@ const destinationLinks = [
 
 const companyLinks = [
   { label: "About Us", href: "/about" },
+  { label: "Itineraries", href: "/itineraries" },
+  { label: "Blog", href: "/blog" },
   { label: "Testimonials", href: "#testimonials" },
   { label: "Press", href: "#press" },
-  { label: "Careers", href: "mailto:careers@curatedascents.com" },
 ];
 
 const supportLinks = [
@@ -36,8 +36,8 @@ const supportLinks = [
   { label: "FAQs", href: "/faq" },
   { label: "Travel Insurance", href: "/faq#travel-insurance" },
   { label: "Visa Information", href: "/faq#visa-information" },
-  { label: "Cancellation Policy", href: "/cancellation-policy" },
   { label: "Terms & Conditions", href: "/terms" },
+  { label: "Privacy Policy", href: "/privacy-policy" },
 ];
 
 const socialIconLinks = [
@@ -53,65 +53,64 @@ export default function Footer() {
   return (
     <footer className="bg-luxury-navy border-t border-luxury-gold/10">
       {/* Main Footer */}
-      <div className="section-padding pb-12">
-        <div className="container-luxury">
+      <div className="py-12 lg:py-16">
+        <div className="container-luxury px-4 sm:px-6 lg:px-8">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12"
           >
             {/* Brand Column */}
-            <motion.div variants={fadeInUp} className="lg:col-span-2">
-              <Link href="/" className="flex items-center gap-3 mb-1">
-                <CuratedAscentsLogo className="text-luxury-gold" size={32} />
-                <span className="text-xl font-serif font-bold text-white">
+            <motion.div variants={fadeInUp} className="md:col-span-2 lg:col-span-1">
+              <Link href="/" className="flex items-center gap-2.5 mb-1">
+                <CuratedAscentsLogo className="text-luxury-gold" size={28} />
+                <span className="text-lg font-serif font-bold text-white">
                   CuratedAscents
                 </span>
               </Link>
-              <p className="text-[10px] tracking-[0.2em] uppercase text-luxury-gold/60 mb-6 ml-[44px]">
+              <p className="text-[10px] tracking-[0.2em] uppercase text-luxury-gold/60 mb-5 ml-[38px]">
                 Beyond Boundaries, Beyond Ordinary
               </p>
-              <p className="text-white/50 mb-6 max-w-sm">
+              <p className="text-white/50 text-sm leading-relaxed mb-5 max-w-xs">
                 Crafting bespoke luxury adventures across the Himalayas since 1996.
-                Where every journey is a masterpiece.
               </p>
 
               {/* Contact Info */}
-              <div className="space-y-3">
+              <div className="space-y-2.5 text-sm">
                 <a
                   href="mailto:hello@curatedascents.com"
-                  className="flex items-center gap-3 text-white/50 hover:text-luxury-gold transition-colors"
+                  className="flex items-center gap-2.5 text-white/50 hover:text-luxury-gold transition-colors"
                 >
-                  <Mail className="w-5 h-5" />
+                  <Mail className="w-4 h-4 flex-shrink-0" />
                   <span>hello@curatedascents.com</span>
                 </a>
                 <a
                   href="tel:+17155054964"
-                  className="flex items-center gap-3 text-white/50 hover:text-luxury-gold transition-colors"
+                  className="flex items-center gap-2.5 text-white/50 hover:text-luxury-gold transition-colors"
                 >
-                  <Phone className="w-5 h-5" />
+                  <Phone className="w-4 h-4 flex-shrink-0" />
                   <span>+1-715-505-4964</span>
                 </a>
-                <div className="flex items-start gap-3 text-white/50">
-                  <MapPin className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span>4498 Voyageur Way, Carmel, IN 46074, USA</span>
+                <div className="flex items-start gap-2.5 text-white/50">
+                  <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <span>4498 Voyageur Way,<br />Carmel, IN 46074, USA</span>
                 </div>
               </div>
 
               {/* Social Links */}
-              <div className="flex gap-4 mt-6">
+              <div className="flex gap-3 mt-5">
                 {socialIconLinks.map((social) => (
                   <a
                     key={social.label}
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full border border-luxury-gold/20 flex items-center justify-center text-white/40 hover:text-luxury-gold hover:border-luxury-gold/50 transition-colors"
+                    className="w-9 h-9 rounded-full border border-luxury-gold/20 flex items-center justify-center text-white/40 hover:text-luxury-gold hover:border-luxury-gold/50 transition-colors"
                     aria-label={social.label}
                   >
-                    <social.icon className="w-5 h-5" />
+                    <social.icon className="w-4 h-4" />
                   </a>
                 ))}
               </div>
@@ -119,8 +118,10 @@ export default function Footer() {
 
             {/* Experiences Column */}
             <motion.div variants={fadeInUp}>
-              <h3 className="text-white font-medium mb-4">Experiences</h3>
-              <ul className="space-y-3">
+              <h3 className="text-white text-sm font-semibold tracking-wide uppercase mb-4">
+                Experiences
+              </h3>
+              <ul className="space-y-2.5">
                 {experienceLinks.map((link) => (
                   <li key={link.label}>
                     <button
@@ -136,43 +137,37 @@ export default function Footer() {
 
             {/* Destinations Column */}
             <motion.div variants={fadeInUp}>
-              <h3 className="text-white font-medium mb-4">Destinations</h3>
-              <div className="space-y-4">
-                {destinationLinks.map((link) => {
-                  const subRegions = getSubRegionsByCountry(link.href.split("/").pop() || "");
-                  return (
-                    <div key={link.label}>
-                      <Link
-                        href={link.href}
-                        className="text-white/70 hover:text-luxury-gold transition-colors text-sm font-medium"
-                      >
-                        {link.label}
-                      </Link>
-                      {subRegions.length > 0 && (
-                        <ul className="mt-1.5 ml-2 space-y-1">
-                          {subRegions.map((sr) => (
-                            <li key={sr.slug}>
-                              <Link
-                                href={`/destinations/${link.href.split("/").pop()}/${sr.slug}`}
-                                className="text-white/40 hover:text-luxury-gold transition-colors text-xs flex items-center gap-1"
-                              >
-                                <ChevronRight className="w-3 h-3" />
-                                {sr.name}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+              <h3 className="text-white text-sm font-semibold tracking-wide uppercase mb-4">
+                Destinations
+              </h3>
+              <ul className="space-y-2.5">
+                {destinationLinks.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-white/50 hover:text-luxury-gold transition-colors text-sm"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+                <li>
+                  <Link
+                    href="/destinations"
+                    className="text-luxury-gold/60 hover:text-luxury-gold transition-colors text-sm"
+                  >
+                    View All &rarr;
+                  </Link>
+                </li>
+              </ul>
             </motion.div>
 
             {/* Company Column */}
             <motion.div variants={fadeInUp}>
-              <h3 className="text-white font-medium mb-4">Company</h3>
-              <ul className="space-y-3">
+              <h3 className="text-white text-sm font-semibold tracking-wide uppercase mb-4">
+                Company
+              </h3>
+              <ul className="space-y-2.5">
                 {companyLinks.map((link) => (
                   <li key={link.label}>
                     <a
@@ -188,8 +183,10 @@ export default function Footer() {
 
             {/* Support Column */}
             <motion.div variants={fadeInUp}>
-              <h3 className="text-white font-medium mb-4">Support</h3>
-              <ul className="space-y-3">
+              <h3 className="text-white text-sm font-semibold tracking-wide uppercase mb-4">
+                Support
+              </h3>
+              <ul className="space-y-2.5">
                 {supportLinks.map((link) => (
                   <li key={link.label}>
                     <Link
@@ -201,19 +198,6 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
-
-              {/* Call Us */}
-              <div className="mt-6 pt-6 border-t border-luxury-gold/10">
-                <h4 className="text-white font-medium mb-3">Call Us</h4>
-                <a
-                  href="tel:+17155054964"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 border border-luxury-gold/30 rounded-full text-luxury-gold hover:bg-luxury-gold/10 transition-colors text-sm"
-                >
-                  <Phone className="w-4 h-4" />
-                  +1-715-505-4964
-                </a>
-                <p className="text-white/30 text-xs mt-2">Mon-Fri 9AM-6PM EST</p>
-              </div>
             </motion.div>
           </motion.div>
         </div>
@@ -221,22 +205,14 @@ export default function Footer() {
 
       {/* Bottom Bar */}
       <div className="border-t border-luxury-gold/10">
-        <div className="container-luxury px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-white/30 text-sm">
+        <div className="container-luxury px-4 sm:px-6 lg:px-8 py-5">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+            <p className="text-white/30 text-xs">
               &copy; {new Date().getFullYear()} CuratedAscents. All rights reserved.
             </p>
-            <div className="flex gap-6">
-              <Link href="/privacy-policy" className="text-white/30 hover:text-white/60 text-sm transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="text-white/30 hover:text-white/60 text-sm transition-colors">
-                Terms of Service
-              </Link>
-              <Link href="/privacy-policy#cookies" className="text-white/30 hover:text-white/60 text-sm transition-colors">
-                Cookies
-              </Link>
-            </div>
+            <p className="text-white/20 text-xs">
+              Mon-Fri 9AM-6PM EST &middot; +1-715-505-4964
+            </p>
           </div>
         </div>
       </div>
