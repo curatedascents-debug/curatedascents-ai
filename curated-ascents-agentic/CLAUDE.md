@@ -43,7 +43,7 @@ npm run test:smoke          # Run @smoke tagged tests only
 
 Tag-specific: `test:admin`, `test:portal`, `test:agency`, `test:auth`, `test:api`, `test:ai-tools`, `test:booking`, `test:regression`, `test:staging`, `test:production`
 
-**Test suite:** 322 tests, 57 spec files, 9 categories, 100% pass rate. Config: `tests/playwright.config.ts`. Full details: `docs/TESTING.md`.
+**Test suite:** 380+ tests, 66 spec files, 9 categories, 100% pass rate. Config: `tests/playwright.config.ts`. Full details: `docs/TESTING.md`.
 
 **Critical test notes:**
 - Tests live in `tests/` (excluded from `tsconfig.json`)
@@ -70,7 +70,7 @@ Defined in `.env.local`:
 
 1. Pull latest from `main`, create feature branch
 2. Develop: `npm run dev` at localhost:3000
-3. Test: `npm run test:chromium` (322 tests)
+3. Test: `npm run test:chromium` (380+ tests)
 4. Build: `npm run build` (zero TS errors)
 5. Push branch, PR, merge to `main` (Vercel auto-deploys)
 

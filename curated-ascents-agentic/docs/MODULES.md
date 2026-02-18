@@ -65,7 +65,7 @@
 
 ## Media Library
 - `src/lib/media/r2-client.ts` — Cloudflare R2 upload/delete with local filesystem fallback (`public/uploads/media/`), WebP conversion, thumbnails via `sharp`
-- `src/lib/media/media-service.ts` — Full CRUD, search, AI photo search, blog image lookup (filename + tag strategies), bulk ops, collections, stats
+- `src/lib/media/media-service.ts` — Full CRUD, search, AI photo search, blog image lookup (filename + tag strategies), itinerary image matching (4-strategy cascade with country filter + Unsplash fallback), bulk ops, collections, stats
 
 ## WhatsApp Integration (6 files)
 - `src/lib/whatsapp/whatsapp-client.ts` — WhatsApp Business API client

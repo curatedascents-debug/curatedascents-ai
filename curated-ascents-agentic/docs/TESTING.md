@@ -1,6 +1,6 @@
 # E2E Test Architecture (`tests/`)
 
-**370+ tests across 66 spec files, 9 categories, 100% pass rate.**
+**380+ tests across 66 spec files, 9 categories, 100% pass rate.**
 
 ## Directory Structure
 
@@ -62,7 +62,7 @@ tests/
 |----------|-------|-------|---------------|
 | api | 21 | ~170 | Admin CRUD, blog, chat, media, payment, portal, financial, availability, risk, loyalty, content, support, agency CRUD, supplier extended, WhatsApp, deduplication, health, security APIs |
 | admin | 12 | 50 | All admin dashboard tabs (rates, hotels, suppliers, clients, quotes, bookings, blog, media, pricing, nurture, reports) |
-| public | 8 | ~50 | Homepage, blog, static pages, SEO, about, sub-region destinations |
+| public | 8 | ~60 | Homepage, blog, static pages, SEO, about, sub-region destinations, itinerary image/formatting |
 | portal | 7 | 22 | Customer portal pages (dashboard, trips, quotes, loyalty, chat, currency, settings) |
 | auth | 4 | 21 | Admin, agency, supplier, portal authentication flows |
 | chat | 5 | 19 | Chat widget, conversation flow, tool responses, personalization/email capture, agency chat |

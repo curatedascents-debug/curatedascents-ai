@@ -166,6 +166,11 @@
 - **Footer Redesign** — Simplified 5-column grid, normalized fonts, removed duplication, cleaner spacing
 - **Hero Text** — Non-breaking spaces prevent "India" from wrapping to next line
 
+## Phase 7.2: Itinerary Image Matching & Display Polish (Complete)
+- **Country-Filtered Image Matching** — `findItineraryImage()` strategies 1 (region) and 2 (keyword) now filter by country, preventing cross-country contamination (e.g., Boudhanath photo for Bhutan itinerary, Kerala photo for Nepal trek)
+- **Unsplash Fallback (Strategy 4)** — Curated `UNSPLASH_ITINERARY_PHOTOS` map with 33+ region-specific Unsplash photo IDs as final fallback when no media library match exists. Search order: exact region → keyword match → country → null
+- **PackageType Formatting** — `formatPackageType()` replaces underscores with spaces and title-cases each word (e.g., `fixed_departure_trek` → "Fixed Departure Trek") in listing cards, detail hero, and filter buttons
+
 ## Future Enhancements
 - **WhatsApp Go-Live** — WhatsApp Business API account verification and production deployment
 - **Video Consultations** — Scheduled video calls with travel experts
