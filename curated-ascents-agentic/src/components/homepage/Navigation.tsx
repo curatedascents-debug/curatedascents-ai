@@ -77,6 +77,9 @@ export default function Navigation() {
     const element = document.querySelector(href);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
+    } else {
+      // Navigate to homepage with anchor when on a different page
+      window.location.href = `/${href}`;
     }
   };
 

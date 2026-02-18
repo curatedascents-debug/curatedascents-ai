@@ -27,8 +27,8 @@ const companyLinks = [
   { label: "About Us", href: "/about" },
   { label: "Itineraries", href: "/itineraries" },
   { label: "Blog", href: "/blog" },
-  { label: "Testimonials", href: "#press" },
-  { label: "Press", href: "#press" },
+  { label: "Testimonials", href: "/#press" },
+  { label: "Press", href: "/#press" },
 ];
 
 const supportLinks = [
