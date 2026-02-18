@@ -218,8 +218,8 @@ export default function AboutPage() {
                   In 1996, Kiran Pokhrel stepped onto his first Himalayan trail and never truly left.
                   What began as an instinct — a pull toward the world&apos;s most dramatic landscapes
                   — became a career spanning nearly three decades. Working with international brands
-                  including TUI, Kuoni Travel, SAGA Holidays, Adventure World Australia, and
-                  Geographical Tours, Kiran built an encyclopaedic knowledge of Nepal, Bhutan, Tibet,
+                  including SITA World Tours, Distant Frontiers, TUI, Kuoni Travel, SAGA Holidays,
+                  Adventure World Australia, and Geographical Tours, Kiran built an encyclopaedic knowledge of Nepal, Bhutan, Tibet,
                   and India: not from brochures, but from thousands of miles walked, hundreds of
                   supplier relationships nurtured, and an intimate understanding of what separates an
                   adequate Himalayan experience from an extraordinary one.

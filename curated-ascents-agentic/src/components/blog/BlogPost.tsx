@@ -5,8 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Calendar, Clock, ArrowLeft, Share2, Facebook, Twitter, Linkedin } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import CuratedAscentsLogo from "@/components/icons/CuratedAscentsLogo";
-import { ChatProvider, useChatContext } from "@/components/homepage/ChatContext";
+import { useChatContext } from "@/components/homepage/ChatContext";
 
 interface Post {
   id: number;
@@ -47,32 +46,15 @@ interface BlogPostProps {
 }
 
 export default function BlogPost({ slug }: BlogPostProps) {
-  return (
-    <ChatProvider>
-      <BlogPostContent slug={slug} />
-    </ChatProvider>
-  );
-}
-
-function BlogPostContent({ slug }: BlogPostProps) {
   const { openChat } = useChatContext();
   const [post, setPost] = useState<Post | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<RelatedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     fetchPost();
   }, [slug]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const fetchPost = async () => {
     try {
@@ -85,7 +67,7 @@ function BlogPostContent({ slug }: BlogPostProps) {
       } else {
         setError(data.error || "Post not found");
       }
-    } catch (err) {
+    } catch {
       setError("Failed to load post");
     } finally {
       setLoading(false);
@@ -145,50 +127,6 @@ function BlogPostContent({ slug }: BlogPostProps) {
 
   return (
     <div className="min-h-screen bg-luxury-navy">
-      {/* Navigation */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          isScrolled
-            ? "bg-luxury-navy/95 backdrop-blur-md border-b border-luxury-gold/10 py-4"
-            : "bg-transparent py-6"
-        }`}
-      >
-        <div className="container-luxury px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 group">
-              <CuratedAscentsLogo className="text-luxury-gold group-hover:text-luxury-gold/80 transition-colors" size={32} />
-              <div>
-                <span className="text-xl font-serif font-bold text-white">
-                  CuratedAscents
-                </span>
-                <span className="hidden sm:block text-[10px] tracking-[0.2em] uppercase text-luxury-gold/60 -mt-0.5">
-                  Beyond Boundaries, Beyond Ordinary
-                </span>
-              </div>
-            </Link>
-
-            <nav className="hidden md:flex items-center gap-8">
-              <Link href="/#signature-journeys" className="text-white/70 hover:text-white transition-colors link-underline">
-                Journeys
-              </Link>
-              <Link href="/blog" className="text-white/70 hover:text-white transition-colors link-underline">
-                Blog
-              </Link>
-              <Link href="/#about" className="text-white/70 hover:text-white transition-colors link-underline">
-                About
-              </Link>
-            </nav>
-
-            <button
-              onClick={() => openChat()}
-              className="hidden md:inline-block px-6 py-2.5 bg-luxury-gold text-luxury-navy text-sm font-medium rounded-full hover:bg-luxury-gold/90 transition-all duration-300"
-            >
-              Plan Your Journey
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* Hero */}
       <div className="relative h-[60vh] min-h-[400px]">
         {post.featuredImage && (
@@ -380,28 +318,6 @@ function BlogPostContent({ slug }: BlogPostProps) {
           </motion.aside>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="border-t border-luxury-gold/10 py-12">
-        <div className="container-luxury px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <CuratedAscentsLogo className="text-luxury-gold" size={24} />
-              <div>
-                <span className="text-lg font-serif font-bold text-white">
-                  CuratedAscents
-                </span>
-                <span className="hidden sm:block text-[9px] tracking-[0.2em] uppercase text-luxury-gold/60 -mt-0.5">
-                  Beyond Boundaries, Beyond Ordinary
-                </span>
-              </div>
-            </Link>
-            <p className="text-white/30 text-sm">
-              &copy; {new Date().getFullYear()} CuratedAscents. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

@@ -78,7 +78,7 @@ export default function HeroSection() {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}
           >
-            Nepal &middot; Bhutan &middot; Tibet &middot; India
+            Nepal&nbsp;&middot;&nbsp;Bhutan&nbsp;&middot;&nbsp;Tibet&nbsp;&middot;&nbsp;India
           </h1>
 
           {/* Subheading */}

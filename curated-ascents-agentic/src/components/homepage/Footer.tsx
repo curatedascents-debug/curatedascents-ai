@@ -60,7 +60,7 @@ export default function Footer() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12"
           >
             {/* Brand Column */}
             <motion.div variants={fadeInUp} className="lg:col-span-2">
