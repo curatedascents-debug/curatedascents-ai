@@ -119,7 +119,54 @@
 - **Cron Auth Standardization** — All cron jobs verify `CRON_SECRET` via `Authorization: Bearer` header
 - **Unique Index Fix** — Added unique index on `exchangeRates(fromCurrency, toCurrency)` for reliable upserts
 
-## Phase 6: Future Enhancements
+## Phase 6: FX Rates, Destinations & Luxury Itineraries (Complete)
+- **FX Rates Admin Tab** — `FxRatesTab.tsx` with Daily Rates, Historical (30/90/365 days), Currencies sub-tabs
+- **Destination Pages** — 4 country pages at `/destinations/[slug]` (Nepal, Bhutan, Tibet, India) with full guides
+- **Destination Layout** — `destinations/layout.tsx` with ChatProvider + Navigation + Footer
+- **Luxury Itineraries (46)** — DB-driven itinerary system with seed data across 4 countries
+- **Itinerary Pages** — `/itineraries` with filtering + `/itineraries/[slug]` detail pages (force-dynamic)
+- **Seed Endpoints** — `/api/admin/seed-itineraries`, `/api/admin/seed-destinations`, `/api/admin/cleanup-itineraries`
+- **Dynamic Sitemap** — Includes destination pages and DB-driven itinerary URLs from `packages` table
+
+## Phase 6.1: Sub-Region Destination Pages (Complete)
+- **14 Sub-Region Pages** — `/destinations/[country]/[slug]` for long-tail SEO
+- **Sub-Region Content** — `src/lib/content/destinations-content.ts` with 14 detailed guides
+- **Nepal:** Everest Region, Annapurna, Chitwan, Pokhara, Upper Mustang
+- **Bhutan:** Paro Valley, Thimphu, Punakha
+- **India:** Ladakh, Sikkim, Darjeeling
+- **Tibet:** Lhasa, Everest North Face
+- **Navigation Dropdown** — Desktop hover dropdown with 4-column country/sub-region layout
+- **JSON-LD** — `TouristDestination` schema per sub-region page
+
+## Phase 6.2: About Page & Founder Story (Complete)
+- **About Page** — `/about` with founder biography, enterprise career history, philosophy section, office contact
+- **About Layout** — `about/layout.tsx` with ChatProvider + Navigation + Footer
+- **Founder Photo** — Real founder portrait in About page and homepage FounderSection
+- **Enterprise Roles** — Travelport, American Airlines, United Airlines, Expedia, Amex GBT, Hilton, Starr Insurance
+- **Brand Partners** — SITA World Tours, Distant Frontiers, TUI, Kuoni Travel, SAGA Holidays, Adventure World Australia, Geographical Tours
+- **JSON-LD** — Person + TravelAgency structured data
+
+## Phase 6.3: HNW Trust & Booking Confidence (Complete)
+- **Booking Confidence** — Secure checkout badge, bank transfer mention, insurance included
+- **Human Escalation** — "Speak to an Expert" button in chat with phone number
+- **Mobile UX** — Comprehensive touch target fixes (44px min), responsive improvements for iPhone/iPad
+
+## Phase 7: Security Hardening — Pre-Launch (Complete)
+- **Rate Limiting** — Token bucket rate limiter in middleware for API endpoints
+- **Prompt Injection Protection** — Input sanitization and output guardrails for AI chat
+- **Admin API Auth** — Inline auth checks on all admin API routes (middleware + belt-and-suspenders)
+- **PII Protections** — Cookie security hardening (sameSite: strict, reduced maxAge), env var audit, privacy notices on email capture
+- **Error Handling** — Centralized `handleApiError()` in `src/lib/api/error-handler.ts`, sanitized errors in production, detailed in dev
+- **DeepSeek Timeout** — 30s AbortController timeout with branded fallback message
+- **Health Endpoint** — `/api/health` for uptime monitoring
+- **Stripe Webhook** — Verified safe error handling
+
+## Phase 7.1: UI Polish (Complete)
+- **Blog Layout** — Shared `blog/layout.tsx` with Navigation + Footer (was inline before)
+- **Footer Redesign** — Simplified 5-column grid, normalized fonts, removed duplication, cleaner spacing
+- **Hero Text** — Non-breaking spaces prevent "India" from wrapping to next line
+
+## Future Enhancements
 - **WhatsApp Go-Live** — WhatsApp Business API account verification and production deployment
 - **Video Consultations** — Scheduled video calls with travel experts
 - **AR/VR Previews** — Virtual destination tours

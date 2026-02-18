@@ -46,7 +46,7 @@ npm run dev           # Dev server on localhost:3000
 npm run build         # Production build (must pass with zero TS errors)
 npm run start         # Production server
 npm run lint          # ESLint
-npm run test:chromium # E2E tests (322 tests, Playwright)
+npm run test:chromium # E2E tests (370+ tests, Playwright)
 npm test              # All E2E tests (all browsers)
 ```
 
@@ -69,7 +69,7 @@ src/
     ├── media/        # R2 client + media service
     ├── pricing/      # Dynamic pricing engine
     └── whatsapp/     # WhatsApp integration (6 modules)
-tests/                # Playwright E2E (322 tests, 57 specs)
+tests/                # Playwright E2E (370+ tests, 66 specs)
 docs/                 # Reference documentation
 ```
 
@@ -84,6 +84,10 @@ docs/                 # Reference documentation
 - **Media Library** — Cloudflare R2 storage with AI auto-tagging
 - **Dynamic Pricing** — Seasonal, demand, early bird, group, loyalty rules
 - **PWA** — Installable progressive web app with offline support
+- **About Page** — Founder story, enterprise career, philosophy, office contact
+- **Destinations** — 4 country + 14 sub-region pages with SEO-optimized guides
+- **Security** — Rate limiting, prompt injection protection, centralized error handling
+- **Health Check** — `/api/health` uptime monitoring endpoint
 
 ## Documentation
 

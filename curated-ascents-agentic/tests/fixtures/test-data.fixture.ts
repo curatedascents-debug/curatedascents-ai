@@ -38,6 +38,7 @@ export const ROUTES = {
   destinationTibet: '/destinations/tibet',
   destinationIndia: '/destinations/india',
   itineraries: '/itineraries',
+  about: '/about',
 
   // Admin
   adminLogin: '/admin/login',
@@ -68,6 +69,7 @@ export const ROUTES = {
 
 export const API_ROUTES = {
   chat: '/api/chat',
+  health: '/api/health',
   personalize: '/api/personalize',
   seedAll: '/api/seed-all',
 

@@ -50,6 +50,7 @@
 - `src/lib/content/narrative-generator.ts` — Narrative content generation
 - `src/lib/content/destination-guides.ts` — Destination guide data
 - `src/lib/content/seed-content.ts` — Content seeding
+- `src/lib/content/destinations-content.ts` — 14 sub-region destination guides (Nepal 5, Bhutan 3, India 3, Tibet 2)
 
 ## Email (20 files)
 - `src/lib/email/send-email.ts` — Email sending via Resend
@@ -80,6 +81,8 @@
 ## API Helpers
 - `src/lib/api/agency-context.ts` — Agency request context from middleware headers
 - `src/lib/api/supplier-context.ts` — Supplier request context from middleware headers
+
+- `src/lib/api/error-handler.ts` — Centralized API error handler: generic in production, sanitized in dev
 
 ## Constants (7 files in `src/lib/constants/`)
 - `destinations.ts`, `experiences.ts`, `hero-slides.ts`, `press.ts`, `social-links.ts`, `stats.ts`, `testimonials.ts`

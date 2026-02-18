@@ -1,6 +1,6 @@
 # E2E Test Architecture (`tests/`)
 
-**322 tests across 57 spec files, 9 categories, 100% pass rate.**
+**370+ tests across 66 spec files, 9 categories, 100% pass rate.**
 
 ## Directory Structure
 
@@ -36,9 +36,9 @@ tests/
 │   ├── HomePage.ts, BlogPage.ts, PortalDashboardPage.ts, ...
 ├── reporters/
 │   └── summary-reporter.ts           # Custom reporter -> test-summary.json
-├── specs/                             # 57 spec files across 9 categories
-│   ├── admin/ (11), agency/ (3), api/ (17), auth/ (4), chat/ (5)
-│   ├── journeys/ (4), portal/ (7), public/ (4), supplier/ (2)
+├── specs/                             # 66 spec files across 9 categories
+│   ├── admin/ (12), agency/ (3), api/ (21), auth/ (4), chat/ (5)
+│   ├── journeys/ (4), portal/ (7), public/ (8), supplier/ (2)
 └── ci/
     └── playwright.yml                 # GitHub Actions CI config
 ```
@@ -51,7 +51,7 @@ tests/
 - Email capture modal blocks chat input after 2nd user message — tests must dismiss it via `chatWidget.skipEmailCapture()` before sending more
 - Use `waitForLoadState('networkidle')` after navigation for reliable page load detection
 - Use `.first()` with `getByRole('button', { name: /regex/ })` to avoid strict mode violations when multiple buttons match
-- Admin API endpoints have NO inline auth — middleware only protects page routes; API tests expect 200 OK
+- Admin API endpoints have inline auth — API tests must include admin auth cookie via `generateAdminToken()` from auth fixture
 - MSW (`msw` devDep): server-side mocking via `tests/msw/` + `src/instrumentation.ts` (ENABLE_MSW=true)
 - Drizzle direct seeding fails (ESM/CJS conflict with `@neondatabase/serverless`); HTTP `/api/seed-all` fallback works
 - Agency auth tests use inline JWT generation via `jose` (same pattern as `auth.fixture.ts`)
@@ -60,9 +60,9 @@ tests/
 
 | Category | Specs | Tests | What's Tested |
 |----------|-------|-------|---------------|
-| api | 17 | 152 | Admin CRUD, blog, chat, media, payment, portal, financial, availability, risk, loyalty, content, support, agency CRUD, supplier extended, WhatsApp, deduplication APIs |
-| admin | 11 | 50 | All admin dashboard tabs (rates, hotels, suppliers, clients, quotes, bookings, blog, media, pricing, nurture, reports) |
-| public | 4 | 30 | Homepage, blog, static pages, SEO |
+| api | 21 | ~170 | Admin CRUD, blog, chat, media, payment, portal, financial, availability, risk, loyalty, content, support, agency CRUD, supplier extended, WhatsApp, deduplication, health, security APIs |
+| admin | 12 | 50 | All admin dashboard tabs (rates, hotels, suppliers, clients, quotes, bookings, blog, media, pricing, nurture, reports) |
+| public | 8 | ~50 | Homepage, blog, static pages, SEO, about, sub-region destinations |
 | portal | 7 | 22 | Customer portal pages (dashboard, trips, quotes, loyalty, chat, currency, settings) |
 | auth | 4 | 21 | Admin, agency, supplier, portal authentication flows |
 | chat | 5 | 19 | Chat widget, conversation flow, tool responses, personalization/email capture, agency chat |

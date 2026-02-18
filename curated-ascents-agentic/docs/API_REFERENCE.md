@@ -6,6 +6,7 @@
 | POST | `/api/chat` | AI chat with tool execution |
 | POST | `/api/personalize` | Save client email/name |
 | GET | `/api/seed-all` | Full database seeding (upsert) |
+| GET | `/api/health` | Health check / uptime monitoring |
 | GET | `/api/seed` | Basic database seed |
 | GET | `/api/seed-agency` | Agency-specific seed data |
 | GET | `/api/agent/supplier-contacts` | Internal agent supplier lookup |
@@ -251,6 +252,9 @@
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
 | POST | `/api/admin/deduplicate` | Detect and remove duplicate seed records |
+| GET | `/api/admin/seed-itineraries` | Seed luxury itineraries into packages table |
+| GET | `/api/admin/seed-destinations` | Seed destination guides |
+| GET | `/api/admin/cleanup-itineraries` | Clean up test itineraries |
 
 ## Supplier Portal APIs
 | Method | Endpoint | Purpose |
