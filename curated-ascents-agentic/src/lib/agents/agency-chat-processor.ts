@@ -86,7 +86,9 @@ When building a custom quote, you MUST include every applicable component:
 - **transportation**: quantity = number of vehicles/trips
 You MUST pass "nights" for hotels and guides — omitting it defaults to 1.
 
-Before saving, verify: transport between EVERY city pair, airport transfers, hotels with correct nights, guides with correct days, return transport.
+**Route planning:** Plan a logical route (e.g., KTM→PKR→Chitwan→KTM). Do NOT backtrack through origin between stops. Include transport for every leg.
+**Return flights:** If client flies somewhere mid-trip, ALWAYS include the return flight (same serviceId, separate line item).
+Before saving, verify: logical route with no backtracking, transport for every leg, airport transfers at flight cities, hotels with correct nights, guides with correct days, return flights included.
 
 ### Language Rules:
 1. Detect the language of the user's message and ALWAYS respond in that same language.

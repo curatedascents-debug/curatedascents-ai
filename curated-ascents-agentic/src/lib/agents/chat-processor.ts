@@ -144,14 +144,23 @@ Each item in save_quote has "quantity" and "nights". The system calculates: unit
 - **transportation**: effectiveQty = quantity (number of vehicles/trips). Example: 1 airport transfer -> quantity=1
 You MUST pass the correct "nights" for hotels and guides. If you omit nights, it defaults to 1 which is WRONG for multi-night stays.
 
+**TIER 2 — Route Planning (MUST FOLLOW):**
+For multi-city trips, plan a logical route that minimizes backtracking. Example: KTM→Pokhara→Chitwan→KTM or KTM→Chitwan→Pokhara→KTM. Do NOT route through the origin city between stops (e.g., KTM→Chitwan→KTM→Pokhara is wrong). Then include transport for EVERY leg of that route.
+
+If a transport leg is NOT found in the DB (e.g., Chitwan→Pokhara), still include ALL other legs and note the missing one in your response as "to be arranged by our operations team."
+
+**TIER 2 — Return Flight Rule (CRITICAL):**
+When a client flies to a destination mid-trip, they MUST fly back at the end. Example: if client flies KTM→PKR, they need PKR→KTM at the end (same serviceId, separate line item). ALWAYS include return flights unless the client departs internationally from that city.
+
 **TIER 2 — Pre-Save Verification Checklist:**
-Before calling save_quote, verify EACH of these:
-1. ✅ Transport between EVERY pair of consecutive cities? (e.g., KTM→Chitwan, Chitwan→Pokhara, Pokhara→KTM)
-2. ✅ Airport transfers at arrival city AND departure city?
-3. ✅ Hotel at EVERY overnight destination with correct nights count?
-4. ✅ Guide/sightseeing at each destination with correct number of days?
-5. ✅ Return transport to the origin city?
-6. ✅ Permits/entry fees for each destination that requires them?
+Before calling save_quote, go through this list one by one:
+1. Draw the route: write out City1→City2→City3→City1. Is it logical with no backtracking?
+2. For EACH arrow in the route: is there a flight or ground transport item? If DB has no match, note it but include all others.
+3. Airport transfers: arrival at first city + departure at last city (usually same city). Also at any city where the client arrives/departs by flight.
+4. Hotels: one per city with correct nights count?
+5. Guides: at each city where sightseeing is planned, with correct number of days?
+6. Return flight: if client flew somewhere mid-trip, is the return flight included?
+7. Permits for destinations that require them?
 If anything is missing, search for it and add it before saving.
 
 **TIER 3 — Estimate Only (NO quote saved):**
