@@ -176,22 +176,26 @@ export async function searchRates(params: {
         )
         .limit(10);
 
-      results.push(...flightResults.map(r => ({
-        id: r.id,
-        serviceType: 'flight',
-        name: `${r.airlineName}: ${r.flightSector}`,
-        airlineName: r.airlineName,
-        flightSector: r.flightSector,
-        departureCity: r.departureCity,
-        arrivalCity: r.arrivalCity,
-        flightDuration: r.flightDuration,
-        baggageAllowanceKg: r.baggageAllowanceKg,
-        aircraftType: r.aircraftType,
-        fareClass: r.fareClass,
-        destination: r.flightSector,
-        inclusions: r.inclusions,
-        exclusions: r.exclusions,
-      })));
+      // Add forward sector results
+      for (const r of flightResults) {
+        results.push({
+          id: r.id,
+          serviceType: 'flight',
+          name: `${r.airlineName}: ${r.flightSector}`,
+          airlineName: r.airlineName,
+          flightSector: r.flightSector,
+          departureCity: r.departureCity,
+          arrivalCity: r.arrivalCity,
+          flightDuration: r.flightDuration,
+          baggageAllowanceKg: r.baggageAllowanceKg,
+          aircraftType: r.aircraftType,
+          fareClass: r.fareClass,
+          destination: r.flightSector,
+          inclusions: r.inclusions,
+          exclusions: r.exclusions,
+          returnSectorNote: `Same rate applies for the return sector (${r.arrivalCity}→${r.departureCity}). Use the same serviceId (${r.id}) for the return flight.`,
+        });
+      }
     }
 
     // Search helicopter sharing
@@ -345,6 +349,28 @@ export async function searchRates(params: {
   }
 }
 
+// Batch search: search multiple service types in one call to reduce tool iterations
+export async function searchMultipleServices(params: {
+  destination: string;
+  serviceTypes: string[];
+  starRating?: number;
+  hotelName?: string;
+}) {
+  const results: Record<string, any[]> = {};
+
+  for (const serviceType of params.serviceTypes) {
+    const found = await searchRates({
+      destination: params.destination,
+      category: serviceType,
+      starRating: params.starRating,
+      hotelName: params.hotelName,
+    });
+    results[serviceType] = found;
+  }
+
+  return results;
+}
+
 // Tool 2: Get specific rate details by ID and type
 export async function getRateDetails(params: { rateId: number; serviceType?: string }) {
   const { rateId, serviceType } = params;
@@ -385,6 +411,38 @@ export async function getRateDetails(params: { rateId: number; serviceType?: str
             .limit(1);
           return flight[0] || null;
         
+        case 'porter':
+          const porter = await db
+            .select()
+            .from(porters)
+            .where(eq(porters.id, rateId))
+            .limit(1);
+          return porter[0] || null;
+
+        case 'helicopter_sharing':
+          const heliShare = await db
+            .select()
+            .from(helicopterSharing)
+            .where(eq(helicopterSharing.id, rateId))
+            .limit(1);
+          return heliShare[0] || null;
+
+        case 'helicopter_charter':
+          const heliCharter = await db
+            .select()
+            .from(helicopterCharter)
+            .where(eq(helicopterCharter.id, rateId))
+            .limit(1);
+          return heliCharter[0] || null;
+
+        case 'permit':
+          const permit = await db
+            .select()
+            .from(permitsFees)
+            .where(eq(permitsFees.id, rateId))
+            .limit(1);
+          return permit[0] || null;
+
         case 'package':
           const pkg = await db
             .select()
@@ -392,7 +450,7 @@ export async function getRateDetails(params: { rateId: number; serviceType?: str
             .where(eq(packages.id, rateId))
             .limit(1);
           return pkg[0] || null;
-        
+
         default:
           return null;
       }
@@ -451,9 +509,12 @@ export async function calculateQuote(params: {
           grandTotal += subtotal;
           lineItems.push({
             serviceType: svc.serviceType,
+            serviceId: svc.serviceId,
             name: (detail as any).roomType || 'Hotel Room',
             rooms,
             nights,
+            unitSellPrice: unitPrice,
+            itemTotal: subtotal,
           });
           break;
         }
@@ -465,9 +526,12 @@ export async function calculateQuote(params: {
           grandTotal += subtotal;
           lineItems.push({
             serviceType: svc.serviceType,
+            serviceId: svc.serviceId,
             name: (detail as any).guideType || (detail as any).region || svc.serviceType,
             quantity: qty,
             days,
+            unitSellPrice: unitPrice,
+            itemTotal: subtotal,
           });
           break;
         }
@@ -477,8 +541,11 @@ export async function calculateQuote(params: {
           grandTotal += subtotal;
           lineItems.push({
             serviceType: svc.serviceType,
+            serviceId: svc.serviceId,
             name: `${(detail as any).vehicleName || (detail as any).vehicleType}: ${(detail as any).routeFrom} → ${(detail as any).routeTo}`,
             quantity: qty,
+            unitSellPrice: unitPrice,
+            itemTotal: subtotal,
           });
           break;
         }
@@ -488,8 +555,11 @@ export async function calculateQuote(params: {
           grandTotal += subtotal;
           lineItems.push({
             serviceType: svc.serviceType,
+            serviceId: svc.serviceId,
             name: `${(detail as any).airlineName}: ${(detail as any).flightSector}`,
             pax: numberOfPax,
+            unitSellPrice: unitPrice,
+            itemTotal: subtotal,
           });
           break;
         }
@@ -499,8 +569,11 @@ export async function calculateQuote(params: {
           grandTotal += subtotal;
           lineItems.push({
             serviceType: svc.serviceType,
+            serviceId: svc.serviceId,
             name: (detail as any).routeName,
             pax: numberOfPax,
+            unitSellPrice: unitPrice,
+            itemTotal: subtotal,
           });
           break;
         }
@@ -510,8 +583,11 @@ export async function calculateQuote(params: {
           grandTotal += subtotal;
           lineItems.push({
             serviceType: svc.serviceType,
+            serviceId: svc.serviceId,
             name: (detail as any).routeName,
             quantity: qty,
+            unitSellPrice: unitPrice,
+            itemTotal: subtotal,
           });
           break;
         }
@@ -521,8 +597,11 @@ export async function calculateQuote(params: {
           grandTotal += subtotal;
           lineItems.push({
             serviceType: svc.serviceType,
+            serviceId: svc.serviceId,
             name: (detail as any).name,
             pax: numberOfPax,
+            unitSellPrice: unitPrice,
+            itemTotal: subtotal,
           });
           break;
         }
@@ -532,8 +611,11 @@ export async function calculateQuote(params: {
           grandTotal += subtotal;
           lineItems.push({
             serviceType: svc.serviceType,
+            serviceId: svc.serviceId,
             name: (detail as any).name,
             pax: numberOfPax,
+            unitSellPrice: unitPrice,
+            itemTotal: subtotal,
           });
           break;
         }
@@ -543,14 +625,17 @@ export async function calculateQuote(params: {
           grandTotal += subtotal;
           lineItems.push({
             serviceType: svc.serviceType,
+            serviceId: svc.serviceId,
             name: (detail as any).name || svc.serviceType,
             quantity: qty,
+            unitSellPrice: unitPrice,
+            itemTotal: subtotal,
           });
         }
       }
     }
 
-    // Only expose the list of services and the grand total — no per-item pricing
+    // Return services with per-item pricing (serviceId, unitSellPrice, itemTotal) for save_quote
     return {
       numberOfPax,
       occupancyType,
@@ -620,6 +705,72 @@ export async function getCategories(destination?: string) {
   ];
 }
 
+// Helper: Look up cost price from the rate table for a given service
+async function getCostPrice(serviceType: string, serviceId: number, occupancyType?: string): Promise<number> {
+  try {
+    const detail = await getRateDetails({ rateId: serviceId, serviceType });
+    if (!detail) return 0;
+
+    switch (serviceType) {
+      case 'hotel':
+        return parseFloat(
+          (occupancyType === 'single'
+            ? (detail as any).costSingle
+            : (detail as any).costDouble) || '0'
+        );
+      case 'transportation':
+      case 'flight':
+      case 'permit':
+      case 'package':
+        return parseFloat((detail as any).costPrice || '0');
+      case 'guide':
+      case 'porter':
+        return parseFloat((detail as any).costPerDay || '0');
+      case 'helicopter_sharing':
+        return parseFloat((detail as any).costPerSeat || '0');
+      case 'helicopter_charter':
+        return parseFloat((detail as any).costPerCharter || '0');
+      default:
+        return parseFloat((detail as any).costPrice || '0');
+    }
+  } catch {
+    return 0;
+  }
+}
+
+// Helper: Look up sell price from the rate table for a given service
+async function getSellPrice(serviceType: string, serviceId: number, occupancyType?: string): Promise<number> {
+  try {
+    const detail = await getRateDetails({ rateId: serviceId, serviceType });
+    if (!detail) return 0;
+
+    switch (serviceType) {
+      case 'hotel':
+        return parseFloat(
+          (occupancyType === 'single'
+            ? (detail as any).sellSingle
+            : (detail as any).sellDouble) || '0'
+        );
+      case 'transportation':
+      case 'flight':
+      case 'permit':
+      case 'package':
+        return parseFloat((detail as any).sellPrice || '0');
+      case 'guide':
+      case 'porter':
+        return parseFloat((detail as any).sellPerDay || '0');
+      case 'helicopter_sharing':
+        return parseFloat((detail as any).sellPerSeat || '0');
+      case 'helicopter_charter':
+        return parseFloat((detail as any).sellPerCharter || '0');
+      default:
+        return parseFloat((detail as any).sellPrice || '0');
+    }
+  } catch {
+    return 0;
+  }
+}
+
 // Tool 6: Save a quote to the database
 export async function saveQuote(params: {
   clientEmail?: string;
@@ -627,15 +778,28 @@ export async function saveQuote(params: {
   quoteName?: string;
   destination?: string;
   numberOfPax?: number;
+  occupancyType?: string;
   items: Array<{
     serviceType: string;
+    serviceId?: number;
     serviceName: string;
     description?: string;
     quantity?: number;
-    sellPrice: number;
+    sellPrice?: number; // Deprecated — prices are always looked up from DB by serviceId
   }>;
 }) {
   try {
+    // Reject quotes where items are missing serviceId (AI must use DB records)
+    const itemsWithoutServiceId = params.items.filter(i => !i.serviceId);
+    if (itemsWithoutServiceId.length > 0) {
+      console.warn('save_quote called with items missing serviceId:', itemsWithoutServiceId.map(i => i.serviceName));
+      return {
+        error: 'Cannot save quote: all items must have a serviceId from the database.',
+        message: `The following items are missing serviceId: ${itemsWithoutServiceId.map(i => i.serviceName).join(', ')}. Please use search_packages or search_rates first to find the correct database records, then include their IDs when saving the quote.`,
+        missingServiceIds: itemsWithoutServiceId.map(i => ({ serviceType: i.serviceType, serviceName: i.serviceName })),
+      };
+    }
+
     // Find or create client
     let clientId: number | null = null;
     if (params.clientEmail) {
@@ -668,11 +832,48 @@ export async function saveQuote(params: {
     const nextNum = (Number(countResult[0]?.count) || 0) + 1;
     const quoteNumber = `QT-${year}-${String(nextNum).padStart(4, '0')}`;
 
-    // Calculate totals
-    let totalSell = 0;
+    // Verify every serviceId actually exists in the database before saving
+    const invalidItems: Array<{ serviceType: string; serviceName: string; serviceId: number }> = [];
     for (const item of params.items) {
-      totalSell += (item.sellPrice || 0) * (item.quantity || 1);
+      if (item.serviceId) {
+        const detail = await getRateDetails({ rateId: item.serviceId, serviceType: item.serviceType });
+        if (!detail) {
+          invalidItems.push({ serviceType: item.serviceType, serviceName: item.serviceName, serviceId: item.serviceId });
+        }
+      }
     }
+    if (invalidItems.length > 0) {
+      console.warn('save_quote called with non-existent serviceIds:', invalidItems);
+      return {
+        error: 'Cannot save quote: some service IDs do not exist in the database.',
+        message: `The following items have invalid serviceIds: ${invalidItems.map(i => `${i.serviceName} (${i.serviceType} #${i.serviceId})`).join(', ')}. Please use search_packages or search_rates to find valid database records first.`,
+        invalidItems,
+      };
+    }
+
+    // Look up cost and sell prices from DB for every item with a serviceId
+    // ALWAYS use DB prices — ignore AI-provided sellPrice to ensure margin integrity
+    const resolvedItems: Array<{ unitCost: number; unitSell: number; unitMargin: number }> = [];
+    let totalSell = 0;
+    let totalCost = 0;
+
+    for (const item of params.items) {
+      const qty = item.quantity || 1;
+
+      // ALWAYS use DB prices — ignore any AI-provided sellPrice
+      const unitCost = item.serviceId ? await getCostPrice(item.serviceType, item.serviceId, params.occupancyType) : 0;
+      const unitSell = item.serviceId ? await getSellPrice(item.serviceType, item.serviceId, params.occupancyType) : 0;
+      const unitMargin = (unitCost > 0 && unitSell > 0) ? unitSell - unitCost : 0;
+      totalSell += unitSell * qty;
+      totalCost += unitCost * qty;
+      resolvedItems.push({ unitCost, unitSell, unitMargin });
+    }
+
+    const totalMargin = totalSell - totalCost;
+    const marginPercent = totalCost > 0 ? (totalMargin / totalCost) * 100 : 0;
+    const perPersonPrice = params.numberOfPax && params.numberOfPax > 0
+      ? totalSell / params.numberOfPax
+      : 0;
 
     const quoteResult = await db
       .insert(quotes)
@@ -683,6 +884,10 @@ export async function saveQuote(params: {
         destination: params.destination || null,
         numberOfPax: params.numberOfPax || null,
         totalSellPrice: totalSell.toFixed(2),
+        totalCostPrice: totalCost > 0 ? totalCost.toFixed(2) : null,
+        totalMargin: totalCost > 0 ? totalMargin.toFixed(2) : null,
+        marginPercent: totalCost > 0 ? marginPercent.toFixed(2) : null,
+        perPersonPrice: perPersonPrice > 0 ? perPersonPrice.toFixed(2) : null,
         currency: 'USD',
         status: 'draft',
       })
@@ -690,16 +895,19 @@ export async function saveQuote(params: {
 
     const quote = quoteResult[0];
 
-    // Insert line items
+    // Insert line items with cost data (all values per-unit)
     if (params.items.length > 0) {
       await db.insert(quoteItems).values(
-        params.items.map((item) => ({
+        params.items.map((item, idx) => ({
           quoteId: quote.id,
           serviceType: item.serviceType || 'miscellaneous',
+          serviceId: item.serviceId || null,
           serviceName: item.serviceName || null,
           description: item.description || null,
           quantity: item.quantity || 1,
-          sellPrice: item.sellPrice?.toFixed(2) || null,
+          costPrice: resolvedItems[idx].unitCost > 0 ? resolvedItems[idx].unitCost.toFixed(2) : null,
+          sellPrice: resolvedItems[idx].unitSell > 0 ? resolvedItems[idx].unitSell.toFixed(2) : null,
+          margin: resolvedItems[idx].unitCost > 0 ? resolvedItems[idx].unitMargin.toFixed(2) : null,
           currency: 'USD',
         }))
       );

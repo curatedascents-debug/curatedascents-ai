@@ -86,6 +86,55 @@ export const TOOL_DEFINITIONS = [
   {
     type: "function",
     function: {
+      name: "search_multiple_services",
+      description: `Search for multiple service types in ONE call. Use this for Tier 2 custom builds to find hotels, guides, flights, transport, permits, and porters in a single tool call instead of making separate search_rates calls for each.
+
+      Returns results grouped by serviceType. Each result includes the service ID needed for calculate_quote and save_quote.
+
+      Example: Search for hotel + guide + flight + transportation in Kathmandu in one call.`,
+      parameters: {
+        type: "object",
+        properties: {
+          destination: {
+            type: "string",
+            description: "Location/destination to search (e.g., Kathmandu, Pokhara, Everest Region)",
+          },
+          serviceTypes: {
+            type: "array",
+            items: {
+              type: "string",
+              enum: [
+                "hotel",
+                "transportation",
+                "guide",
+                "porter",
+                "flight",
+                "helicopter_sharing",
+                "helicopter_charter",
+                "permit",
+                "miscellaneous",
+              ],
+            },
+            description: "Array of service types to search for simultaneously",
+          },
+          starRating: {
+            type: "integer",
+            minimum: 1,
+            maximum: 5,
+            description: "Star rating filter for hotels (1-5)",
+          },
+          hotelName: {
+            type: "string",
+            description: "Search by specific hotel name",
+          },
+        },
+        required: ["destination", "serviceTypes"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "search_packages",
       description: `Search for curated travel packages, treks, tours, and expeditions. Returns day-by-day itineraries when available.
 
@@ -289,9 +338,14 @@ export const TOOL_DEFINITIONS = [
     type: "function",
     function: {
       name: "save_quote",
-      description: `Save a quote to the database. Use this when the client confirms they want a quote saved,
-      or when you have gathered enough information to create a formal quote.
-      The quote will be saved as a draft and can be viewed in the admin dashboard.`,
+      description: `Save a quote to the database. IMPORTANT: You MUST use calculate_quote first to verify pricing, then pass the same serviceType + serviceId pairs here. Every item MUST include the serviceId from the database — never fabricate prices or omit serviceId. Prices are looked up automatically from the DB by serviceId — do NOT pass sellPrice.
+
+      Two patterns:
+      - PACKAGE QUOTE: One item with serviceType 'package' + package ID. Admin sees package cost/sell/margin from DB.
+      - CUSTOM BUILD: Multiple items — each component (hotel, guide, flight, permit, transport, porter) with its own serviceId from search_rates/search_hotels results. Admin sees full per-component cost breakdown.
+
+      WORKFLOW: search_packages/search_rates → calculate_quote → save_quote (with serviceIds from search results).
+      NEVER call save_quote for Tier 3 estimates (when no DB records exist).`,
       parameters: {
         type: "object",
         properties: {
@@ -315,6 +369,11 @@ export const TOOL_DEFINITIONS = [
             type: "integer",
             description: "Number of travelers",
           },
+          occupancyType: {
+            type: "string",
+            enum: ["single", "double", "triple"],
+            description: "Room occupancy type (affects hotel cost lookup)",
+          },
           items: {
             type: "array",
             items: {
@@ -322,7 +381,11 @@ export const TOOL_DEFINITIONS = [
               properties: {
                 serviceType: {
                   type: "string",
-                  description: "Type of service",
+                  description: "Type of service (must match what was used in search_rates/search_packages)",
+                },
+                serviceId: {
+                  type: "integer",
+                  description: "REQUIRED: The database ID from search_rates/search_packages results. This links the quote item to the actual rate record for cost/margin tracking.",
                 },
                 serviceName: {
                   type: "string",
@@ -334,19 +397,15 @@ export const TOOL_DEFINITIONS = [
                 },
                 quantity: {
                   type: "integer",
-                  description: "Quantity",
-                },
-                sellPrice: {
-                  type: "number",
-                  description: "Sell price per unit",
+                  description: "Quantity (number of units — rooms×nights, pax, days, trips, etc.)",
                 },
               },
-              required: ["serviceType", "serviceName", "sellPrice"],
+              required: ["serviceType", "serviceId", "serviceName"],
             },
-            description: "Array of quote line items",
+            description: "Array of quote line items — each MUST have a serviceId from the database. Prices are looked up from DB automatically.",
           },
         },
-        required: ["items"],
+        required: ["items", "numberOfPax"],
       },
     },
   },
