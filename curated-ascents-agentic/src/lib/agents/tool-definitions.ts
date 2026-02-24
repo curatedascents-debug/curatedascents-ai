@@ -397,12 +397,16 @@ export const TOOL_DEFINITIONS = [
                 },
                 quantity: {
                   type: "integer",
-                  description: "Quantity (number of units — rooms×nights, pax, days, trips, etc.)",
+                  description: "Number of units: for hotels = number of rooms, for guides/porters = number of guides, for flights/permits = numberOfPax, for transportation = number of vehicles. Default 1.",
+                },
+                nights: {
+                  type: "integer",
+                  description: "Number of nights (hotels) or days (guides/porters). REQUIRED for hotels and guides. E.g., 3 nights in Kathmandu hotel → nights=3. 2 days of guide → nights=2.",
                 },
               },
               required: ["serviceType", "serviceId", "serviceName"],
             },
-            description: "Array of quote line items — each MUST have a serviceId from the database. Prices are looked up from DB automatically.",
+            description: "Array of quote line items — each MUST have a serviceId from the database. Prices are looked up from DB automatically. You MUST pass nights for hotels and guides.",
           },
         },
         required: ["items", "numberOfPax"],

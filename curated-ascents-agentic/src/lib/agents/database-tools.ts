@@ -785,6 +785,7 @@ export async function saveQuote(params: {
     serviceName: string;
     description?: string;
     quantity?: number;
+    nights?: number; // Number of nights (hotels) or days (guides/porters)
     sellPrice?: number; // Deprecated — prices are always looked up from DB by serviceId
   }>;
 }) {
@@ -853,20 +854,49 @@ export async function saveQuote(params: {
 
     // Look up cost and sell prices from DB for every item with a serviceId
     // ALWAYS use DB prices — ignore AI-provided sellPrice to ensure margin integrity
-    const resolvedItems: Array<{ unitCost: number; unitSell: number; unitMargin: number }> = [];
+    // Quantity calculation mirrors calculateQuote logic per service type
+    const resolvedItems: Array<{ unitCost: number; unitSell: number; unitMargin: number; effectiveQty: number }> = [];
     let totalSell = 0;
     let totalCost = 0;
 
     for (const item of params.items) {
       const qty = item.quantity || 1;
+      const nights = item.nights || 1;
 
       // ALWAYS use DB prices — ignore any AI-provided sellPrice
       const unitCost = item.serviceId ? await getCostPrice(item.serviceType, item.serviceId, params.occupancyType) : 0;
       const unitSell = item.serviceId ? await getSellPrice(item.serviceType, item.serviceId, params.occupancyType) : 0;
       const unitMargin = (unitCost > 0 && unitSell > 0) ? unitSell - unitCost : 0;
-      totalSell += unitSell * qty;
-      totalCost += unitCost * qty;
-      resolvedItems.push({ unitCost, unitSell, unitMargin });
+
+      // Calculate effective quantity based on service type (mirrors calculateQuote logic)
+      let effectiveQty: number;
+      switch (item.serviceType) {
+        case 'hotel': {
+          // Hotel: price is per room per night → qty (rooms) × nights
+          const rooms = qty || (params.numberOfPax ? Math.ceil(params.numberOfPax / (params.occupancyType === 'single' ? 1 : 2)) : 1);
+          effectiveQty = rooms * nights;
+          break;
+        }
+        case 'guide':
+        case 'porter':
+          // Guide/porter: price is per day → qty (number of guides) × nights (days)
+          effectiveQty = qty * nights;
+          break;
+        case 'flight':
+        case 'helicopter_sharing':
+        case 'permit':
+        case 'package':
+          // Per-person pricing → use qty (should be numberOfPax)
+          effectiveQty = qty;
+          break;
+        default:
+          // Transportation, helicopter charter, misc → flat per-unit
+          effectiveQty = qty;
+      }
+
+      totalSell += unitSell * effectiveQty;
+      totalCost += unitCost * effectiveQty;
+      resolvedItems.push({ unitCost, unitSell, unitMargin, effectiveQty });
     }
 
     const totalMargin = totalSell - totalCost;
@@ -895,7 +925,9 @@ export async function saveQuote(params: {
 
     const quote = quoteResult[0];
 
-    // Insert line items with cost data (all values per-unit)
+    // Insert line items with cost data
+    // quantity stores effectiveQty (rooms×nights for hotels, guides×days for guides, etc.)
+    // costPrice/sellPrice are per-unit rates; quantity × sellPrice = line total
     if (params.items.length > 0) {
       await db.insert(quoteItems).values(
         params.items.map((item, idx) => ({
@@ -904,7 +936,7 @@ export async function saveQuote(params: {
           serviceId: item.serviceId || null,
           serviceName: item.serviceName || null,
           description: item.description || null,
-          quantity: item.quantity || 1,
+          quantity: resolvedItems[idx].effectiveQty,
           costPrice: resolvedItems[idx].unitCost > 0 ? resolvedItems[idx].unitCost.toFixed(2) : null,
           sellPrice: resolvedItems[idx].unitSell > 0 ? resolvedItems[idx].unitSell.toFixed(2) : null,
           margin: resolvedItems[idx].unitCost > 0 ? resolvedItems[idx].unitMargin.toFixed(2) : null,
