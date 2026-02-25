@@ -13,6 +13,7 @@ import {
   quotes,
   bookings,
   clients,
+  aiBusinessRules,
 } from "@/db/schema";
 import { eq, and, isNull, or, lte, gte, sql } from "drizzle-orm";
 
@@ -143,6 +144,38 @@ function sanitizeForAgency(value: unknown): unknown {
   }
 
   return value;
+}
+
+// ─── DYNAMIC RULE LOADER ────────────────────────────────────────────────────
+async function loadActiveRules(appliesTo: 'customer_chat' | 'agency_chat' | 'whatsapp'): Promise<string> {
+  try {
+    const rules = await db
+      .select({ category: aiBusinessRules.category, ruleText: aiBusinessRules.ruleText })
+      .from(aiBusinessRules)
+      .where(and(
+        eq(aiBusinessRules.isActive, true),
+        or(eq(aiBusinessRules.appliesTo, 'all'), eq(aiBusinessRules.appliesTo, appliesTo))
+      ))
+      .orderBy(aiBusinessRules.priority);
+
+    if (rules.length === 0) return '';
+
+    const grouped = new Map<string, string[]>();
+    for (const r of rules) {
+      if (!grouped.has(r.category)) grouped.set(r.category, []);
+      grouped.get(r.category)!.push(r.ruleText);
+    }
+
+    let section = '\n\n## Business Rules (Admin-Configured)\n';
+    for (const [cat, texts] of grouped) {
+      section += `\n### ${cat.replace(/_/g, ' ').toUpperCase()}\n`;
+      texts.forEach(t => { section += `- ${t}\n`; });
+    }
+    return section;
+  } catch (error) {
+    console.error('Failed to load AI business rules:', error);
+    return '';
+  }
 }
 
 // ─── AGENCY MARGIN LOOKUP ────────────────────────────────────────────────────
@@ -541,7 +574,13 @@ export async function processAgencyChatMessage(
 
   try {
     // Build agency-specific system prompt
-    const systemPrompt = `${AGENCY_SYSTEM_PROMPT}\n\n## Agency Context\nYou are currently assisting **${agencyName}** (Agency ID: ${agencyId}). All quotes and bookings will be associated with this agency.`;
+    let systemPrompt = `${AGENCY_SYSTEM_PROMPT}\n\n## Agency Context\nYou are currently assisting **${agencyName}** (Agency ID: ${agencyId}). All quotes and bookings will be associated with this agency.`;
+
+    // Load admin-editable business rules from DB
+    const dynamicRules = await loadActiveRules('agency_chat');
+    if (dynamicRules) {
+      systemPrompt += dynamicRules;
+    }
 
     const apiMessages: Array<
       { role: string; content: string } | Record<string, unknown>

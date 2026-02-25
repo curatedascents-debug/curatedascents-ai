@@ -16,8 +16,8 @@ import {
 import { checkInputGuardrails } from "@/lib/agents/input-guardrails";
 import { checkOutputGuardrails, addPricingDisclaimer } from "@/lib/agents/output-guardrails";
 import { db } from "@/db";
-import { clients, chatSafetyLogs } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { clients, chatSafetyLogs, aiBusinessRules } from "@/db/schema";
+import { eq, and, or } from "drizzle-orm";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
@@ -255,6 +255,38 @@ const WHATSAPP_PROMPT_ADDITIONS = `
 - If sharing links, put them on their own line
 - Offer to send detailed quotes via email when appropriate`;
 
+// ─── DYNAMIC RULE LOADER ────────────────────────────────────────────────────
+async function loadActiveRules(appliesTo: 'customer_chat' | 'agency_chat' | 'whatsapp'): Promise<string> {
+  try {
+    const rules = await db
+      .select({ category: aiBusinessRules.category, ruleText: aiBusinessRules.ruleText })
+      .from(aiBusinessRules)
+      .where(and(
+        eq(aiBusinessRules.isActive, true),
+        or(eq(aiBusinessRules.appliesTo, 'all'), eq(aiBusinessRules.appliesTo, appliesTo))
+      ))
+      .orderBy(aiBusinessRules.priority);
+
+    if (rules.length === 0) return ''; // Fallback: hardcoded rules still in prompt
+
+    const grouped = new Map<string, string[]>();
+    for (const r of rules) {
+      if (!grouped.has(r.category)) grouped.set(r.category, []);
+      grouped.get(r.category)!.push(r.ruleText);
+    }
+
+    let section = '\n\n## Business Rules (Admin-Configured)\n';
+    for (const [cat, texts] of grouped) {
+      section += `\n### ${cat.replace(/_/g, ' ').toUpperCase()}\n`;
+      texts.forEach(t => { section += `- ${t}\n`; });
+    }
+    return section;
+  } catch (error) {
+    console.error('Failed to load AI business rules:', error);
+    return ''; // Fallback to hardcoded rules
+  }
+}
+
 export interface Message {
   role: "user" | "assistant" | "system";
   content: string;
@@ -401,6 +433,13 @@ export async function processChatMessage(
     // Add WhatsApp-specific guidelines
     if (source === "whatsapp") {
       systemPrompt += WHATSAPP_PROMPT_ADDITIONS;
+    }
+
+    // Load admin-editable business rules from DB
+    const chatType = source === "whatsapp" ? "whatsapp" : "customer_chat";
+    const dynamicRules = await loadActiveRules(chatType as 'customer_chat' | 'whatsapp');
+    if (dynamicRules) {
+      systemPrompt += dynamicRules;
     }
 
     // Personalize with client data

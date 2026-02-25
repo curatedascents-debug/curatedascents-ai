@@ -3347,3 +3347,34 @@ export const chatSafetyLogs = pgTable('chat_safety_logs', {
   index('chat_safety_created_idx').on(table.createdAt),
   index('chat_safety_client_idx').on(table.clientId),
 ]);
+
+// ─── AI BUSINESS RULES ──────────────────────────────────────────────────────
+
+export const aiRuleCategoryEnum = pgEnum('ai_rule_category', [
+  'pricing_display', 'component_checklist', 'route_planning',
+  'quantity_rules', 'communication', 'escalation',
+  'country_specific', 'search_strategy',
+]);
+
+export const aiRuleAppliesToEnum = pgEnum('ai_rule_applies_to', [
+  'all', 'customer_chat', 'agency_chat', 'whatsapp',
+]);
+
+export const aiBusinessRules = pgTable('ai_business_rules', {
+  id: serial('id').primaryKey(),
+  category: aiRuleCategoryEnum('category').notNull(),
+  ruleKey: text('rule_key').notNull().unique(),
+  ruleTitle: text('rule_title').notNull(),
+  ruleText: text('rule_text').notNull(),
+  appliesTo: aiRuleAppliesToEnum('applies_to').default('all').notNull(),
+  priority: integer('priority').default(100).notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
+  country: text('country'),
+  serviceType: text('service_type'),
+  createdBy: text('created_by'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => [
+  index('ai_rules_category_idx').on(table.category),
+  index('ai_rules_active_priority_idx').on(table.isActive, table.priority),
+]);

@@ -1,6 +1,6 @@
 "use client";
 
-export type TabType = "rates" | "suppliers" | "hotels" | "clients" | "quotes" | "bookings" | "reports" | "agencies" | "pricing" | "nurture" | "competitors" | "blog" | "whatsapp" | "media" | "price-alerts" | "fx-rates";
+export type TabType = "rates" | "suppliers" | "hotels" | "clients" | "quotes" | "bookings" | "reports" | "agencies" | "pricing" | "nurture" | "competitors" | "blog" | "whatsapp" | "media" | "price-alerts" | "fx-rates" | "ai-rules";
 
 interface TabConfig {
   key: TabType;
