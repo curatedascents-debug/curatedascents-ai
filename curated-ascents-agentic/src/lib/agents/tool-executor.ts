@@ -3,6 +3,7 @@
 
 import {
   searchRates,
+  searchMultipleServices,
   getRateDetails,
   calculateQuote,
   getDestinations,
@@ -91,6 +92,14 @@ export async function executeToolCall(
           hotelName: args.hotelName as string | undefined,
         }));
 
+      case "search_multiple_services":
+        return JSON.stringify(await searchMultipleServices({
+          destination: args.destination as string,
+          serviceTypes: args.serviceTypes as string[],
+          starRating: args.starRating as number | undefined,
+          hotelName: args.hotelName as string | undefined,
+        }));
+
       case "search_packages":
         return JSON.stringify(await searchRates({
           destination: args.destination as string | undefined,
@@ -140,8 +149,10 @@ export async function executeToolCall(
           quoteName: args.quoteName as string | undefined,
           destination: args.destination as string | undefined,
           numberOfPax: args.numberOfPax as number | undefined,
+          occupancyType: args.occupancyType as string | undefined,
           items: args.items as Array<{
             serviceType: string;
+            serviceId?: number;
             serviceName: string;
             description?: string;
             quantity?: number;
@@ -383,6 +394,7 @@ export async function executeToolCall(
             "search_rates",
             "search_hotels",
             "search_packages",
+            "search_multiple_services",
             "calculate_quote",
             "get_destinations",
             "get_categories",

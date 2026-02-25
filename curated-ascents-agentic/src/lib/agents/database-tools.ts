@@ -342,6 +342,37 @@ export async function searchRates(params: {
       })));
     }
 
+    // Search miscellaneous services (dining, activities, etc.)
+    if (!category || category.toLowerCase().includes('miscellaneous') || category.toLowerCase().includes('dining') || category.toLowerCase().includes('meal') || category.toLowerCase().includes('lunch') || category.toLowerCase().includes('dinner')) {
+      const miscResults = await db
+        .select()
+        .from(miscellaneousServices)
+        .where(
+          and(
+            eq(miscellaneousServices.isActive, true),
+            destination ? or(
+              ilike(miscellaneousServices.name, `%${destination}%`),
+              ilike(miscellaneousServices.category, `%${destination}%`),
+              ilike(miscellaneousServices.destination, `%${destination}%`)
+            ) : undefined
+          )
+        )
+        .limit(10);
+
+      results.push(...miscResults.map(r => ({
+        id: r.id,
+        serviceType: 'miscellaneous',
+        name: r.name,
+        category: r.category,
+        description: r.description,
+        destination: r.destination,
+        duration: r.duration,
+        priceType: r.priceType,
+        inclusions: r.inclusions,
+        exclusions: r.exclusions,
+      })));
+    }
+
     return results.slice(0, 15); // Limit total results
   } catch (error) {
     console.error('Error searching rates:', error);
@@ -450,6 +481,14 @@ export async function getRateDetails(params: { rateId: number; serviceType?: str
             .where(eq(packages.id, rateId))
             .limit(1);
           return pkg[0] || null;
+
+        case 'miscellaneous':
+          const misc = await db
+            .select()
+            .from(miscellaneousServices)
+            .where(eq(miscellaneousServices.id, rateId))
+            .limit(1);
+          return misc[0] || null;
 
         default:
           return null;
@@ -855,13 +894,43 @@ export async function saveQuote(params: {
     // Look up cost and sell prices from DB for every item with a serviceId
     // ALWAYS use DB prices — ignore AI-provided sellPrice to ensure margin integrity
     // Quantity calculation mirrors calculateQuote logic per service type
-    const resolvedItems: Array<{ unitCost: number; unitSell: number; unitMargin: number; effectiveQty: number }> = [];
+    const resolvedItems: Array<{ unitCost: number; unitSell: number; unitMargin: number; effectiveQty: number; correctedQty: number; correctedNights: number }> = [];
     let totalSell = 0;
     let totalCost = 0;
 
     for (const item of params.items) {
-      const qty = item.quantity || 1;
-      const nights = item.nights || 1;
+      let qty = item.quantity || 1;
+      let nights = item.nights || 1;
+
+      // ── Auto-correct AI qty/nights confusion ─────────────────────────────
+      // The AI frequently stuffs nights into qty (e.g., qty=3, nights=3 for a 3-night hotel)
+      // or sets qty=nights and nights=1. Detect and fix these patterns.
+      if (item.serviceType === 'hotel') {
+        // Hotel qty should be rooms (usually 1 for a couple). If qty > 1 and qty == nights,
+        // the AI likely put nights into both fields. Fix: rooms=1, keep nights.
+        if (qty > 1 && qty === nights) {
+          const rooms = params.numberOfPax ? Math.ceil(params.numberOfPax / (params.occupancyType === 'single' ? 1 : 2)) : 1;
+          qty = rooms;
+        }
+        // If qty looks like nights (> 1) and nights is 1 (default), AI forgot nights.
+        // Swap: nights = qty, qty = rooms.
+        if (qty > 1 && nights === 1) {
+          nights = qty;
+          qty = params.numberOfPax ? Math.ceil(params.numberOfPax / (params.occupancyType === 'single' ? 1 : 2)) : 1;
+        }
+      }
+      if (item.serviceType === 'guide' || item.serviceType === 'porter') {
+        // Guide qty should be number of guides (usually 1). If qty > 1 and qty == nights,
+        // the AI put days into both. Fix: guides=1, keep nights (days).
+        if (qty > 1 && qty === nights) {
+          qty = 1;
+        }
+        // If qty looks like days (> 1) and nights is 1, AI forgot nights. Swap.
+        if (qty > 1 && nights === 1) {
+          nights = qty;
+          qty = 1;
+        }
+      }
 
       // ALWAYS use DB prices — ignore any AI-provided sellPrice
       const unitCost = item.serviceId ? await getCostPrice(item.serviceType, item.serviceId, params.occupancyType) : 0;
@@ -889,14 +958,18 @@ export async function saveQuote(params: {
           // Per-person pricing → use qty (should be numberOfPax)
           effectiveQty = qty;
           break;
+        case 'miscellaneous':
+          // Miscellaneous (meals, activities): qty (pax) × nights (days) for per-person-per-day items
+          effectiveQty = qty * nights;
+          break;
         default:
-          // Transportation, helicopter charter, misc → flat per-unit
+          // Transportation, helicopter charter → flat per-unit
           effectiveQty = qty;
       }
 
       totalSell += unitSell * effectiveQty;
       totalCost += unitCost * effectiveQty;
-      resolvedItems.push({ unitCost, unitSell, unitMargin, effectiveQty });
+      resolvedItems.push({ unitCost, unitSell, unitMargin, effectiveQty, correctedQty: qty, correctedNights: nights });
     }
 
     const totalMargin = totalSell - totalCost;
@@ -937,6 +1010,8 @@ export async function saveQuote(params: {
           serviceName: item.serviceName || null,
           description: item.description || null,
           quantity: resolvedItems[idx].effectiveQty,
+          nights: resolvedItems[idx].correctedNights || null,
+          days: (item.serviceType === 'guide' || item.serviceType === 'porter') ? (resolvedItems[idx].correctedNights || null) : null,
           costPrice: resolvedItems[idx].unitCost > 0 ? resolvedItems[idx].unitCost.toFixed(2) : null,
           sellPrice: resolvedItems[idx].unitSell > 0 ? resolvedItems[idx].unitSell.toFixed(2) : null,
           margin: resolvedItems[idx].unitCost > 0 ? resolvedItems[idx].unitMargin.toFixed(2) : null,

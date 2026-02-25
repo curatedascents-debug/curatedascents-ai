@@ -397,14 +397,14 @@ export const TOOL_DEFINITIONS = [
                 },
                 quantity: {
                   type: "integer",
-                  description: "Number of units: for hotels = number of rooms, for guides/porters = number of guides, for flights/permits = numberOfPax, for transportation = number of vehicles. Default 1.",
+                  description: "REQUIRED. Number of units — NOT travelers, NOT nights. Hotels: number of ROOMS (1 room for a couple sharing). Guides: number of GUIDES (usually 1). Flights/permits/packages: numberOfPax. Transport: number of vehicles (usually 1).",
                 },
                 nights: {
                   type: "integer",
-                  description: "Number of nights (hotels) or days (guides/porters). REQUIRED for hotels and guides. E.g., 3 nights in Kathmandu hotel → nights=3. 2 days of guide → nights=2.",
+                  description: "REQUIRED. Hotels: number of NIGHTS (2 nights stay = 2). Guides: number of DAYS working (2 sightseeing days = 2). Flights/transport/permits: set to 1. System calculates total = quantity × nights.",
                 },
               },
-              required: ["serviceType", "serviceId", "serviceName"],
+              required: ["serviceType", "serviceId", "serviceName", "quantity", "nights"],
             },
             description: "Array of quote line items — each MUST have a serviceId from the database. Prices are looked up from DB automatically. You MUST pass nights for hotels and guides.",
           },
