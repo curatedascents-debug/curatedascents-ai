@@ -1,17 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import { useChatContext } from "./ChatContext";
 
 const HERO_IMAGE = "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/nepal/landscape/everest-region5-4c22ff59.webp";
+const HERO_VIDEO = "https://videos.pexels.com/video-files/30778291/13165728_640_360_60fps.mp4";
+const HERO_POSTER = "https://images.pexels.com/videos/30778289/pictures/preview-0.jpeg";
 
 export default function HeroSection() {
   const { openChat } = useChatContext();
   const [isVisible, setIsVisible] = useState(false);
   const [heroImageSrc, setHeroImageSrc] = useState(HERO_IMAGE);
   const [heroImageAlt, setHeroImageAlt] = useState("Himalayan landscape at golden hour");
+  const [videoFailed, setVideoFailed] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     setIsVisible(true);
@@ -42,20 +46,48 @@ export default function HeroSection() {
 
   return (
     <section className="relative h-screen min-h-[700px] flex items-end overflow-hidden">
-      {/* Background Image with Ken Burns effect */}
+      {/* Background: Video (with image fallback) */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 animate-ken-burns">
-          <Image
-            src={heroImageSrc}
-            alt={heroImageAlt}
-            fill
-            priority
-            className="object-cover"
-            sizes="100vw"
-          />
-        </div>
-        {/* Dark gradient overlay — heavier at bottom for text readability */}
+        {/* Video layer */}
+        {!videoFailed && (
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster={HERO_POSTER}
+            onError={() => setVideoFailed(true)}
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source src={HERO_VIDEO} type="video/mp4" />
+          </video>
+        )}
+
+        {/* Fallback image (shown when video fails or before video loads) */}
+        {videoFailed && (
+          <div className="absolute inset-0 animate-ken-burns">
+            <Image
+              src={heroImageSrc}
+              alt={heroImageAlt}
+              fill
+              priority
+              className="object-cover"
+              sizes="100vw"
+            />
+          </div>
+        )}
+
+        {/* Dark gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-luxury-navy/30 via-luxury-navy/40 to-luxury-navy/85" />
+
+        {/* Video credit */}
+        {!videoFailed && (
+          <p className="absolute bottom-3 right-4 z-10 text-[10px] text-white/40 select-none">
+            Video: Pexels / Ex Route Adventures
+          </p>
+        )}
       </div>
 
       {/* Content — positioned bottom-left */}
