@@ -36,10 +36,10 @@ export const metadata: Metadata = {
 
 // Country hero images for fallback
 const countryImages: Record<string, string> = {
-  Nepal: "/uploads/media/nepal/landscape/everest-region-everest-view-hotel-eed54c67.webp",
-  Bhutan: "/uploads/media/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917.webp",
-  Tibet: "/uploads/media/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
-  India: "/uploads/media/india/landscape/jaipur-rajasthan-india-e33d82ba.webp",
+  Nepal: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/nepal/landscape/everest-region-everest-view-hotel-eed54c67.webp",
+  Bhutan: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917.webp",
+  Tibet: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
+  India: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/india/landscape/jaipur-rajasthan-india-e33d82ba.webp",
 };
 
 export default async function ItinerariesPage({
@@ -48,27 +48,36 @@ export default async function ItinerariesPage({
   searchParams: Promise<{ country?: string; type?: string }>;
 }) {
   const params = await searchParams;
-  const allPackages = await db
-    .select({
-      id: packages.id,
-      slug: packages.slug,
-      name: packages.name,
-      packageType: packages.packageType,
-      country: packages.country,
-      region: packages.region,
-      durationDays: packages.durationDays,
-      durationNights: packages.durationNights,
-      difficulty: packages.difficulty,
-      maxAltitude: packages.maxAltitude,
-      groupSizeMin: packages.groupSizeMin,
-      groupSizeMax: packages.groupSizeMax,
-      itinerarySummary: packages.itinerarySummary,
-      itineraryDetailed: packages.itineraryDetailed,
-      sellPrice: packages.sellPrice,
-    })
-    .from(packages)
-    .where(eq(packages.isActive, true))
-    .orderBy(desc(packages.createdAt));
+
+  // Fetch packages — gracefully return empty array on DB error
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let allPackages: any[] = [];
+
+  try {
+    allPackages = await db
+      .select({
+        id: packages.id,
+        slug: packages.slug,
+        name: packages.name,
+        packageType: packages.packageType,
+        country: packages.country,
+        region: packages.region,
+        durationDays: packages.durationDays,
+        durationNights: packages.durationNights,
+        difficulty: packages.difficulty,
+        maxAltitude: packages.maxAltitude,
+        groupSizeMin: packages.groupSizeMin,
+        groupSizeMax: packages.groupSizeMax,
+        itinerarySummary: packages.itinerarySummary,
+        itineraryDetailed: packages.itineraryDetailed,
+        sellPrice: packages.sellPrice,
+      })
+      .from(packages)
+      .where(eq(packages.isActive, true))
+      .orderBy(desc(packages.createdAt));
+  } catch (error) {
+    console.error("[Itineraries] Failed to fetch packages:", error);
+  }
 
   // Filter
   let filtered = allPackages;
@@ -88,21 +97,29 @@ export default async function ItinerariesPage({
   const types = [...new Set(allPackages.map((p) => p.packageType).filter(Boolean))] as string[];
 
   // Fetch dynamic images from media library for all filtered packages
-  const imageResults = await Promise.all(
-    filtered.map((pkg) =>
-      findItineraryImage({
-        name: pkg.name,
-        country: pkg.country || undefined,
-        region: pkg.region || undefined,
-      })
-    )
-  );
+  // Use allSettled so a single image fetch failure doesn't crash the whole page
   const imageMap = new Map<number, string>();
-  filtered.forEach((pkg, i) => {
-    if (imageResults[i]?.cdnUrl) {
-      imageMap.set(pkg.id, imageResults[i].cdnUrl);
+  if (filtered.length > 0) {
+    try {
+      const imageResults = await Promise.allSettled(
+        filtered.map((pkg) =>
+          findItineraryImage({
+            name: pkg.name,
+            country: pkg.country || undefined,
+            region: pkg.region || undefined,
+          })
+        )
+      );
+      filtered.forEach((pkg, i) => {
+        const result = imageResults[i];
+        if (result.status === "fulfilled" && result.value?.cdnUrl) {
+          imageMap.set(pkg.id, result.value.cdnUrl);
+        }
+      });
+    } catch (error) {
+      console.error("[Itineraries] Failed to fetch images:", error);
     }
-  });
+  }
 
   return (
     <>

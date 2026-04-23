@@ -31,7 +31,7 @@ const destinations = [
     subtitle: "The Land of the Himalayas",
     description:
       "Home to Mount Everest and eight of the world's fourteen 8,000m peaks, Nepal offers unparalleled trekking, ancient temples, and vibrant culture.",
-    heroImage: "/uploads/media/nepal/landscape/everest-region-everest-view-hotel-eed54c67.webp",
+    heroImage: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/nepal/landscape/everest-region-everest-view-hotel-eed54c67.webp",
     highlights: [
       { label: "Everest Base Camp", href: "/destinations/nepal/everest-region" },
       { label: "Annapurna Circuit", href: "/destinations/nepal/annapurna" },
@@ -46,7 +46,7 @@ const destinations = [
     subtitle: "The Land of the Thunder Dragon",
     description:
       "The world's last Himalayan kingdom measures success by Gross National Happiness. Pristine forests, ancient dzongs, and deeply preserved Buddhist culture await.",
-    heroImage: "/uploads/media/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917.webp",
+    heroImage: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917.webp",
     highlights: [
       { label: "Tiger's Nest", href: "/destinations/bhutan/paro-valley" },
       { label: "Punakha Dzong", href: "/destinations/bhutan/punakha" },
@@ -60,7 +60,7 @@ const destinations = [
     subtitle: "The Roof of the World",
     description:
       "Perched on the highest plateau on Earth, Tibet offers a profound journey through ancient Buddhist culture, sacred lakes, and otherworldly landscapes.",
-    heroImage: "/uploads/media/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
+    heroImage: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
     highlights: [
       { label: "Potala Palace", href: "/destinations/tibet/lhasa" },
       { label: "Everest North Face", href: "/destinations/tibet/everest-north-face" },
@@ -73,7 +73,7 @@ const destinations = [
     subtitle: "A Tapestry of Cultures & Legends",
     description:
       "From the royal palaces of Rajasthan to the Himalayan monasteries of Ladakh and the tranquil backwaters of Kerala, India offers extraordinary diversity.",
-    heroImage: "/uploads/media/india/landscape/jaipur-rajasthan-india-e33d82ba.webp",
+    heroImage: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/india/landscape/jaipur-rajasthan-india-e33d82ba.webp",
     highlights: [
       { label: "Ladakh", href: "/destinations/india/ladakh" },
       { label: "Rajasthan", href: "/destinations/india/rajasthan" },

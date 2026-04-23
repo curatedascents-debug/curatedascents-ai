@@ -53,7 +53,9 @@ test.describe('Sub-Region Destination Pages @smoke @regression', () => {
   test('sub-region page has breadcrumb back to country', async ({ page }) => {
     await page.goto('/destinations/nepal/everest-region');
     await page.waitForLoadState('domcontentloaded');
-    const countryLink = page.locator('a[href="/destinations/nepal"]').first();
+    // Scope to section elements to avoid picking up the hidden nav dropdown link
+    // which also has href="/destinations/nepal" but lives in <header> and is invisible
+    const countryLink = page.locator('section a[href="/destinations/nepal"]').first();
     if (await countryLink.count() > 0) {
       await expect(countryLink).toBeVisible();
     }

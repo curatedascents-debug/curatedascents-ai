@@ -39,7 +39,7 @@ export const itineraries: Itinerary[] = [
     groupSize: "2–8 guests",
     bestMonths: "Mar–May, Sep–Nov",
     startingPrice: 4500,
-    heroImage: "/uploads/media/nepal/landscape/everest-region5-4c22ff59.webp",
+    heroImage: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/nepal/landscape/everest-region5-4c22ff59.webp",
     heroAlt: "Everest region mountain landscape in Nepal",
     overview:
       "Journey through the heart of Nepal — from the ancient temples of Kathmandu to the jungles of Chitwan, the lakes of Pokhara, and the foothills of the Annapurna range. This expedition balances cultural immersion with adventure, all wrapped in five-star comfort.",
@@ -102,7 +102,7 @@ export const itineraries: Itinerary[] = [
     groupSize: "2–6 guests",
     bestMonths: "Mar–May, Sep–Nov",
     startingPrice: 6200,
-    heroImage: "/uploads/media/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917.webp",
+    heroImage: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917.webp",
     heroAlt: "Tiger's Nest Monastery perched on a cliff in Paro, Bhutan",
     overview:
       "Discover the world's last Himalayan kingdom — a land where Gross National Happiness matters more than GDP. From the cliffside Tiger's Nest monastery to the pristine Gangtey Valley, this journey reveals Bhutan's spiritual depth, stunning architecture, and untouched landscapes.",
@@ -160,7 +160,7 @@ export const itineraries: Itinerary[] = [
     groupSize: "2–8 guests",
     bestMonths: "May–Jun, Sep–Oct",
     startingPrice: 3800,
-    heroImage: "/uploads/media/india/landscape/udaipur-rajasthan-india-17d99ac2.webp",
+    heroImage: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/india/landscape/udaipur-rajasthan-india-17d99ac2.webp",
     heroAlt: "Mountain landscape in the Indian Himalayas",
     overview:
       "From the spiritual banks of the Ganges to the high passes of Ladakh, this expedition traverses India's most spectacular Himalayan landscapes. Experience ashram yoga, British-era hill stations, ancient monasteries, and the otherworldly beauty of the Changthang plateau.",
@@ -221,7 +221,7 @@ export const itineraries: Itinerary[] = [
     groupSize: "2–6 guests",
     bestMonths: "Apr–Jun, Sep–Oct",
     startingPrice: 5500,
-    heroImage: "/uploads/media/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
+    heroImage: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
     heroAlt: "Potala Palace in Lhasa, Tibet",
     overview:
       "Traverse the Roof of the World — from the golden-roofed Potala Palace in Lhasa to the north face of Everest. This journey follows the ancient route through Tibet's most sacred monasteries, dramatic passes, and high-altitude landscapes that few travellers ever witness.",

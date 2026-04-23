@@ -33,10 +33,10 @@ interface PageProps {
 
 // Country hero images for fallback
 const countryImages: Record<string, string> = {
-  Nepal: "/uploads/media/nepal/landscape/everest-region-everest-view-hotel-eed54c67.webp",
-  Bhutan: "/uploads/media/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917.webp",
-  Tibet: "/uploads/media/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
-  India: "/uploads/media/india/landscape/jaipur-rajasthan-india-e33d82ba.webp",
+  Nepal: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/nepal/landscape/everest-region-everest-view-hotel-eed54c67.webp",
+  Bhutan: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917.webp",
+  Tibet: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
+  India: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/india/landscape/jaipur-rajasthan-india-e33d82ba.webp",
 };
 
 async function getPackage(slug: string) {

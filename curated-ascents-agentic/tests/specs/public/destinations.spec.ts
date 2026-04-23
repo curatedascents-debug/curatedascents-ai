@@ -37,8 +37,9 @@ test.describe('Destination Pages @smoke @regression', () => {
     test('shows country cards with links', async ({ page }) => {
       await page.goto('/destinations');
       await page.waitForLoadState('domcontentloaded');
-      // Wait for links to appear
-      const countryLinks = page.locator('a[href*="/destinations/"]');
+      // Scope to section elements to avoid picking up hidden nav dropdown links
+      // (the nav dropdown also contains a[href*="/destinations/"] but lives in <header>)
+      const countryLinks = page.locator('section a[href*="/destinations/"]');
       await expect(countryLinks.first()).toBeVisible({ timeout: 10_000 });
       const count = await countryLinks.count();
       expect(count).toBeGreaterThanOrEqual(4);

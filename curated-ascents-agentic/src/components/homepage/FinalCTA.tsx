@@ -8,7 +8,7 @@ export default function FinalCTA() {
       {/* Background image */}
       <div className="absolute inset-0">
         <Image
-          src="/uploads/media/nepal/landscape/annapurna-region-1c948b82.webp"
+          src="https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/nepal/landscape/annapurna-region-1c948b82.webp"
           alt="Dramatic mountain landscape"
           fill
           loading="lazy"

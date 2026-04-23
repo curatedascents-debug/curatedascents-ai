@@ -50,7 +50,7 @@ const destinationData: Record<string, DestinationData> = {
     subtitle: "The Land of the Himalayas",
     overview:
       "Nepal, nestled between India and Tibet, is a land of incredible natural beauty and rich cultural heritage. From the towering peaks of the Himalayas, including Mount Everest, to the lush jungles of the Terai, Nepal offers diverse landscapes and experiences. The country is home to ancient temples, vibrant festivals, and some of the world's most renowned trekking routes. Whether you're seeking adventure, spirituality, or cultural immersion, Nepal delivers an unforgettable experience.",
-    heroImage: "/uploads/media/nepal/landscape/everest-region-everest-view-hotel-eed54c67.webp",
+    heroImage: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/nepal/landscape/everest-region-everest-view-hotel-eed54c67.webp",
     highlights: [
       { title: "Mount Everest", description: "The world's highest peak and ultimate mountaineering destination" },
       { title: "Kathmandu Valley", description: "UNESCO World Heritage temples and rich Newari culture" },
@@ -89,7 +89,7 @@ const destinationData: Record<string, DestinationData> = {
     subtitle: "The Land of the Thunder Dragon",
     overview:
       "Bhutan, the last great Himalayan kingdom, is a country that measures success by Gross National Happiness rather than GDP. Nestled between India and Tibet, this Buddhist kingdom has preserved its traditional culture while embracing sustainable development. From the iconic Tiger's Nest Monastery clinging to a cliff face to the pristine forests that cover 72% of the country, Bhutan offers a unique travel experience unlike anywhere else on Earth.",
-    heroImage: "/uploads/media/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917.webp",
+    heroImage: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917.webp",
     highlights: [
       { title: "Tiger's Nest Monastery", description: "Iconic cliffside monastery, Bhutan's most sacred site" },
       { title: "Punakha Dzong", description: "Stunning fortress at the confluence of two rivers" },
@@ -127,7 +127,7 @@ const destinationData: Record<string, DestinationData> = {
     subtitle: "The Roof of the World",
     overview:
       "Tibet, perched on the highest plateau on Earth, offers a profound journey through ancient Buddhist culture and breathtaking landscapes. From the magnificent Potala Palace in Lhasa to the sacred Mount Kailash, Tibet's spiritual heritage runs deep. The region's otherworldly scenery — turquoise lakes, vast grasslands, and snow-capped peaks — combined with warm Tibetan hospitality creates an unforgettable experience.",
-    heroImage: "/uploads/media/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
+    heroImage: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/tibet/landscape/potala-palace-lhasa-tibet-china-dd114557.webp",
     highlights: [
       { title: "Potala Palace", description: "Former winter residence of the Dalai Lama, iconic symbol of Tibet" },
       { title: "Jokhang Temple", description: "Tibet's most sacred temple and pilgrimage destination" },
@@ -165,7 +165,7 @@ const destinationData: Record<string, DestinationData> = {
     subtitle: "A Tapestry of Cultures, Landscapes & Legends",
     overview:
       "India, the world's most diverse subcontinent, offers an extraordinary range of luxury travel experiences — from the snow-capped Himalayas of Ladakh and the spiritual banks of the Ganges to the royal palaces of Rajasthan and the tranquil backwaters of Kerala. With over 5,000 years of unbroken civilization, India weaves together ancient temples, vibrant bazaars, world-class cuisine, and breathtaking natural beauty into journeys that are as enriching as they are exhilarating.",
-    heroImage: "/uploads/media/india/landscape/jaipur-rajasthan-india-e33d82ba.webp",
+    heroImage: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/india/landscape/jaipur-rajasthan-india-e33d82ba.webp",
     highlights: [
       { title: "Rajasthan's Royal Palaces", description: "Magnificent forts and heritage palace hotels across the Land of Kings" },
       { title: "Ladakh & the Himalayas", description: "High-altitude monasteries, pristine lakes, and dramatic mountain passes" },

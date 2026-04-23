@@ -55,19 +55,19 @@ const partners = [
 const destinations = [
   {
     name: "Nepal",
-    image: "/uploads/media/nepal/landscape/everest-region5-4c22ff59-thumb.webp",
+    image: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/nepal/landscape/everest-region5-4c22ff59-thumb.webp",
   },
   {
     name: "Bhutan",
-    image: "/uploads/media/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917-thumb.webp",
+    image: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/bhutan/landscape/bhutan-taktsang-monastery2-1d1a0917-thumb.webp",
   },
   {
     name: "Tibet",
-    image: "/uploads/media/tibet/landscape/lhasa-potala-palace-47dd9d03-thumb.webp",
+    image: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/tibet/landscape/lhasa-potala-palace-47dd9d03-thumb.webp",
   },
   {
     name: "India",
-    image: "/uploads/media/india/landscape/udaipur-rajasthan-india-17d99ac2-thumb.webp",
+    image: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/india/landscape/udaipur-rajasthan-india-17d99ac2-thumb.webp",
   },
 ];
 

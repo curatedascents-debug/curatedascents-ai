@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import { useChatContext } from "./ChatContext";
 
-const HERO_IMAGE = "/uploads/media/nepal/landscape/everest-region5-4c22ff59.webp";
+const HERO_IMAGE = "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/nepal/landscape/everest-region5-4c22ff59.webp";
 
 export default function HeroSection() {
   const { openChat } = useChatContext();

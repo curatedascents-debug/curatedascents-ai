@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/uploads/media/nepal/landscape/everest-region1-049bedc8.webp",
+        url: "https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/nepal/landscape/everest-region1-049bedc8.webp",
         width: 1200,
         height: 630,
         alt: "Himalayan panorama — CuratedAscents luxury adventure travel",
@@ -152,7 +152,7 @@ export default function AboutPage() {
       {/* Hero */}
       <section className="relative h-[50vh] sm:h-[60vh] min-h-[400px]">
         <Image
-          src="/uploads/media/nepal/landscape/everest-region1-049bedc8.webp"
+          src="https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/nepal/landscape/everest-region1-049bedc8.webp"
           alt="Himalayan panorama at golden hour"
           fill
           priority
@@ -186,7 +186,7 @@ export default function AboutPage() {
               <div className="lg:col-span-1">
                 <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-luxury-gold/20">
                   <Image
-                    src="/uploads/media/nepal/people/kiran_pokhrel_photo_formal-caec398d.webp"
+                    src="https://pub-53e4bdb73e3a4f0fb91769acaef3fa63.r2.dev/nepal/people/kiran_pokhrel_photo_formal-caec398d.webp"
                     alt="Kiran Pokhrel — Founder of CuratedAscents"
                     fill
                     className="object-cover"
