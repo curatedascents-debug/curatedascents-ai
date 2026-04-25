@@ -9,7 +9,7 @@ export async function GET() {
   const resend = new Resend(process.env.RESEND_API_KEY);
   try {
     const { data, error } = await resend.emails.send({
-      from: "Kiran Pokhrel <curatedascents@gmail.com>",
+from: process.env.EMAIL_FROM || "CuratedAscents <onboarding@resend.dev>",
       to: ["info@e-tourchannel.com"],
       subject: "Re: Nepal Hotel Rates Template — File Attached Directly",
       html: "<p>Dear Team,</p><p>Apologies for the trouble with the previous link — please find the Nepal Hotel Rates Template attached directly to this email as an Excel file (.xlsx).</p><p>A quick reminder on how to use it:</p><ul><li><strong>Start with the Instructions sheet</strong> (opens first, read before filling anything)</li><li><strong>Fill Hotel Details</strong> — one row per hotel, mandatory fields marked with ★</li><li><strong>Fill Room Rates</strong> — one row per room type per season, select hotel from the dropdown</li></ul><p><strong>Important:</strong> All rates must be ALL-INCLUSIVE of VAT (13%) and Service Charge (10%). Please do not enter pre-tax or net rates.</p><p>Please save and return the completed file as .xlsx at your earliest convenience.</p><p>Best regards,<br>Kiran Pokhrel<br>Mobile: +1 (715) 505-4964<br>Email: curatedascents@gmail.com</p>",
