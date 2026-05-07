@@ -29,20 +29,20 @@ const AGENCY_FALLBACK_MESSAGE =
 const REASONING_PATTERNS = [
   /let me (?:now |re-?)?(?:check|think|reconsider|recalculate|re-?route|re-?plan|look at|count|recount|verify|confirm|re-?count|re-?think|also check)/i,
   /let me (?:plan|build|calculate|set up|figure out|work out|now present|structure|draft|outline|arrange|map out|lay out|put together)/i,
-  /(?:actually|wait)[,.]? (?:let me|I need to|I should|I realize|I had|since)/i,
+  /(?:actually|wait)[,.]? (?:I need to|I should|I realize|I had)\b/i,
+  /\bwait[,.]? let me\b/i,
   /so for transport[:\s]/i,
   /I need to (?:re-?think|reconsider|check|verify|add|include|re-?count|re-?calculate)/i,
   /let me (?:now|also|first|re-?|re-?calculate|re-?count|re-?do|re-?plan|re-?route|re-?consider)/i,
   /let me recalculate|let me recount|let me redo|let me re-?plan/i,
-  /(?:^|\n)(?:route|route:|day \d+:|step \d+:)\s/i,
-  /(?:KTM|PKR|BHD|DEL|CCU)\s*(?:\(arrive|\(depart|→|->)/i,
+  // Airport-code route deliberation: KTM → PKR style (NOT "Kathmandu → Pokhara")
+  /\b(?:KTM|PKR|BHD|DEL|CCU|PBH|IXB|GAU)\s*(?:→|->|\(arrive|\(depart)/i,
   /<think>/i,
   /serviceId=\d+/,
   /\bserviceId\b.*=.*\d/,
   /hmm[,.]?\s/i,
-  /looking at (?:this|the|my)/i,
   /I (?:realize|realise) I (?:need|should|must)/i,
-  /now let me|so let me|first let me|then let me/i,
+  /now let me|so let me|first let me/i,
 ];
 
 function containsReasoning(content: string): boolean {
