@@ -28,17 +28,21 @@ const AGENCY_FALLBACK_MESSAGE =
 // ─── REASONING DETECTOR ──────────────────────────────────────────────────────
 const REASONING_PATTERNS = [
   /let me (?:now |re-?)?(?:check|think|reconsider|recalculate|re-?route|re-?plan|look at|count|recount|verify|confirm|re-?count|re-?think|also check)/i,
+  /let me (?:plan|build|calculate|set up|figure out|work out|now present|structure|draft|outline|arrange|map out|lay out|put together)/i,
   /(?:actually|wait)[,.]? (?:let me|I need to|I should|I realize|I had|since)/i,
   /so for transport[:\s]/i,
   /I need to (?:re-?think|reconsider|check|verify|add|include|re-?count|re-?calculate)/i,
   /let me (?:now|also|first|re-?|re-?calculate|re-?count|re-?do|re-?plan|re-?route|re-?consider)/i,
   /let me recalculate|let me recount|let me redo|let me re-?plan/i,
+  /(?:^|\n)(?:route|route:|day \d+:|step \d+:)\s/i,
+  /(?:KTM|PKR|BHD|DEL|CCU)\s*(?:\(arrive|\(depart|→|->)/i,
   /<think>/i,
   /serviceId=\d+/,
   /\bserviceId\b.*=.*\d/,
   /hmm[,.]?\s/i,
   /looking at (?:this|the|my)/i,
   /I (?:realize|realise) I (?:need|should|must)/i,
+  /now let me|so let me|first let me|then let me/i,
 ];
 
 function containsReasoning(content: string): boolean {
@@ -826,8 +830,68 @@ export async function processAgencyChatMessage(
           const presData = await presResponse.json();
           const presText: string | undefined = presData.choices?.[0]?.message?.content;
           if (presText) {
-            finalResponse = stripObviousReasoning(presText);
-            console.log("[agency] Presentation pass complete");
+            const presStripped = stripObviousReasoning(presText);
+
+            // If the presentation pass STILL contains reasoning, attempt one more pass
+            // with a harder constraint; if that also fails, use a polite fallback.
+            if (containsReasoning(presStripped)) {
+              console.warn("[agency] Presentation pass still has reasoning — retrying with hard constraint");
+              try {
+                const hardController = new AbortController();
+                const hardTimeout = setTimeout(() => hardController.abort(), DEEPSEEK_TIMEOUT_MS);
+
+                const hardMessages = [
+                  ...apiMessages,
+                  { ...assistantMessage, content: "" },
+                  {
+                    role: "user",
+                    content:
+                      "IMPORTANT: Respond ONLY with the final itinerary and pricing. " +
+                      "Do NOT include any planning thoughts, route deliberation, or internal notes. " +
+                      "Start directly with the itinerary heading.",
+                  },
+                ];
+
+                const hardResponse = await fetch(DEEPSEEK_API_URL, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+                  },
+                  body: JSON.stringify({
+                    model: "deepseek-chat",
+                    messages: hardMessages,
+                    temperature: 0.2,
+                    max_tokens: 2500,
+                  }),
+                  signal: hardController.signal,
+                });
+
+                clearTimeout(hardTimeout);
+
+                if (hardResponse.ok) {
+                  const hardData = await hardResponse.json();
+                  const hardText: string | undefined = hardData.choices?.[0]?.message?.content;
+                  if (hardText && !containsReasoning(stripObviousReasoning(hardText))) {
+                    finalResponse = stripObviousReasoning(hardText);
+                    console.log("[agency] Hard-constraint pass successful");
+                  } else {
+                    // Both passes failed — return a graceful holding message
+                    finalResponse =
+                      "I'm putting together the complete itinerary and pricing for you — " +
+                      "please give me one moment. If you need immediate assistance, our team is available at **+1-715-505-4964**.";
+                    console.warn("[agency] Hard-constraint pass also leaked reasoning — using holding message");
+                  }
+                }
+              } catch (hardError) {
+                console.error("[agency] Hard-constraint pass failed:", hardError);
+                // Fall through to presStripped below
+                finalResponse = presStripped;
+              }
+            } else {
+              finalResponse = presStripped;
+              console.log("[agency] Presentation pass complete");
+            }
           }
         }
       } catch (presError) {
