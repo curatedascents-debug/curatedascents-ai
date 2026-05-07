@@ -251,6 +251,43 @@ html {
   text-underline-offset: 2px;
 }
 
+/* Markdown table rendering */
+.markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.6rem 0;
+  font-size: 0.82rem;
+}
+
+.markdown-content table:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content th {
+  background-color: #1e293b;
+  color: #C9A96E;
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  text-align: left;
+  border: 1px solid #334155;
+  white-space: nowrap;
+}
+
+.markdown-content td {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #1e293b;
+  color: #e2e8f0;
+  vertical-align: top;
+}
+
+.markdown-content tr:nth-child(even) td {
+  background-color: #0f172a;
+}
+
+.markdown-content tr:hover td {
+  background-color: #1e293b;
+}
+
 /* Hide scrollbar but keep functionality */
 .scrollbar-hide {
   -ms-overflow-style: none;

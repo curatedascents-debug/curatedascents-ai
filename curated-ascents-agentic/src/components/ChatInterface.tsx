@@ -1,6 +1,7 @@
 "use client";
 
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useState, useRef, useEffect } from "react";
 import { Send, Loader2, Phone, X } from "lucide-react";
 
@@ -42,12 +43,61 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
     return "Welcome to CuratedAscents. I'm your private Expedition Architect with deep expertise across Nepal, Bhutan, Tibet, and India. Whether you're dreaming of a Himalayan trek, a palace stay in Rajasthan, or a spiritual journey through Bhutan — tell me what inspires you, and I'll design something extraordinary.";
   };
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: getWelcomeMessage(),
-    },
-  ]);
+  // ── Chat persistence (localStorage) ─────────────────────────────────────
+  // Only persist the public homepage chat — portal and agency have their own
+  // auth context and session management.
+  const PERSIST = !portalMode && !agencyMode;
+  const LS_ID  = 'ca_chat_conv_id';
+  const LS_TS  = 'ca_chat_conv_ts';
+  const lsMsgs = (id: string) => `ca_chat_msgs_${id}`;
+  const TTL    = 24 * 60 * 60 * 1000; // 24 hours
+
+  // conversationId — reuse from localStorage if still fresh, else generate new
+  const [conversationId] = useState<string>(() => {
+    if (!PERSIST || typeof window === 'undefined') {
+      return `conv_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    }
+    const storedId = localStorage.getItem(LS_ID);
+    const storedTs = localStorage.getItem(LS_TS);
+    const fresh = storedId && storedTs && (Date.now() - parseInt(storedTs, 10)) < TTL;
+    if (fresh && storedId) return storedId;
+    // Start a new conversation
+    const newId = `conv_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    localStorage.setItem(LS_ID, newId);
+    localStorage.setItem(LS_TS, Date.now().toString());
+    return newId;
+  });
+
+  // messages — restore from localStorage if the conversation is still fresh
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (PERSIST && typeof window !== 'undefined') {
+      const storedTs = localStorage.getItem(LS_TS);
+      if (storedTs && (Date.now() - parseInt(storedTs, 10)) < TTL) {
+        const storedId = localStorage.getItem(LS_ID);
+        if (storedId) {
+          try {
+            const raw = localStorage.getItem(lsMsgs(storedId));
+            if (raw) {
+              const parsed = JSON.parse(raw) as Message[];
+              if (parsed.length > 0) return parsed;
+            }
+          } catch { /* ignore corrupt data */ }
+        }
+      }
+    }
+    return [{ role: "assistant", content: getWelcomeMessage() }];
+  });
+
+  // Persist messages to localStorage on every change
+  useEffect(() => {
+    if (!PERSIST || typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(lsMsgs(conversationId), JSON.stringify(messages));
+      localStorage.setItem(LS_TS, Date.now().toString()); // bump timestamp on activity
+    } catch { /* storage full or unavailable — fail silently */ }
+  }, [messages]); // eslint-disable-line react-hooks/exhaustive-deps
+  // ─────────────────────────────────────────────────────────────────────────
+
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [clientEmail, setClientEmail] = useState(portalClientEmail || "");
@@ -71,7 +121,6 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
 
   // ── Lead scoring integration ─────────────────────────────────────────────
   const [clientId, setClientId] = useState<number | null>(portalClientId ?? null);
-  const [conversationId] = useState(() => `conv_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`);
   // ─────────────────────────────────────────────────────────────────────────
 
   const [progressMessage, setProgressMessage] = useState("");
@@ -296,7 +345,7 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
                     <p className="text-sm leading-relaxed">{msg.content}</p>
                   ) : (
                     <div className="markdown-content text-sm">
-                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                     </div>
                   )}
                 </div>
@@ -548,7 +597,7 @@ export default function ChatInterface({ isWidget = false, initialMessage, portal
         <p style={{ margin: 0, padding: 0, lineHeight: 1.6 }}>{msg.content}</p>
       ) : (
         <div className="markdown-content" style={{ margin: 0, padding: 0 }}>
-          <ReactMarkdown>{msg.content}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
         </div>
       )}
     </div>
