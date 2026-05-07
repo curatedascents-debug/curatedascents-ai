@@ -122,11 +122,31 @@ export function checkInputGuardrails(
   // 4. Prompt injection detection
   for (const { pattern, severity, label } of INJECTION_PATTERNS) {
     if (pattern.test(message)) {
-      // High severity: block completely
+      // High severity: block completely with a varied warm redirect
       if (severity === "high") {
+        // Rotate through responses based on label so repeat probes don't look identical
+        const redirects: Record<string, string> = {
+          instruction_override:
+            "That's a bit outside what I can help with — but I'd love to plan an extraordinary adventure for you! Which destination are you dreaming of: Nepal, Bhutan, Tibet, or India?",
+          role_manipulation:
+            "I'm here as your Expedition Architect, focused entirely on crafting incredible journeys to the Himalayas and beyond. Where can I take you?",
+          prompt_extraction:
+            "Happy to keep the details between us! Now — what kind of adventure are you imagining? A Himalayan trek, a wildlife safari, or a cultural immersion?",
+          cost_probing:
+            "Our pricing is presented as all-inclusive package totals — I'm not able to share per-service costs or internal details. But I'd love to build a full itinerary and total price for you! Where are you headed?",
+          delimiter_injection:
+            "I'm your Expedition Architect for CuratedAscents — here to craft luxury journeys in Nepal, Bhutan, Tibet, and India. What adventure can I help you plan?",
+          encoding_attack:
+            "Looks like something got a bit garbled there! I'm your Expedition Architect — tell me about your dream trip and I'll make it happen.",
+          jailbreak:
+            "I appreciate the creativity, but I'm fully committed to my role as your Expedition Architect! No jailbreaks needed — just tell me your dream destination and I'll craft something extraordinary.",
+        };
+        const reason =
+          redirects[label] ??
+          "I'm your Expedition Architect, here to help plan luxury adventures in Nepal, Bhutan, Tibet, and India. How can I assist with your travel plans?";
         return {
           allowed: false,
-          reason: "I'm your Expedition Architect, here to help plan luxury adventures in Nepal, Bhutan, Tibet, and India. How can I assist with your travel plans?",
+          reason,
           severity,
           label,
         };
