@@ -26,43 +26,92 @@ const DEEPSEEK_TIMEOUT_MS = 30_000; // 30 second timeout
 const BRANDED_FALLBACK_MESSAGE =
   "Our Expedition Architect is momentarily unavailable. Please try again, or call us at +1-715-505-4964 for immediate assistance.";
 
-// ─── REASONING STRIPPER ─────────────────────────────────────────────────────
+// ─── REASONING DETECTOR & CLEANUP ───────────────────────────────────────────
+
+/** Patterns that indicate internal reasoning leaked into the response */
+const REASONING_PATTERNS = [
+  /let me (?:now |re-?)?(?:check|think|reconsider|recalculate|re-?route|re-?plan|look at|count|recount|verify|confirm|re-?count|re-?think|also check)/i,
+  /(?:actually|wait)[,.]? (?:let me|I need to|I should|I realize|I had|since)/i,
+  /so for transport[:\s]/i,
+  /I need to (?:re-?think|reconsider|check|verify|add|include|re-?count|re-?calculate)/i,
+  /let me (?:now|also|first|re-?|re-?calculate|re-?count|re-?do|re-?plan|re-?route|re-?consider)/i,
+  /let me recalculate|let me recount|let me redo|let me re-?plan/i,
+  /<think>/i,
+  /serviceId=\d+/,        // raw serviceId references meant for internal use
+  /\bserviceId\b.*=.*\d/,
+  /day \d+:.*\n.*serviceId/i,
+  /looking at (?:this|the|my)/i,
+  /I (?:realize|realise) I (?:need|should|must)/i,
+];
+
 /**
- * Strip internal reasoning/thinking from the final AI response.
- * DeepSeek sometimes outputs chain-of-thought before the client-facing content.
+ * Returns true if the response contains internal reasoning that should not be shown to clients.
  */
-function stripInternalReasoning(content: string): string {
+function containsReasoning(content: string): boolean {
+  if (!content) return false;
+  // Quick pass: look for thin tags
+  if (/<think>/i.test(content)) return true;
+  // Check all patterns
+  return REASONING_PATTERNS.some(p => p.test(content));
+}
+
+/**
+ * Fast regex strip: remove <think> blocks and trim obvious reasoning preamble.
+ * Used as a first pass before the API cleanup.
+ */
+function stripObviousReasoning(content: string): string {
   if (!content) return content;
+  // Remove <think>...</think> blocks
+  return content.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+}
 
-  // 1. Strip explicit <think>...</think> blocks (deepseek-reasoner format)
-  let cleaned = content.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+/**
+ * Make a second lightweight API call to rewrite the response without reasoning.
+ * Called only when reasoning patterns are detected in the final output.
+ */
+async function cleanupResponse(rawResponse: string): Promise<string> {
+  if (!DEEPSEEK_API_KEY) return rawResponse;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15_000);
 
-  // 2. If the response begins with planning/reasoning language, find where
-  //    the real client-facing content starts.
-  const REASONING_STARTERS = [
-    "I notice ", "I need to rethink", "Let me rethink", "Actually wait",
-    "Let me reconsider", "Let me think", "I'll need to", "Wait, I had",
-    "Actually, I need", "Let me also", "Let me plan", "So for transport",
-    "Actually, since", "Now let me", "Let me re-plan", "Let me re-think",
-    "Hmm,", "OK so", "OK,", "Alright,",
-  ];
+    const res = await fetch(DEEPSEEK_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a professional travel consultant editor. " +
+              "Rewrite the following response to remove ALL internal reasoning, planning notes, route calculations, serviceId references, and thinking. " +
+              "Keep ONLY the final client-facing content: the itinerary, pricing summary, and professional communication. " +
+              "Never include phrases like 'Let me...', 'Actually...', 'Wait...', 'I need to...', 'Let me recalculate', 'serviceId=', etc. " +
+              "Start directly with the client greeting or itinerary. Output only polished, professional content.",
+          },
+          {
+            role: "user",
+            content: `Please clean up this response:\n\n${rawResponse}`,
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 2500,
+      }),
+      signal: controller.signal,
+    });
 
-  const firstLine = cleaned.split("\n")[0] ?? "";
-  const startsWithReasoning = REASONING_STARTERS.some(phrase =>
-    firstLine.startsWith(phrase)
-  );
+    clearTimeout(timeout);
 
-  if (startsWithReasoning) {
-    // Client responses typically begin with an emoji, ## heading, greeting, or bold title
-    const clientResponseRegex =
-      /\n\n((?:[🌄🏔️✈️🎯💰🏨🚗🥾✅❌⭐🌿🦏🦏]|##\s|(?:Here'?s?|What a|I've|Allow me|Great|Wonderful|Perfect|Excellent|Bonjour|Hello|Your )[^\n]|\*\*\d+-Day|\*\*[A-Z][^*]+\*\*\s*\n))/;
-    const match = cleaned.match(clientResponseRegex);
-    if (match?.index && match.index > 50) {
-      cleaned = cleaned.substring(match.index + 2).trim();
-    }
+    if (!res.ok) return rawResponse;
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || rawResponse;
+  } catch {
+    return rawResponse; // Fall back gracefully if cleanup call fails
   }
-
-  return cleaned;
 }
 
 // ─── PRICING SANITISER ──────────────────────────────────────────────────────
@@ -668,7 +717,14 @@ export async function processChatMessage(
     }
 
     // ── Output guardrails ──────────────────────────────────────────────────
-    let finalResponse = stripInternalReasoning(assistantMessage.content || "");
+    // Stage 1: fast regex strip of <think> blocks and obvious preamble
+    let finalResponse = stripObviousReasoning(assistantMessage.content || "");
+
+    // Stage 2: if reasoning patterns are still present, run a cleanup API call
+    if (containsReasoning(finalResponse)) {
+      console.log(`[${source}] Reasoning detected in final response — running cleanup pass`);
+      finalResponse = await cleanupResponse(finalResponse);
+    }
 
     if (finalResponse) {
       const outputCheck = checkOutputGuardrails(finalResponse);
