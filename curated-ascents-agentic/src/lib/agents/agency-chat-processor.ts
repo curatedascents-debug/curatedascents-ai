@@ -789,10 +789,10 @@ export async function processAgencyChatMessage(
     // Stage 1: strip <think> blocks
     let finalResponse = stripObviousReasoning(assistantMessage.content || "");
 
-    // Stage 2: presentation pass — if reasoning detected AND tools were used,
-    // make a fresh API call with all context but no tools to get a clean response
-    if (hadToolCalls && containsReasoning(finalResponse)) {
-      console.log("[agency] Reasoning detected — running presentation pass");
+    // Stage 2: presentation pass — always run after tool calls to guarantee a
+    // clean, formatted response (pattern detection is unreliable; always reformat).
+    if (hadToolCalls) {
+      console.log("[agency] Tool calls completed — running presentation pass");
       try {
         const presController = new AbortController();
         const presTimeout = setTimeout(() => presController.abort(), DEEPSEEK_TIMEOUT_MS);
