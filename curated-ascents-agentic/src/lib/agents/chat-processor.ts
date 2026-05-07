@@ -26,6 +26,45 @@ const DEEPSEEK_TIMEOUT_MS = 30_000; // 30 second timeout
 const BRANDED_FALLBACK_MESSAGE =
   "Our Expedition Architect is momentarily unavailable. Please try again, or call us at +1-715-505-4964 for immediate assistance.";
 
+// ─── REASONING STRIPPER ─────────────────────────────────────────────────────
+/**
+ * Strip internal reasoning/thinking from the final AI response.
+ * DeepSeek sometimes outputs chain-of-thought before the client-facing content.
+ */
+function stripInternalReasoning(content: string): string {
+  if (!content) return content;
+
+  // 1. Strip explicit <think>...</think> blocks (deepseek-reasoner format)
+  let cleaned = content.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+
+  // 2. If the response begins with planning/reasoning language, find where
+  //    the real client-facing content starts.
+  const REASONING_STARTERS = [
+    "I notice ", "I need to rethink", "Let me rethink", "Actually wait",
+    "Let me reconsider", "Let me think", "I'll need to", "Wait, I had",
+    "Actually, I need", "Let me also", "Let me plan", "So for transport",
+    "Actually, since", "Now let me", "Let me re-plan", "Let me re-think",
+    "Hmm,", "OK so", "OK,", "Alright,",
+  ];
+
+  const firstLine = cleaned.split("\n")[0] ?? "";
+  const startsWithReasoning = REASONING_STARTERS.some(phrase =>
+    firstLine.startsWith(phrase)
+  );
+
+  if (startsWithReasoning) {
+    // Client responses typically begin with an emoji, ## heading, greeting, or bold title
+    const clientResponseRegex =
+      /\n\n((?:[🌄🏔️✈️🎯💰🏨🚗🥾✅❌⭐🌿🦏🦏]|##\s|(?:Here'?s?|What a|I've|Allow me|Great|Wonderful|Perfect|Excellent|Bonjour|Hello|Your )[^\n]|\*\*\d+-Day|\*\*[A-Z][^*]+\*\*\s*\n))/;
+    const match = cleaned.match(clientResponseRegex);
+    if (match?.index && match.index > 50) {
+      cleaned = cleaned.substring(match.index + 2).trim();
+    }
+  }
+
+  return cleaned;
+}
+
 // ─── PRICING SANITISER ──────────────────────────────────────────────────────
 const SENSITIVE_FIELDS = [
   // Cost fields
@@ -189,6 +228,12 @@ If anything is missing, search for it and add it before saving.
   - Item 2: "Pokhara–Kathmandu flight" (return), serviceId=X, quantity=numberOfPax
 - This gives the admin 2 line items with correct per-sector cost/sell. NEVER combine both sectors into one item.
 - This applies to ALL domestic sectors: KTM-LUA, KTM-PKR, KTM-BWA, PKR-JOM, etc.
+
+### Response Format (CRITICAL — NEVER BREAK THESE RULES):
+- **NEVER include your internal reasoning, planning notes, or thinking in your response.** The client must ONLY see the final, polished message.
+- Do NOT write phrases like "I notice I need to rethink...", "Actually wait...", "Let me reconsider...", "So for transport:", "Let me think...", etc. These are internal and must never appear in the output.
+- Go directly to the client-facing content. Start your response with a warm greeting or structured itinerary — never with your planning process.
+- Your tool calls and internal planning are invisible to the client. Keep them that way.
 
 ### Communication Style:
 - Be warm, professional, and knowledgeable
@@ -568,7 +613,17 @@ export async function processChatMessage(
         })
       );
 
-      apiMessages.push(assistantMessage);
+      // Strip content from tool-call messages before pushing to history.
+      // DeepSeek populates content with internal reasoning during tool-call
+      // iterations; including it causes the model to reproduce that reasoning
+      // in the final response.
+      const assistantMsgForHistory = {
+        ...assistantMessage,
+        content: assistantMessage.tool_calls
+          ? ""
+          : (assistantMessage.content ?? ""),
+      };
+      apiMessages.push(assistantMsgForHistory);
       apiMessages.push(...toolResults);
 
       try {
@@ -613,7 +668,7 @@ export async function processChatMessage(
     }
 
     // ── Output guardrails ──────────────────────────────────────────────────
-    let finalResponse = assistantMessage.content || "";
+    let finalResponse = stripInternalReasoning(assistantMessage.content || "");
 
     if (finalResponse) {
       const outputCheck = checkOutputGuardrails(finalResponse);
