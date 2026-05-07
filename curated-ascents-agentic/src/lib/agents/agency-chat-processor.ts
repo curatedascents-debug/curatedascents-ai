@@ -10,6 +10,7 @@ import { getRateDetails } from "@/lib/agents/database-tools";
 import { db } from "@/db";
 import {
   agencyMarginOverrides,
+  agencies,
   quotes,
   bookings,
   clients,
@@ -19,6 +20,37 @@ import { eq, and, isNull, or, lte, gte, sql } from "drizzle-orm";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
+const DEEPSEEK_TIMEOUT_MS = 30_000;
+
+const AGENCY_FALLBACK_MESSAGE =
+  "Our Expedition Architect is momentarily unavailable. Please try again, or contact our team at +1-715-505-4964 for immediate assistance.";
+
+// ─── REASONING DETECTOR ──────────────────────────────────────────────────────
+const REASONING_PATTERNS = [
+  /let me (?:now |re-?)?(?:check|think|reconsider|recalculate|re-?route|re-?plan|look at|count|recount|verify|confirm|re-?count|re-?think|also check)/i,
+  /(?:actually|wait)[,.]? (?:let me|I need to|I should|I realize|I had|since)/i,
+  /so for transport[:\s]/i,
+  /I need to (?:re-?think|reconsider|check|verify|add|include|re-?count|re-?calculate)/i,
+  /let me (?:now|also|first|re-?|re-?calculate|re-?count|re-?do|re-?plan|re-?route|re-?consider)/i,
+  /let me recalculate|let me recount|let me redo|let me re-?plan/i,
+  /<think>/i,
+  /serviceId=\d+/,
+  /\bserviceId\b.*=.*\d/,
+  /hmm[,.]?\s/i,
+  /looking at (?:this|the|my)/i,
+  /I (?:realize|realise) I (?:need|should|must)/i,
+];
+
+function containsReasoning(content: string): boolean {
+  if (!content) return false;
+  if (/<think>/i.test(content)) return true;
+  return REASONING_PATTERNS.some((p) => p.test(content));
+}
+
+function stripObviousReasoning(content: string): string {
+  if (!content) return content;
+  return content.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+}
 
 // ─── AGENCY SYSTEM PROMPT ────────────────────────────────────────────────────
 const AGENCY_SYSTEM_PROMPT = `You are the Expedition Architect for CuratedAscents, a luxury adventure travel company specializing in Nepal, Tibet, Bhutan, and India. You are currently assisting a B2B travel agency partner.
@@ -90,6 +122,11 @@ You MUST pass "nights" for hotels and guides — omitting it defaults to 1.
 **Route planning:** Plan a logical route (e.g., KTM→PKR→Chitwan→KTM). Do NOT backtrack through origin between stops. Include transport for every leg.
 **Return flights:** If client flies somewhere mid-trip, ALWAYS include the return flight (same serviceId, separate line item).
 Before saving, verify: logical route with no backtracking, transport for every leg, airport transfers at flight cities, hotels with correct nights, guides with correct days, return flights included.
+
+### Response Format (CRITICAL):
+- **NEVER include internal reasoning, planning notes, or thinking in your response.** Go directly to the professional summary.
+- Do NOT write phrases like "Hmm...", "Let me reconsider...", "Actually wait...", "So for transport:", "Let me think...", etc.
+- Start your response with the itinerary or pricing summary — never with your planning process.
 
 ### Language Rules:
 1. Detect the language of the user's message and ALWAYS respond in that same language.
@@ -219,6 +256,18 @@ async function getAgencyMarginMultiplier(
       if (specificOverride) {
         return parseFloat(specificOverride.marginPercent) / 100;
       }
+    }
+
+    // No override found — fall back to the agency's own configured default margin
+    // (agencies.defaultMarginPercent), then to the global hardcoded default
+    const agencyRow = await db
+      .select({ defaultMarginPercent: agencies.defaultMarginPercent })
+      .from(agencies)
+      .where(eq(agencies.id, agencyId))
+      .limit(1);
+
+    if (agencyRow.length > 0 && agencyRow[0].defaultMarginPercent) {
+      return parseFloat(agencyRow[0].defaultMarginPercent) / 100;
     }
 
     return DEFAULT_AGENCY_MARGIN;
@@ -590,42 +639,51 @@ export async function processAgencyChatMessage(
       ...messages,
     ];
 
-    // Initial API call
-    let response = await fetch(DEEPSEEK_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: apiMessages,
-        tools: TOOL_DEFINITIONS,
-        tool_choice: "auto",
-        temperature: 0.7,
-        max_tokens: 2000,
-      }),
-    });
+    // ── Initial API call ──────────────────────────────────────────────────
+    let response: Response;
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), DEEPSEEK_TIMEOUT_MS);
+      response = await fetch(DEEPSEEK_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "deepseek-chat",
+          messages: apiMessages,
+          tools: TOOL_DEFINITIONS,
+          tool_choice: "auto",
+          temperature: 0.7,
+          max_tokens: 2000,
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+    } catch (fetchError) {
+      const isTimeout = fetchError instanceof DOMException && fetchError.name === "AbortError";
+      console.error(`[agency] DeepSeek ${isTimeout ? "timeout" : "fetch error"}:`, fetchError);
+      return { success: true, response: AGENCY_FALLBACK_MESSAGE };
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error("DeepSeek API error (agency):", errorText);
-      return {
-        success: false,
-        response: "",
-        error: "Failed to get AI response",
-      };
+      return { success: true, response: AGENCY_FALLBACK_MESSAGE };
     }
 
     let data = await response.json();
     let assistantMessage = data.choices[0].message;
 
-    // Tool calling loop
+    // ── Tool calling loop ─────────────────────────────────────────────────
     const maxIterations = 15;
     let iterations = 0;
+    let hadToolCalls = false;
 
     while (assistantMessage.tool_calls && iterations < maxIterations) {
       iterations++;
+      hadToolCalls = true;
 
       const toolResults = await Promise.all(
         assistantMessage.tool_calls.map(
@@ -633,9 +691,7 @@ export async function processAgencyChatMessage(
             id: string;
             function: { name: string; arguments: string };
           }) => {
-            console.log(
-              `[agency] Executing tool: ${toolCall.function.name}`
-            );
+            console.log(`[agency] Executing tool: ${toolCall.function.name}`);
 
             try {
               const args = JSON.parse(toolCall.function.arguments);
@@ -648,18 +704,12 @@ export async function processAgencyChatMessage(
               const resultData =
                 typeof result === "string" ? JSON.parse(result) : result;
 
-              // Use agency sanitization — strips raw cost/margin but keeps agency prices
               const sanitized = sanitizeForAgency(resultData);
 
               if (
                 (sanitized as Record<string, unknown>)?.rates &&
-                Array.isArray(
-                  (sanitized as Record<string, unknown>).rates
-                ) &&
-                (
-                  (sanitized as Record<string, unknown>)
-                    .rates as unknown[]
-                ).length === 0
+                Array.isArray((sanitized as Record<string, unknown>).rates) &&
+                ((sanitized as Record<string, unknown>).rates as unknown[]).length === 0
               ) {
                 (sanitized as Record<string, unknown>).fallback_hint =
                   "No rates found in database. Use your knowledge to provide approximate market rates. Clearly label as estimates and offer to get confirmed pricing.";
@@ -677,12 +727,8 @@ export async function processAgencyChatMessage(
                 role: "tool" as const,
                 content: JSON.stringify({
                   error: "Tool execution failed",
-                  message:
-                    error instanceof Error
-                      ? error.message
-                      : "Unknown error",
-                  fallback_hint:
-                    "Database query failed. Use your knowledge to provide approximate market rates.",
+                  message: error instanceof Error ? error.message : "Unknown error",
+                  fallback_hint: "Database query failed. Use your knowledge to provide approximate market rates.",
                 }),
               };
             }
@@ -690,24 +736,40 @@ export async function processAgencyChatMessage(
         )
       );
 
-      apiMessages.push(assistantMessage);
+      // Strip content from intermediate tool-call messages so reasoning
+      // doesn't bleed into the model's next turn or the final response
+      const assistantMsgForHistory = {
+        ...assistantMessage,
+        content: assistantMessage.tool_calls ? "" : (assistantMessage.content ?? ""),
+      };
+      apiMessages.push(assistantMsgForHistory);
       apiMessages.push(...toolResults);
 
-      response = await fetch(DEEPSEEK_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "deepseek-chat",
-          messages: apiMessages,
-          tools: TOOL_DEFINITIONS,
-          tool_choice: "auto",
-          temperature: 0.7,
-          max_tokens: 2000,
-        }),
-      });
+      try {
+        const loopController = new AbortController();
+        const loopTimeout = setTimeout(() => loopController.abort(), DEEPSEEK_TIMEOUT_MS);
+        response = await fetch(DEEPSEEK_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: apiMessages,
+            tools: TOOL_DEFINITIONS,
+            tool_choice: "auto",
+            temperature: 0.7,
+            max_tokens: 2000,
+          }),
+          signal: loopController.signal,
+        });
+        clearTimeout(loopTimeout);
+      } catch (fetchError) {
+        const isTimeout = fetchError instanceof DOMException && fetchError.name === "AbortError";
+        console.error(`[agency] DeepSeek tool-loop ${isTimeout ? "timeout" : "fetch error"}:`, fetchError);
+        return { success: true, response: AGENCY_FALLBACK_MESSAGE };
+      }
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -719,16 +781,76 @@ export async function processAgencyChatMessage(
       assistantMessage = data.choices[0].message;
     }
 
+    // ── Output guardrails ────────────────────────────────────────────────
+    // Stage 1: strip <think> blocks
+    let finalResponse = stripObviousReasoning(assistantMessage.content || "");
+
+    // Stage 2: presentation pass — if reasoning detected AND tools were used,
+    // make a fresh API call with all context but no tools to get a clean response
+    if (hadToolCalls && containsReasoning(finalResponse)) {
+      console.log("[agency] Reasoning detected — running presentation pass");
+      try {
+        const presController = new AbortController();
+        const presTimeout = setTimeout(() => presController.abort(), DEEPSEEK_TIMEOUT_MS);
+
+        const presMessages = [
+          ...apiMessages,
+          { ...assistantMessage, content: "" }, // strip reasoning from context
+          {
+            role: "user",
+            content:
+              "Please present the complete itinerary and pricing to the agency partner now. " +
+              "Write a professional, concise summary — no planning notes, no internal calculations, no serviceId references.",
+          },
+        ];
+
+        const presResponse = await fetch(DEEPSEEK_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: presMessages,
+            // No tools — forces a clean text response
+            temperature: 0.4,
+            max_tokens: 2500,
+          }),
+          signal: presController.signal,
+        });
+
+        clearTimeout(presTimeout);
+
+        if (presResponse.ok) {
+          const presData = await presResponse.json();
+          const presText: string | undefined = presData.choices?.[0]?.message?.content;
+          if (presText) {
+            finalResponse = stripObviousReasoning(presText);
+            console.log("[agency] Presentation pass complete");
+          }
+        }
+      } catch (presError) {
+        console.error("[agency] Presentation pass failed:", presError);
+        // Fall through — use Stage 1 stripped response
+      }
+    }
+
+    // ── Empty response safety net ────────────────────────────────────────
+    if (!finalResponse || finalResponse.trim() === "") {
+      console.warn("[agency] Empty finalResponse — applying fallback");
+      finalResponse = AGENCY_FALLBACK_MESSAGE;
+    }
+
     return {
       success: true,
-      response: assistantMessage.content || "",
+      response: finalResponse,
     };
   } catch (error) {
     console.error("[agency] Chat processing error:", error);
     return {
-      success: false,
-      response: "",
-      error: error instanceof Error ? error.message : "Unknown error",
+      success: true,
+      response: AGENCY_FALLBACK_MESSAGE,
     };
   }
 }
