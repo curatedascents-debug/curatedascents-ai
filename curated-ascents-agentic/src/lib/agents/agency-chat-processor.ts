@@ -220,7 +220,7 @@ async function loadActiveRules(appliesTo: 'customer_chat' | 'agency_chat' | 'wha
 }
 
 // ─── AGENCY MARGIN LOOKUP ────────────────────────────────────────────────────
-const DEFAULT_AGENCY_MARGIN = 0.20; // 20%
+const DEFAULT_AGENCY_MARGIN = 0.30; // 30%
 
 async function getAgencyMarginMultiplier(
   agencyId: number,

@@ -105,7 +105,7 @@ export async function POST(request: Request) {
         primaryColor: primaryColor || "#3b82f6",
         secondaryColor: secondaryColor || "#1e293b",
         accentColor: accentColor || "#60a5fa",
-        defaultMarginPercent: defaultMarginPercent || "50.00",
+        defaultMarginPercent: defaultMarginPercent || "30.00",
         miceMarginPercent: miceMarginPercent || "35.00",
         currency: currency || "USD",
         email,

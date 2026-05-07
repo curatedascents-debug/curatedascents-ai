@@ -634,7 +634,7 @@ function AddAgencyModal({ onClose, onSave }: { onClose: () => void; onSave: () =
     website: "",
     country: "",
     primaryColor: "#3b82f6",
-    defaultMarginPercent: "50",
+    defaultMarginPercent: "30",
     miceMarginPercent: "35",
     currency: "USD",
     maxUsers: 5,

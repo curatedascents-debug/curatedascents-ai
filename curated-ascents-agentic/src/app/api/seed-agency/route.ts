@@ -42,7 +42,7 @@ export async function GET() {
         primaryColor: "#3b82f6",
         secondaryColor: "#1e293b",
         accentColor: "#60a5fa",
-        defaultMarginPercent: "45.00",
+        defaultMarginPercent: "30.00",
         miceMarginPercent: "35.00",
         currency: "USD",
         email: "info@adventuretravel.com",
