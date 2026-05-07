@@ -615,9 +615,11 @@ export async function processChatMessage(
     // ── Tool calling loop ───────────────────────────────────────────────────
     const maxIterations = 15;
     let iterations = 0;
+    let hadToolCalls = false; // track whether any tools were used
 
     while (assistantMessage.tool_calls && iterations < maxIterations) {
       iterations++;
+      hadToolCalls = true;
 
       const toolResults = await Promise.all(
         assistantMessage.tool_calls.map(async (toolCall: { id: string; function: { name: string; arguments: string } }) => {
@@ -720,10 +722,67 @@ export async function processChatMessage(
     // Stage 1: fast regex strip of <think> blocks and obvious preamble
     let finalResponse = stripObviousReasoning(assistantMessage.content || "");
 
-    // Stage 2: if reasoning patterns are still present, run a cleanup API call
-    if (containsReasoning(finalResponse)) {
-      console.log(`[${source}] Reasoning detected in final response — running cleanup pass`);
-      finalResponse = await cleanupResponse(finalResponse);
+    // Stage 2: presentation pass — if reasoning leaked AND tools were used,
+    // make a fresh API call with all tool results in context but NO tools,
+    // nudging the model to write a clean client-facing response.
+    if (hadToolCalls && containsReasoning(finalResponse)) {
+      console.log(`[${source}] Reasoning detected — running presentation pass`);
+      try {
+        const presController = new AbortController();
+        const presTimeout = setTimeout(() => presController.abort(), DEEPSEEK_TIMEOUT_MS);
+
+        // apiMessages already contains system prompt + conversation + all tool results.
+        // Push the final assistant message with content stripped so reasoning doesn't
+        // re-enter the context, then add a user nudge to present cleanly.
+        const presMessages = [
+          ...apiMessages,
+          { ...assistantMessage, content: "" }, // stripped — no reasoning in history
+          {
+            role: "user",
+            content:
+              "Please present the complete itinerary and pricing to the client now. " +
+              "Start with a warm greeting. Write only the final client-facing content — " +
+              "no planning notes, no internal calculations, no serviceId references.",
+          },
+        ];
+
+        const presResponse = await fetch(DEEPSEEK_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: presMessages,
+            // No tools — forces a direct text response, no more tool calls
+            temperature: 0.4,
+            max_tokens: source === "whatsapp" ? 1500 : 2500,
+          }),
+          signal: presController.signal,
+        });
+
+        clearTimeout(presTimeout);
+
+        if (presResponse.ok) {
+          const presData = await presResponse.json();
+          const presText: string | undefined = presData.choices?.[0]?.message?.content;
+          if (presText) {
+            const stripped = stripObviousReasoning(presText);
+            if (!containsReasoning(stripped)) {
+              console.log(`[${source}] Presentation pass succeeded`);
+              finalResponse = stripped;
+            } else {
+              // Presentation pass still has reasoning — use stripped version as best effort
+              console.log(`[${source}] Presentation pass still has reasoning — using stripped version`);
+              finalResponse = stripped;
+            }
+          }
+        }
+      } catch (presError) {
+        console.error(`[${source}] Presentation pass failed:`, presError);
+        // Fall through — use Stage 1 stripped response
+      }
     }
 
     if (finalResponse) {
