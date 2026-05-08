@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Loader2, ArrowLeft, CreditCard, Building2, Banknote, ShieldCheck, Info } from "lucide-react";
+import { Loader2, ArrowLeft, CreditCard, Building2, Banknote, ShieldCheck, CheckCircle2 } from "lucide-react";
 import TrustBadgeStrip from "@/components/TrustBadgeStrip";
 
 interface QuoteItem {
@@ -36,6 +36,32 @@ export default function QuoteDetailPage() {
   const router = useRouter();
   const [quote, setQuote] = useState<QuoteDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [accepting, setAccepting] = useState(false);
+  const [acceptError, setAcceptError] = useState<string | null>(null);
+  const [accepted, setAccepted] = useState(false);
+
+  const handleAcceptAndPay = async () => {
+    setAccepting(true);
+    setAcceptError(null);
+    try {
+      const res = await fetch(`/api/portal/quotes/${id}/accept`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        setAcceptError(data.error || "Something went wrong. Please try again.");
+        return;
+      }
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        // Stripe not configured — show confirmation message
+        setAccepted(true);
+      }
+    } catch {
+      setAcceptError("Unable to process request. Please contact us directly.");
+    } finally {
+      setAccepting(false);
+    }
+  };
 
   useEffect(() => {
     fetch(`/api/portal/quotes/${id}`)
@@ -121,6 +147,51 @@ export default function QuoteDetailPage() {
               <p className="text-white text-sm font-medium">${parseFloat(item.totalPrice).toLocaleString()}</p>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Accept & Pay CTA */}
+      {quote.status !== "cancelled" && !accepted && (
+        <div className="bg-gradient-to-br from-emerald-900/40 to-slate-800 border border-emerald-700/50 rounded-2xl p-5 space-y-3">
+          <div>
+            <h3 className="text-white font-semibold text-base">Ready to confirm your trip?</h3>
+            <p className="text-slate-400 text-sm mt-1">
+              Pay a <span className="text-emerald-400 font-medium">30% deposit</span> to secure your booking.
+              Balance due 60 days before departure.
+            </p>
+          </div>
+          {acceptError && (
+            <p className="text-red-400 text-sm">{acceptError}</p>
+          )}
+          <button
+            onClick={handleAcceptAndPay}
+            disabled={accepting || quote.status === "accepted"}
+            className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition"
+          >
+            {accepting ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
+            ) : quote.status === "accepted" ? (
+              <><CheckCircle2 className="w-4 h-4" /> Quote Accepted</>
+            ) : (
+              <><CreditCard className="w-4 h-4" /> Accept & Pay 30% Deposit</>
+            )}
+          </button>
+          <p className="text-slate-500 text-xs text-center">
+            {quote.currency} {(parseFloat(quote.totalSellPrice) * 0.3).toLocaleString(undefined, { maximumFractionDigits: 0 })} due now &middot; Secure payment via Stripe
+          </p>
+        </div>
+      )}
+
+      {/* Accepted confirmation (no Stripe) */}
+      {accepted && (
+        <div className="bg-emerald-900/30 border border-emerald-700/50 rounded-2xl p-5 flex items-start gap-3">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-white font-semibold text-sm">Booking Confirmed!</p>
+            <p className="text-slate-400 text-sm mt-1">
+              Your quote has been accepted. Our team will send deposit payment details to your email within 24 hours.
+            </p>
+          </div>
         </div>
       )}
 
