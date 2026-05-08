@@ -53,7 +53,15 @@ function containsReasoning(content: string): boolean {
 
 function stripObviousReasoning(content: string): string {
   if (!content) return content;
-  return content.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+  return content
+    // Strip <think> blocks
+    .replace(/<think>[\s\S]*?<\/think>/gi, "")
+    // Strip XML-style tool invocations DeepSeek writes when no tools are available
+    .replace(/<invoke\s+name="[^"]*"[\s\S]*?<\/invoke>/gi, "")
+    .replace(/<invoke\s+name="[^"]*"[^>]*\/>/gi, "")
+    // Strip any residual tool-call markup lines
+    .replace(/^<\/?(?:invoke|tool_call|function_call|parameters)[^>]*>.*$/gim, "")
+    .trim();
 }
 
 // ─── AGENCY SYSTEM PROMPT ────────────────────────────────────────────────────
@@ -803,8 +811,11 @@ export async function processAgencyChatMessage(
           {
             role: "user",
             content:
-              "Please present the complete itinerary and pricing to the agency partner now. " +
-              "Write a professional, concise summary — no planning notes, no internal calculations, no serviceId references.",
+              "Please present the result to the agency partner now in plain text only. " +
+              "If a quote was saved successfully, confirm the quote reference number and total. " +
+              "If itinerary/pricing was assembled, show the complete day-by-day breakdown and pricing. " +
+              "CRITICAL: Do NOT write any XML, do NOT write <invoke> tags, do NOT attempt to call any tools. " +
+              "Write only clean professional text — no planning notes, no serviceId references, no internal markup of any kind.",
           },
         ];
 
@@ -846,9 +857,10 @@ export async function processAgencyChatMessage(
                   {
                     role: "user",
                     content:
-                      "IMPORTANT: Respond ONLY with the final itinerary and pricing. " +
-                      "Do NOT include any planning thoughts, route deliberation, or internal notes. " +
-                      "Start directly with the itinerary heading.",
+                      "IMPORTANT: Respond ONLY with the final result in plain text. " +
+                      "Do NOT include planning thoughts, route deliberation, or internal notes. " +
+                      "Do NOT write any XML or <invoke> tags — plain text only. " +
+                      "Start directly with the itinerary heading or quote confirmation.",
                   },
                 ];
 
