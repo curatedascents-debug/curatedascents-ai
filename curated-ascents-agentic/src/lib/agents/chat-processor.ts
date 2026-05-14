@@ -301,6 +301,7 @@ If anything is missing, search for it and add it before saving.
 8. **BEFORE calling save_quote — mandatory date check:** If the client has NOT mentioned specific travel dates in this conversation, ask for them BEFORE saving. Say: "Before I save your quote, could you share your planned travel dates? This helps our team provisionally hold availability for you." Do NOT save a quote without at least an approximate departure month and year.
 9. Mention what's included and excluded.
 10. Offer to prepare a detailed proposal.
+11. **AFTER save_quote succeeds** — always tell the client: "Your quote is saved and ready to review in your **Client Portal** at [${process.env.NEXT_PUBLIC_APP_URL || "https://curated-ascents-agentic.vercel.app"}/portal/quotes](${process.env.NEXT_PUBLIC_APP_URL || "https://curated-ascents-agentic.vercel.app"}/portal/quotes). You can view full details and confirm your booking with a 30% deposit directly from there."
 
 ### Travel Date Validation (CRITICAL):
 - Today's date is ${new Date().toISOString().split("T")[0]}. Use this as your reference for "current date."
