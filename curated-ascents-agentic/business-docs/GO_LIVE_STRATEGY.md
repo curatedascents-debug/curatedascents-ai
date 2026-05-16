@@ -37,6 +37,31 @@
 
 ---
 
+## 0. Recommended Launch Sequence
+
+Based on current system state (May 7, 2026), complete tasks in this order for the fastest safe path to go-live:
+
+| Priority | Task | Est. Time | Blocks |
+|----------|------|-----------|--------|
+| 🔴 P0 | **Fix `ENABLE_MSW=false` in Vercel** — currently `true`, runs test mocks in production | 5 min | Live AI chat for real users |
+| 🔴 P0 | **Set all missing JWT secrets** (`ADMIN_SESSION_SECRET`, `CUSTOMER_JWT_SECRET`, `SUPPLIER_JWT_SECRET`, `AGENCY_JWT_SECRET`, `CRON_SECRET`) | 10 min | All portal logins, all 19 cron jobs |
+| 🔴 P0 | **Change `ADMIN_PASSWORD`** from default before going public | 5 min | Security |
+| 🔴 P1 | **DNS setup** — add curatedascents.com to Vercel, update GoDaddy A + CNAME records | 30 min + propagation | Everything on real domain |
+| 🔴 P1 | **Resend domain verification** — add SPF/DKIM/DMARC in GoDaddy | 30 min + 24hr propagation | All transactional emails (booking confirmations, payment receipts, portal access codes) |
+| 🔴 P1 | **Stripe live mode** — copy live keys to Vercel, register webhook at `https://curatedascents.com/api/payments/webhook` | 20 min | All payments |
+| 🟡 P2 | **Bhutan DB rates audit** — current luxury Bhutan rates ($2,500/pp) are unrealistically low; Bhutan SDF alone is $200/night. Audit and correct before taking Bhutan bookings | 1–2 hrs | Bhutan quote accuracy |
+| 🟡 P2 | **Blog content review** — AI-generated posts need human read-through before driving traffic | 2–3 hrs | SEO credibility |
+| ⏳ P2 | **Hero video** — replace Pexels placeholder in HeroSection.tsx with Ashray's footage | Waiting on Ashray | First impression |
+| ⏳ P2 | **Photo library** — upload Ashray's photos via Media tab | Waiting on Ashray | Visual content |
+| 🟡 P3 | **Google Workspace setup** — `kiran@curatedascents.com`, info@/reservations@ aliases, Google Calendar booking link | 1 hr | Human email inbox, video consultations |
+| ❌ P3 | **Full E2E test suite vs. production** — run all 380+ Playwright tests against live URL | 30 min | Final go/no-go gate |
+| ❌ P3 | **Mobile test** — iPhone and Android, confirm chat + checkout work | 20 min | Mobile UX |
+| ❌ P3 | **Submit sitemap to Google Search Console** | 10 min | SEO indexing |
+
+> **Fastest path to accepting first booking:** Complete P0 items (20 min) + P1 items (1.5 hrs + DNS propagation overnight). That's ~2 hours of work + one overnight wait.
+
+---
+
 ## 2. Pre-Launch Checklist
 
 ### 2.1 Hosting & Domain Setup
