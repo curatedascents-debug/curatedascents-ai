@@ -48,11 +48,23 @@ interface SimulationResult {
   demandScore?: number;
 }
 
+interface ServiceMargin {
+  id: number;
+  serviceTypeKey: string;
+  displayName: string | null;
+  b2cMarginPercent: string;
+  agentMarginPercent: string;
+}
+
 export default function PricingTab() {
-  const [activeSubTab, setActiveSubTab] = useState<"rules" | "demand" | "simulate" | "analytics">("rules");
+  const [activeSubTab, setActiveSubTab] = useState<"rules" | "demand" | "simulate" | "analytics" | "discounts">("rules");
   const [rules, setRules] = useState<PricingRule[]>([]);
   const [metrics, setMetrics] = useState<DemandMetric[]>([]);
   const [loading, setLoading] = useState(true);
+  const [discountsEnabled, setDiscountsEnabled] = useState<boolean | null>(null);
+  const [serviceMargins, setServiceMargins] = useState<ServiceMargin[]>([]);
+  const [discountsLoading, setDiscountsLoading] = useState(false);
+  const [marginsLoading, setMarginsLoading] = useState(false);
   const [showRuleModal, setShowRuleModal] = useState(false);
   const [editingRule, setEditingRule] = useState<PricingRule | null>(null);
 
@@ -79,7 +91,48 @@ export default function PricingTab() {
     if (activeSubTab === "rules") fetchRules();
     if (activeSubTab === "demand") fetchDemandMetrics();
     if (activeSubTab === "analytics") fetchAnalytics();
+    if (activeSubTab === "discounts") { fetchDiscountConfig(); fetchServiceMargins(); }
   }, [activeSubTab]);
+
+  const fetchDiscountConfig = async () => {
+    setDiscountsLoading(true);
+    try {
+      const res = await fetch("/api/admin/pricing/config?key=discounts_enabled");
+      const data = await res.json();
+      setDiscountsEnabled(data.value === "true");
+    } catch {
+      setDiscountsEnabled(false);
+    } finally {
+      setDiscountsLoading(false);
+    }
+  };
+
+  const fetchServiceMargins = async () => {
+    setMarginsLoading(true);
+    try {
+      const res = await fetch("/api/admin/pricing/service-margins");
+      const data = await res.json();
+      setServiceMargins(data.margins || []);
+    } catch {
+      setServiceMargins([]);
+    } finally {
+      setMarginsLoading(false);
+    }
+  };
+
+  const toggleDiscounts = async () => {
+    const newVal = !discountsEnabled;
+    try {
+      await fetch("/api/admin/pricing/config", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "discounts_enabled", value: String(newVal) }),
+      });
+      setDiscountsEnabled(newVal);
+    } catch (error) {
+      console.error("Error toggling discounts:", error);
+    }
+  };
 
   const fetchRules = async () => {
     setLoading(true);
@@ -212,6 +265,7 @@ export default function PricingTab() {
           { key: "demand", label: "Demand Metrics" },
           { key: "simulate", label: "Price Simulator" },
           { key: "analytics", label: "Analytics" },
+          { key: "discounts", label: "Discount Controls" },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -609,6 +663,94 @@ export default function PricingTab() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Discount Controls Tab */}
+      {activeSubTab === "discounts" && (
+        <div>
+          <h3 className="text-lg font-semibold text-white mb-4">Discount Controls</h3>
+
+          {/* Master kill-switch */}
+          <div className="bg-slate-800 border border-slate-700 rounded-lg p-5 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-white font-medium">Discounts Master Switch</div>
+                <div className="text-slate-400 text-sm mt-1">
+                  Enable or disable all discounts globally. When off, every quote shows standard sell price only.
+                </div>
+              </div>
+              {discountsLoading ? (
+                <span className="text-slate-400 text-sm">Loading...</span>
+              ) : (
+                <button
+                  onClick={toggleDiscounts}
+                  className={`px-5 py-2 rounded-lg font-medium transition-colors ${
+                    discountsEnabled
+                      ? "bg-green-600 hover:bg-green-700 text-white"
+                      : "bg-slate-600 hover:bg-slate-500 text-slate-200"
+                  }`}
+                >
+                  {discountsEnabled ? "Enabled" : "Disabled"}
+                </button>
+              )}
+            </div>
+
+            {!discountsEnabled && discountsEnabled !== null && (
+              <div className="mt-4 flex items-center gap-2 bg-amber-900/30 border border-amber-700 rounded-lg px-4 py-3">
+                <svg className="w-5 h-5 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                </svg>
+                <span className="text-amber-300 text-sm">
+                  All discounts are currently disabled. Quotes show standard sell prices only.
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Service Margins Table */}
+          <div className="bg-slate-800 border border-slate-700 rounded-lg p-5">
+            <h4 className="text-white font-medium mb-4">Service Type Margins</h4>
+            {marginsLoading ? (
+              <div className="text-center py-8 text-slate-400">Loading margins...</div>
+            ) : serviceMargins.length === 0 ? (
+              <div className="text-center py-8 text-slate-400">
+                No margin data found.{" "}
+                <a href="/api/admin/migrate-discount-config" className="text-emerald-400 underline">
+                  Run migration
+                </a>{" "}
+                to seed defaults.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-700 text-slate-400">
+                      <th className="text-left pb-3 pr-4">Service Type</th>
+                      <th className="text-right pb-3 pr-4">B2C Margin</th>
+                      <th className="text-right pb-3">Agent Margin</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {serviceMargins.map((m) => (
+                      <tr key={m.id} className="border-b border-slate-700/50">
+                        <td className="py-3 pr-4 text-white">
+                          <div>{m.displayName || m.serviceTypeKey}</div>
+                          <div className="text-xs text-slate-500">{m.serviceTypeKey}</div>
+                        </td>
+                        <td className="py-3 pr-4 text-right text-emerald-400 font-medium">
+                          {parseFloat(m.b2cMarginPercent).toFixed(0)}%
+                        </td>
+                        <td className="py-3 text-right text-blue-400 font-medium">
+                          {parseFloat(m.agentMarginPercent).toFixed(0)}%
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

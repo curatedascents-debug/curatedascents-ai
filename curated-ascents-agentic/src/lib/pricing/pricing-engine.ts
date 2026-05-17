@@ -932,3 +932,67 @@ export async function getPricingAnalytics(params: {
     dailyTrends,
   };
 }
+
+// ============================================
+// SERVICE MARGIN LOOKUP (table-driven)
+// ============================================
+
+interface MarginCacheEntry {
+  data: Record<string, { b2c: number; agent: number }>;
+  fetchedAt: number;
+}
+
+let _marginCache: MarginCacheEntry | null = null;
+const MARGIN_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+async function loadMarginsCache(): Promise<Record<string, { b2c: number; agent: number }>> {
+  if (_marginCache && Date.now() - _marginCache.fetchedAt < MARGIN_CACHE_TTL_MS) {
+    return _marginCache.data;
+  }
+  try {
+    const rows = await db.execute(
+      sql`SELECT service_type_key, b2c_margin_percent, agent_margin_percent FROM service_type_margins`
+    );
+    const data: Record<string, { b2c: number; agent: number }> = {};
+    for (const row of rows.rows as Array<{ service_type_key: string; b2c_margin_percent: string; agent_margin_percent: string }>) {
+      data[row.service_type_key] = {
+        b2c: parseFloat(row.b2c_margin_percent),
+        agent: parseFloat(row.agent_margin_percent),
+      };
+    }
+    _marginCache = { data, fetchedAt: Date.now() };
+    return data;
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Look up the margin percentage for a service type from the DB.
+ * Falls back to 50% B2C / 30% agent if the table doesn't have the key.
+ */
+export async function getMarginForService(serviceTypeKey: string, isAgent: boolean): Promise<number> {
+  const cache = await loadMarginsCache();
+  const entry = cache[serviceTypeKey];
+  if (entry) {
+    return isAgent ? entry.agent : entry.b2c;
+  }
+  return isAgent ? 30 : 50;
+}
+
+/**
+ * Check if discounts are currently enabled via pricingConfig kill-switch.
+ * Returns false (discounts disabled) if value = 'false' or table doesn't exist.
+ */
+export async function checkDiscountsEnabled(): Promise<boolean> {
+  try {
+    const rows = await db.execute(
+      sql`SELECT value FROM pricing_config WHERE key = 'discounts_enabled' LIMIT 1`
+    );
+    const row = rows.rows[0] as { value: string } | undefined;
+    if (!row) return false;
+    return row.value === 'true';
+  } catch {
+    return false;
+  }
+}

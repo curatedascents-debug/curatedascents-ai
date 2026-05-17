@@ -18,6 +18,7 @@ import {
   suppliers,
   quotes,
   quoteItems,
+  quoteAuditLog,
   clients,
   bookings,
   paymentMilestones,
@@ -27,6 +28,8 @@ import {
 import { eq, ilike, and, gte, lte, or, sql, desc } from 'drizzle-orm';
 import { GATEWAY_AIRPORTS, type GatewayCountry } from '@/lib/constants/gateway-airports';
 import { buildFlightSearchUrls } from '@/lib/utils/flight-url-builder';
+import { getToolCallLog } from '@/lib/agents/tool-call-log';
+import { getMarginForService } from '@/lib/pricing/pricing-engine';
 
 // Tool 1: Search rates across all service types
 export async function searchRates(params: {
@@ -998,26 +1001,111 @@ export async function saveQuote(params: {
 
     const quote = quoteResult[0];
 
-    // Insert line items with cost data
+    // Build per-item margin keys and audit data
+    const marginKeys = params.items.map(item => {
+      const st = (item.serviceType || 'miscellaneous').toLowerCase();
+      if (st === 'hotel') return 'hotel_room_only';
+      if (st === 'guide') return 'guide_service';
+      if (st === 'porter') return 'porter_service';
+      if (st === 'flight') return 'domestic_flight';
+      if (st === 'helicopter_sharing' || st === 'helicopter') return 'helicopter';
+      if (st === 'permit') return 'trekking_permit';
+      if (st === 'transportation') return 'ground_transport';
+      if (st === 'package') return 'miscellaneous';
+      return 'miscellaneous';
+    });
+
+    // Determine rateSource per item (DB lookup = internal_db, estimate = ai_estimate)
+    const rateSources = params.items.map((item, idx) =>
+      item.serviceId && resolvedItems[idx].unitSell > 0 ? 'internal_db' : 'ai_estimate'
+    );
+
+    // Insert line items with cost data + audit columns
     // quantity stores effectiveQty (rooms×nights for hotels, guides×days for guides, etc.)
     // costPrice/sellPrice are per-unit rates; quantity × sellPrice = line total
     if (params.items.length > 0) {
-      await db.insert(quoteItems).values(
-        params.items.map((item, idx) => ({
-          quoteId: quote.id,
-          serviceType: item.serviceType || 'miscellaneous',
-          serviceId: item.serviceId || null,
-          serviceName: item.serviceName || null,
-          description: item.description || null,
-          quantity: resolvedItems[idx].effectiveQty,
-          nights: resolvedItems[idx].correctedNights || null,
-          days: (item.serviceType === 'guide' || item.serviceType === 'porter') ? (resolvedItems[idx].correctedNights || null) : null,
-          costPrice: resolvedItems[idx].unitCost > 0 ? resolvedItems[idx].unitCost.toFixed(2) : null,
-          sellPrice: resolvedItems[idx].unitSell > 0 ? resolvedItems[idx].unitSell.toFixed(2) : null,
-          margin: resolvedItems[idx].unitCost > 0 ? resolvedItems[idx].unitMargin.toFixed(2) : null,
-          currency: 'USD',
-        }))
+      const isAgent = false; // chat always uses B2C margin for new quotes
+      const marginPercentValues = await Promise.all(
+        marginKeys.map(key => getMarginForService(key, isAgent))
       );
+
+      await db.insert(quoteItems).values(
+        params.items.map((item, idx) => {
+          const unitSell = resolvedItems[idx].unitSell;
+          const unitCost = resolvedItems[idx].unitCost;
+          const calcMarginPct = unitCost > 0 ? ((unitSell - unitCost) / unitCost * 100) : marginPercentValues[idx];
+          const note = unitSell > 0 && unitCost > 0
+            ? `Cost: $${unitCost.toFixed(2)} × ${(1 + calcMarginPct / 100).toFixed(2)} margin = $${unitSell.toFixed(2)} sell price (${rateSources[idx]})`
+            : `Sell price: $${unitSell.toFixed(2)} (${rateSources[idx]})`;
+          return {
+            quoteId: quote.id,
+            serviceType: item.serviceType || 'miscellaneous',
+            serviceId: item.serviceId || null,
+            serviceName: item.serviceName || null,
+            description: item.description || null,
+            quantity: resolvedItems[idx].effectiveQty,
+            nights: resolvedItems[idx].correctedNights || null,
+            days: (item.serviceType === 'guide' || item.serviceType === 'porter') ? (resolvedItems[idx].correctedNights || null) : null,
+            costPrice: unitCost > 0 ? unitCost.toFixed(2) : null,
+            sellPrice: unitSell > 0 ? unitSell.toFixed(2) : null,
+            margin: unitCost > 0 ? resolvedItems[idx].unitMargin.toFixed(2) : null,
+            currency: 'USD',
+            // Audit columns
+            rateSource: rateSources[idx],
+            serviceTypeMarginKey: marginKeys[idx],
+            marginPercent: calcMarginPct.toFixed(2),
+            baseSellPrice: unitSell > 0 ? unitSell.toFixed(2) : null,
+            appliedDiscounts: [],
+            calculationNote: note,
+          };
+        })
+      );
+    }
+
+    // Write audit log entry
+    try {
+      const toolsUsed = getToolCallLog();
+      const rateSourceCounts = rateSources.reduce<Record<string, number>>((acc, src) => {
+        acc[src] = (acc[src] || 0) + 1;
+        return acc;
+      }, {});
+      const blendedMarginPct = totalCost > 0 ? ((totalSell - totalCost) / totalCost * 100).toFixed(1) : '0';
+      const aiCount = rateSourceCounts['ai_estimate'] || 0;
+      const dbCount = rateSourceCounts['internal_db'] || 0;
+      const extCount = rateSourceCounts['external_research'] || 0;
+      const summaryParts = [`${params.items.length} items:`];
+      if (dbCount) summaryParts.push(`${dbCount} internal_db`);
+      if (extCount) summaryParts.push(`${extCount} external_research`);
+      if (aiCount) summaryParts.push(`${aiCount} ai_estimate`);
+      summaryParts.push(`Blended margin: ${blendedMarginPct}%`);
+
+      await db.insert(quoteAuditLog).values({
+        quoteId: quote.id,
+        eventType: 'quote_created',
+        changedBy: 'ai_agent',
+        changedByDetail: params.clientEmail || null,
+        toolsUsed: toolsUsed as unknown as Record<string, unknown>[],
+        rateSourceSummary: rateSourceCounts,
+        quoteSnapshot: {
+          quote: {
+            id: quote.id,
+            quoteNumber,
+            destination: params.destination,
+            numberOfPax: params.numberOfPax,
+            totalSellPrice: totalSell,
+          },
+          items: params.items.map((item, idx) => ({
+            serviceType: item.serviceType,
+            serviceName: item.serviceName,
+            rateSource: rateSources[idx],
+            unitSell: resolvedItems[idx].unitSell,
+            effectiveQty: resolvedItems[idx].effectiveQty,
+          })),
+        },
+        calculationSummary: summaryParts.join('. '),
+      });
+    } catch (auditErr) {
+      console.error('Failed to write quote audit log:', auditErr);
     }
 
     return {

@@ -1,6 +1,9 @@
 // src/lib/agents/tool-executor.ts
 // Executes tool calls from the AI - Fully corrected for new schema
 
+import { pushToolCallEntry, resetToolCallLog } from "./tool-call-log";
+export { getToolCallLog, resetToolCallLog } from "./tool-call-log";
+
 import {
   searchRates,
   searchMultipleServices,
@@ -65,25 +68,46 @@ function stripPricing(obj: any): any {
   return obj;
 }
 
+function summarizeResult(toolName: string, resultJson: string): string {
+  try {
+    const obj = JSON.parse(resultJson);
+    if (obj?.error) return `error: ${obj.error}`;
+    if (Array.isArray(obj)) return `${obj.length} results`;
+    if (obj?.results && Array.isArray(obj.results)) return `${obj.results.length} results`;
+    if (obj?.quoteNumber) return `saved quote ${obj.quoteNumber}`;
+    if (obj?.quoteId) return `quote ID ${obj.quoteId}`;
+    if (obj?.currencies) return `${obj.currencies.length} currencies`;
+    if (obj?.finalPrice !== undefined) return `dynamic price $${obj.finalPrice}`;
+    return "ok";
+  } catch {
+    return "ok";
+  }
+}
+
 export async function executeToolCall(
   toolName: string,
   args: Record<string, any>
 ): Promise<string> {
   console.log(`Executing tool: ${toolName}`, args);
 
+  const timestamp = new Date().toISOString();
+  let result = "";
+  let success = true;
+
   try {
     switch (toolName) {
       case "search_rates":
-        return JSON.stringify(await searchRates({
+        result = JSON.stringify(await searchRates({
           destination: args.destination as string | undefined,
           // Tool definition uses serviceType; map to category for searchRates
           category: (args.serviceType || args.category) as string | undefined,
           minPrice: args.minPrice as number | undefined,
           maxPrice: args.maxPrice as number | undefined,
         }));
+        break;
 
       case "search_hotels":
-        return JSON.stringify(await searchRates({
+        result = JSON.stringify(await searchRates({
           destination: args.destination as string | undefined,
           category: "hotel",
           minPrice: args.minPrice as number | undefined,
@@ -91,17 +115,19 @@ export async function executeToolCall(
           starRating: args.starRating as number | undefined,
           hotelName: args.hotelName as string | undefined,
         }));
+        break;
 
       case "search_multiple_services":
-        return JSON.stringify(await searchMultipleServices({
+        result = JSON.stringify(await searchMultipleServices({
           destination: args.destination as string,
           serviceTypes: args.serviceTypes as string[],
           starRating: args.starRating as number | undefined,
           hotelName: args.hotelName as string | undefined,
         }));
+        break;
 
       case "search_packages":
-        return JSON.stringify(await searchRates({
+        result = JSON.stringify(await searchRates({
           destination: args.destination as string | undefined,
           category: "package",
           minPrice: args.minPrice as number | undefined,
@@ -111,9 +137,10 @@ export async function executeToolCall(
           maxDays: args.maxDays as number | undefined,
           region: args.region as string | undefined,
         }));
+        break;
 
       case "calculate_quote":
-        return JSON.stringify(await calculateQuote({
+        result = JSON.stringify(await calculateQuote({
           services: args.services as Array<{
             serviceType: string;
             serviceId: number;
@@ -124,26 +151,30 @@ export async function executeToolCall(
           numberOfRooms: args.numberOfRooms as number | undefined,
           occupancyType: args.occupancyType as string | undefined,
         }));
+        break;
 
       case "get_destinations":
-        return JSON.stringify(await getDestinations(
+        result = JSON.stringify(await getDestinations(
           args.country ? { country: args.country as string } : undefined
         ));
+        break;
 
       case "get_categories":
-        return JSON.stringify(await getCategories(args.destination as string | undefined));
+        result = JSON.stringify(await getCategories(args.destination as string | undefined));
+        break;
 
       case "get_service_details":
       case "get_rate_details":
         // Tool definition uses serviceId; also accept rateId for backward compat
         // Strip all pricing — AI should only describe services, not show per-item prices
-        return JSON.stringify(stripPricing(await getRateDetails({
+        result = JSON.stringify(stripPricing(await getRateDetails({
           rateId: (args.serviceId || args.rateId) as number,
           serviceType: args.serviceType as string | undefined,
         })));
+        break;
 
       case "save_quote":
-        return JSON.stringify(await saveQuote({
+        result = JSON.stringify(await saveQuote({
           clientEmail: args.clientEmail as string | undefined,
           clientName: args.clientName as string | undefined,
           quoteName: args.quoteName as string | undefined,
@@ -159,85 +190,97 @@ export async function executeToolCall(
             sellPrice: number;
           }>,
         }));
+        break;
 
       case "research_external_rates":
-        return JSON.stringify(await researchExternalRates({
+        result = JSON.stringify(await researchExternalRates({
           serviceType: args.serviceType as string,
           serviceName: args.serviceName as string,
           location: args.location as string,
           category: args.category as string | undefined,
           additionalContext: args.additionalContext as string | undefined,
         }));
+        break;
 
       // Booking Operations Tools
       case "get_booking_status":
-        return JSON.stringify(await getBookingStatus({
+        result = JSON.stringify(await getBookingStatus({
           bookingReference: args.bookingReference as string,
         }));
+        break;
 
       case "get_payment_schedule":
-        return JSON.stringify(await getPaymentSchedule({
+        result = JSON.stringify(await getPaymentSchedule({
           bookingReference: args.bookingReference as string,
         }));
+        break;
 
       case "convert_quote_to_booking":
-        return JSON.stringify(await convertQuoteToBooking({
+        result = JSON.stringify(await convertQuoteToBooking({
           quoteNumber: args.quoteNumber as string,
           clientEmail: args.clientEmail as string | undefined,
         }));
+        break;
 
       case "check_supplier_confirmations":
-        return JSON.stringify(await checkSupplierConfirmations({
+        result = JSON.stringify(await checkSupplierConfirmations({
           bookingReference: args.bookingReference as string,
         }));
+        break;
 
       case "get_trip_briefing":
-        return JSON.stringify(await getTripBriefing({
+        result = JSON.stringify(await getTripBriefing({
           bookingReference: args.bookingReference as string,
         }));
+        break;
 
       // Enhanced Expedition Architect Tools
       case "check_availability":
-        return JSON.stringify(await checkAvailability(
+        result = JSON.stringify(await checkAvailability(
           args.serviceType as string,
           args.serviceId as number,
           args.startDate as string,
           args.endDate as string,
           args.quantity as number | undefined
         ));
+        break;
 
       case "validate_trek_acclimatization":
-        return JSON.stringify(validateAcclimatization(
+        result = JSON.stringify(validateAcclimatization(
           args.itinerary as Array<{ day: number; location: string; overnightAltitude?: number }>
         ));
+        break;
 
       case "validate_permits":
-        return JSON.stringify(await validatePermits(
+        result = JSON.stringify(await validatePermits(
           args.destinationRegion as string,
           args.tripStartDate as string,
           args.nationality as string | undefined
         ));
+        break;
 
-      case "get_upsell_suggestions":
+      case "get_upsell_suggestions": {
         // Load client profile if clientId is available in context
         const clientProfile = args.clientId
           ? await loadClientProfile(args.clientId as number)
           : undefined;
-        return JSON.stringify(generateUpsellSuggestions(
+        result = JSON.stringify(generateUpsellSuggestions(
           args.tripType as string,
           args.destination as string,
           clientProfile || undefined,
           args.currentServices as string[] | undefined
         ));
+        break;
+      }
 
       // Currency Tools
-      case "convert_currency":
+      case "convert_currency": {
         const conversionResult = await convertCurrency(
           args.amount as number,
           (args.fromCurrency as string) || BASE_CURRENCY,
           args.toCurrency as string
         );
-        return JSON.stringify({
+        result = JSON.stringify({
           originalAmount: conversionResult.originalAmount,
           originalCurrency: conversionResult.originalCurrency,
           originalFormatted: formatCurrency(conversionResult.originalAmount, conversionResult.originalCurrency),
@@ -247,10 +290,12 @@ export async function executeToolCall(
           exchangeRate: conversionResult.rate,
           rateTimestamp: conversionResult.rateTimestamp.toISOString(),
         });
+        break;
+      }
 
-      case "get_supported_currencies":
+      case "get_supported_currencies": {
         const currencies = await getSupportedCurrencies();
-        return JSON.stringify({
+        result = JSON.stringify({
           currencies: currencies.map(c => ({
             code: c.code,
             name: c.name,
@@ -259,9 +304,11 @@ export async function executeToolCall(
           baseCurrency: BASE_CURRENCY,
           note: "All prices are in USD by default. We can show prices in your preferred currency upon request.",
         });
+        break;
+      }
 
       // Dynamic Pricing Tools
-      case "get_dynamic_price":
+      case "get_dynamic_price": {
         const dynamicPriceResult = await calculateDynamicPrice({
           serviceType: args.serviceType as string,
           serviceId: args.serviceId as number,
@@ -270,7 +317,7 @@ export async function executeToolCall(
           paxCount: args.paxCount as number | undefined,
           loyaltyTier: args.loyaltyTier as string | undefined,
         });
-        return JSON.stringify({
+        result = JSON.stringify({
           originalPrice: dynamicPriceResult.originalPrice,
           finalPrice: dynamicPriceResult.finalPrice,
           currency: dynamicPriceResult.currency,
@@ -286,9 +333,10 @@ export async function executeToolCall(
             ? `You save ${formatCurrency(dynamicPriceResult.savings, "USD")} (${dynamicPriceResult.savingsPercent}% off)!`
             : undefined,
         });
+        break;
+      }
 
-      case "check_pricing_promotions":
-        const promoDestination = (args.destination as string || "").toLowerCase();
+      case "check_pricing_promotions": {
         const promoServiceType = args.serviceType as string | undefined;
         const promoMonth = args.travelMonth as string | undefined;
 
@@ -361,14 +409,16 @@ export async function executeToolCall(
               discount: `${discount}% off`,
             })),
           },
-          tip: "Book early (90+ days ahead) to get up to 15% off, or travel with a group of 20+ for maximum savings!",
+          tip: "Standard pricing applies. Contact us for group or special rate enquiries.",
         };
 
-        return JSON.stringify(promotions);
+        result = JSON.stringify(promotions);
+        break;
+      }
 
       // Media Library Tool
       case "search_photos":
-        return JSON.stringify(await searchPhotos({
+        result = JSON.stringify(await searchPhotos({
           country: args.country as string | undefined,
           destination: args.destination as string | undefined,
           category: args.category as string | undefined,
@@ -378,17 +428,19 @@ export async function executeToolCall(
           featured: args.featured as boolean | undefined,
           limit: args.limit as number | undefined,
         }));
+        break;
 
       case "suggest_flight_search":
-        return JSON.stringify(await suggestFlightSearch({
+        result = JSON.stringify(await suggestFlightSearch({
           origin_code: args.origin_code as string | undefined,
           destination_country: args.destination_country as string,
           departure_date: args.departure_date as string | undefined,
           return_date: args.return_date as string | undefined,
         }));
+        break;
 
       default:
-        return JSON.stringify({
+        result = JSON.stringify({
           error: `Unknown tool: ${toolName}`,
           availableTools: [
             "search_rates",
@@ -420,13 +472,23 @@ export async function executeToolCall(
         });
     }
   } catch (error) {
-    console.error(`Error executing ${toolName}:`, error);
-    return JSON.stringify({
+    success = false;
+    result = JSON.stringify({
       error: "Tool execution failed",
       message: error instanceof Error ? error.message : "Unknown error",
       tool: toolName,
     });
+    console.error(`Error executing ${toolName}:`, error);
   }
+
+  pushToolCallEntry({
+    tool: toolName,
+    success,
+    timestamp,
+    resultSummary: summarizeResult(toolName, result),
+  });
+
+  return result;
 }
 
 // Export with alternative name for compatibility

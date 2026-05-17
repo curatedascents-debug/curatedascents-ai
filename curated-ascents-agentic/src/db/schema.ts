@@ -11,6 +11,8 @@ import {
   pgEnum,
   index,
   uniqueIndex,
+  varchar,
+  numeric,
 } from 'drizzle-orm/pg-core';
 
 // ============================================
@@ -799,6 +801,17 @@ export const quoteItems = pgTable('quote_items', {
   
   currency: text('currency').default('USD'),
   notes: text('notes'),
+
+  // Audit trail columns
+  rateSource: varchar('rate_source', { length: 50 }),
+  sourceReference: varchar('source_reference', { length: 255 }),
+  sourceUrl: varchar('source_url', { length: 500 }),
+  marginPercent: numeric('margin_percent', { precision: 5, scale: 2 }),
+  serviceTypeMarginKey: varchar('service_type_margin_key', { length: 100 }),
+  baseSellPrice: numeric('base_sell_price', { precision: 10, scale: 2 }),
+  appliedDiscounts: jsonb('applied_discounts'),
+  calculationNote: text('calculation_note'),
+
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -3377,4 +3390,85 @@ export const aiBusinessRules = pgTable('ai_business_rules', {
 }, (table) => [
   index('ai_rules_category_idx').on(table.category),
   index('ai_rules_active_priority_idx').on(table.isActive, table.priority),
+]);
+
+// ─── PRICING CONFIG & DISCOUNT RULES ────────────────────────────────────────
+
+export const pricingConfig = pgTable('pricing_config', {
+  id: serial('id').primaryKey(),
+  key: varchar('key', { length: 100 }).notNull().unique(),
+  value: text('value').notNull(),
+  description: text('description'),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const earlyBirdRules = pgTable('early_bird_rules', {
+  id: serial('id').primaryKey(),
+  daysInAdvance: integer('days_in_advance').notNull(),
+  discountPercent: numeric('discount_percent', { precision: 5, scale: 2 }).notNull(),
+  isActive: boolean('is_active').default(false),
+  label: varchar('label', { length: 100 }),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const groupDiscountRules = pgTable('group_discount_rules', {
+  id: serial('id').primaryKey(),
+  minPax: integer('min_pax').notNull(),
+  maxPax: integer('max_pax'),
+  discountPercent: numeric('discount_percent', { precision: 5, scale: 2 }).notNull(),
+  isActive: boolean('is_active').default(false),
+  label: varchar('label', { length: 100 }),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const lastMinuteRules = pgTable('last_minute_rules', {
+  id: serial('id').primaryKey(),
+  daysBeforeDeparture: integer('days_before_departure').notNull(),
+  discountPercent: numeric('discount_percent', { precision: 5, scale: 2 }).notNull(),
+  isActive: boolean('is_active').default(false),
+  label: varchar('label', { length: 100 }),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const loyaltyTiers = pgTable('loyalty_tiers', {
+  id: serial('id').primaryKey(),
+  tierName: varchar('tier_name', { length: 50 }).notNull(),
+  minPoints: integer('min_points').notNull(),
+  discountPercent: numeric('discount_percent', { precision: 5, scale: 2 }).notNull(),
+  isActive: boolean('is_active').default(false),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const serviceFeeTypeEnum = pgEnum('service_fee_type', ['none', 'flat_per_unit', 'percentage']);
+
+export const serviceTypeMargins = pgTable('service_type_margins', {
+  id: serial('id').primaryKey(),
+  serviceTypeKey: varchar('service_type_key', { length: 100 }).notNull().unique(),
+  displayName: varchar('display_name', { length: 150 }),
+  b2cMarginPercent: numeric('b2c_margin_percent', { precision: 5, scale: 2 }).notNull().default('50'),
+  agentMarginPercent: numeric('agent_margin_percent', { precision: 5, scale: 2 }).notNull().default('30'),
+  serviceFeeType: serviceFeeTypeEnum('service_fee_type').default('none'),
+  serviceFeeAmount: numeric('service_fee_amount', { precision: 10, scale: 2 }),
+  notes: text('notes'),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// ─── QUOTE AUDIT LOG ─────────────────────────────────────────────────────────
+
+export const quoteAuditLog = pgTable('quote_audit_log', {
+  id: serial('id').primaryKey(),
+  quoteId: integer('quote_id').references(() => quotes.id),
+  eventType: varchar('event_type', { length: 100 }).notNull(),
+  changedBy: varchar('changed_by', { length: 100 }),
+  changedByDetail: varchar('changed_by_detail', { length: 255 }),
+  toolsUsed: jsonb('tools_used'),
+  rateSourceSummary: jsonb('rate_source_summary'),
+  quoteSnapshot: jsonb('quote_snapshot'),
+  calculationSummary: text('calculation_summary'),
+  ipAddress: varchar('ip_address', { length: 45 }),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => [
+  index('quote_audit_log_quote_idx').on(table.quoteId),
+  index('quote_audit_log_event_idx').on(table.eventType),
+  index('quote_audit_log_created_idx').on(table.createdAt),
 ]);
