@@ -37,9 +37,9 @@ import {
 import {
   calculateDynamicPrice,
   DEMAND_ADJUSTMENTS,
-  EARLY_BIRD_TIERS,
-  GROUP_DISCOUNT_TIERS,
-  LOYALTY_DISCOUNTS,
+  DEFAULT_EARLY_BIRD_TIERS,
+  DEFAULT_GROUP_DISCOUNT_TIERS,
+  DEFAULT_LOYALTY_DISCOUNTS,
 } from "@/lib/pricing/pricing-engine";
 import { db } from "@/db";
 import { pricingRules, seasons } from "@/db/schema";
@@ -396,15 +396,15 @@ export async function executeToolCall(
             validUntil: r.validTo,
           })).filter(p => p.discount),
           standardDiscounts: {
-            earlyBird: EARLY_BIRD_TIERS.map(t => ({
+            earlyBird: DEFAULT_EARLY_BIRD_TIERS.map(t => ({
               daysAhead: `${t.daysAhead}+ days`,
               discount: `${t.discount}% off`,
             })),
-            groupDiscounts: GROUP_DISCOUNT_TIERS.map(t => ({
+            groupDiscounts: DEFAULT_GROUP_DISCOUNT_TIERS.map(t => ({
               minPax: `${t.minPax}+ travelers`,
               discount: `${t.discount}% off`,
             })),
-            loyaltyDiscounts: Object.entries(LOYALTY_DISCOUNTS).map(([tier, discount]) => ({
+            loyaltyDiscounts: Object.entries(DEFAULT_LOYALTY_DISCOUNTS).map(([tier, discount]) => ({
               tier: tier.charAt(0).toUpperCase() + tier.slice(1),
               discount: `${discount}% off`,
             })),

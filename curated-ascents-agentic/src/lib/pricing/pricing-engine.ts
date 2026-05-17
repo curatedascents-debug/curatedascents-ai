@@ -89,29 +89,29 @@ export const DEMAND_ADJUSTMENTS = {
   VERY_HIGH: 15,
 } as const;
 
-// Early bird discount tiers (days in advance)
-export const EARLY_BIRD_TIERS = [
-  { daysAhead: 90, discount: 15 }, // 90+ days: 15% off
-  { daysAhead: 60, discount: 10 }, // 60-89 days: 10% off
-  { daysAhead: 30, discount: 5 }, // 30-59 days: 5% off
+// Early bird discount tiers (days in advance) — fallback defaults used when DB table is empty
+export const DEFAULT_EARLY_BIRD_TIERS = [
+  { daysAhead: 90, discount: 15 },
+  { daysAhead: 60, discount: 10 },
+  { daysAhead: 30, discount: 5 },
 ] as const;
 
-// Last minute discount tiers
-export const LAST_MINUTE_TIERS = [
-  { daysAhead: 3, discount: 20 }, // 0-3 days: 20% off (if available)
-  { daysAhead: 7, discount: 15 }, // 4-7 days: 15% off
-  { daysAhead: 14, discount: 10 }, // 8-14 days: 10% off
+// Last minute discount tiers — fallback defaults
+export const DEFAULT_LAST_MINUTE_TIERS = [
+  { daysAhead: 3, discount: 20 },
+  { daysAhead: 7, discount: 15 },
+  { daysAhead: 14, discount: 10 },
 ] as const;
 
-// Group discount tiers
-export const GROUP_DISCOUNT_TIERS = [
-  { minPax: 20, discount: 15 }, // 20+ pax: 15% off
-  { minPax: 10, discount: 10 }, // 10-19 pax: 10% off
-  { minPax: 6, discount: 5 }, // 6-9 pax: 5% off
+// Group discount tiers — fallback defaults
+export const DEFAULT_GROUP_DISCOUNT_TIERS = [
+  { minPax: 20, discount: 15 },
+  { minPax: 10, discount: 10 },
+  { minPax: 6, discount: 5 },
 ] as const;
 
-// Loyalty tier discounts
-export const LOYALTY_DISCOUNTS: Record<string, number> = {
+// Loyalty tier discounts — fallback defaults
+export const DEFAULT_LOYALTY_DISCOUNTS: Record<string, number> = {
   bronze: 2,
   silver: 5,
   gold: 8,
@@ -201,68 +201,101 @@ export async function calculateDynamicPrice(
     }
   }
 
-  // 5. Apply built-in rules if no conflicting DB rules
+  // 5. Apply built-in discount rules (DB-backed, 5-min TTL, fallback to defaults)
+  const discountsEnabled = await checkDiscountsEnabled();
 
-  // Early bird discount
-  if (!appliedRules.some((r) => r.ruleType === "early_bird")) {
+  if (discountsEnabled) {
     const daysAhead = Math.floor(
       (travelDate.getTime() - bookingDate.getTime()) / (1000 * 60 * 60 * 24)
     );
-    for (const tier of EARLY_BIRD_TIERS) {
-      if (daysAhead >= tier.daysAhead) {
+
+    // Early bird discount
+    if (!appliedRules.some((r) => r.ruleType === "early_bird")) {
+      const ebRules = await getEarlyBirdRules(); // sorted DESC by daysInAdvance
+      for (const rule of ebRules) {
+        if (daysAhead >= rule.daysInAdvance) {
+          const priceBeforeRule = currentPrice;
+          currentPrice = currentPrice * (1 - rule.discountPercent / 100);
+          appliedRules.push({
+            ruleId: -1,
+            ruleName: `Early Bird (${rule.daysInAdvance}+ days)`,
+            ruleType: "early_bird",
+            adjustmentType: "percentage",
+            adjustmentValue: -rule.discountPercent,
+            priceBeforeRule,
+            priceAfterRule: currentPrice,
+          });
+          break;
+        }
+      }
+    }
+
+    // Last minute discount (mutually exclusive with early bird)
+    if (
+      !appliedRules.some((r) => r.ruleType === "last_minute") &&
+      !appliedRules.some((r) => r.ruleType === "early_bird")
+    ) {
+      const lmRules = await getLastMinuteRules(); // sorted ASC by daysBeforeDeparture
+      for (const rule of lmRules) {
+        if (daysAhead <= rule.daysBeforeDeparture) {
+          const priceBeforeRule = currentPrice;
+          currentPrice = currentPrice * (1 - rule.discountPercent / 100);
+          appliedRules.push({
+            ruleId: -5,
+            ruleName: `Last Minute (within ${rule.daysBeforeDeparture} days)`,
+            ruleType: "last_minute",
+            adjustmentType: "percentage",
+            adjustmentValue: -rule.discountPercent,
+            priceBeforeRule,
+            priceAfterRule: currentPrice,
+          });
+          break;
+        }
+      }
+    }
+
+    // Group discount
+    if (!appliedRules.some((r) => r.ruleType === "group") && paxCount > 1) {
+      const gdRules = await getGroupDiscountRules(); // sorted DESC by minPax
+      for (const rule of gdRules) {
+        if (paxCount >= rule.minPax && (rule.maxPax === null || paxCount <= rule.maxPax)) {
+          const priceBeforeRule = currentPrice;
+          currentPrice = currentPrice * (1 - rule.discountPercent / 100);
+          appliedRules.push({
+            ruleId: -2,
+            ruleName: `Group Discount (${rule.minPax}+ pax)`,
+            ruleType: "group",
+            adjustmentType: "percentage",
+            adjustmentValue: -rule.discountPercent,
+            priceBeforeRule,
+            priceAfterRule: currentPrice,
+          });
+          break;
+        }
+      }
+    }
+
+    // Loyalty discount
+    if (!appliedRules.some((r) => r.ruleType === "loyalty") && loyaltyTier) {
+      const ltRules = await getLoyaltyTiers();
+      const matchedTier = ltRules.find(
+        (t) => t.tierName.toLowerCase() === loyaltyTier.toLowerCase()
+      );
+      if (matchedTier) {
         const priceBeforeRule = currentPrice;
-        currentPrice = currentPrice * (1 - tier.discount / 100);
+        currentPrice = currentPrice * (1 - matchedTier.discountPercent / 100);
         appliedRules.push({
-          ruleId: -1,
-          ruleName: `Early Bird (${tier.daysAhead}+ days)`,
-          ruleType: "early_bird",
+          ruleId: -3,
+          ruleName: `${loyaltyTier} Member Discount`,
+          ruleType: "loyalty",
           adjustmentType: "percentage",
-          adjustmentValue: -tier.discount,
+          adjustmentValue: -matchedTier.discountPercent,
           priceBeforeRule,
           priceAfterRule: currentPrice,
         });
-        break;
       }
     }
-  }
-
-  // Group discount
-  if (!appliedRules.some((r) => r.ruleType === "group") && paxCount > 1) {
-    for (const tier of GROUP_DISCOUNT_TIERS) {
-      if (paxCount >= tier.minPax) {
-        const priceBeforeRule = currentPrice;
-        currentPrice = currentPrice * (1 - tier.discount / 100);
-        appliedRules.push({
-          ruleId: -2,
-          ruleName: `Group Discount (${tier.minPax}+ pax)`,
-          ruleType: "group",
-          adjustmentType: "percentage",
-          adjustmentValue: -tier.discount,
-          priceBeforeRule,
-          priceAfterRule: currentPrice,
-        });
-        break;
-      }
-    }
-  }
-
-  // Loyalty discount
-  if (!appliedRules.some((r) => r.ruleType === "loyalty") && loyaltyTier) {
-    const discount = LOYALTY_DISCOUNTS[loyaltyTier.toLowerCase()];
-    if (discount) {
-      const priceBeforeRule = currentPrice;
-      currentPrice = currentPrice * (1 - discount / 100);
-      appliedRules.push({
-        ruleId: -3,
-        ruleName: `${loyaltyTier} Member Discount`,
-        ruleType: "loyalty",
-        adjustmentType: "percentage",
-        adjustmentValue: -discount,
-        priceBeforeRule,
-        priceAfterRule: currentPrice,
-      });
-    }
-  }
+  } // end discountsEnabled
 
   // Demand-based adjustment (only if enabled and no manual promotional rule)
   if (
@@ -994,5 +1027,105 @@ export async function checkDiscountsEnabled(): Promise<boolean> {
     return row.value === 'true';
   } catch {
     return false;
+  }
+}
+
+// ============================================
+// DB-BACKED DISCOUNT RULE LOADERS (5-min TTL)
+// ============================================
+
+const DISCOUNT_CACHE_TTL_MS = 5 * 60 * 1000;
+
+interface EarlyBirdRule { daysInAdvance: number; discountPercent: number; }
+interface GroupDiscountRule { minPax: number; maxPax: number | null; discountPercent: number; }
+interface LastMinuteRule { daysBeforeDeparture: number; discountPercent: number; }
+interface LoyaltyTierRule { tierName: string; minPoints: number; discountPercent: number; }
+
+let _earlyBirdCache: { data: EarlyBirdRule[]; fetchedAt: number } | null = null;
+let _groupDiscountCache: { data: GroupDiscountRule[]; fetchedAt: number } | null = null;
+let _lastMinuteCache: { data: LastMinuteRule[]; fetchedAt: number } | null = null;
+let _loyaltyTierCache: { data: LoyaltyTierRule[]; fetchedAt: number } | null = null;
+
+async function getEarlyBirdRules(): Promise<EarlyBirdRule[]> {
+  if (_earlyBirdCache && Date.now() - _earlyBirdCache.fetchedAt < DISCOUNT_CACHE_TTL_MS) {
+    return _earlyBirdCache.data;
+  }
+  try {
+    const rows = await db.execute(sql`
+      SELECT days_in_advance, discount_percent FROM early_bird_rules
+      WHERE is_active = true ORDER BY days_in_advance DESC
+    `);
+    const data = (rows.rows as Array<{ days_in_advance: string; discount_percent: string }>)
+      .map(r => ({ daysInAdvance: parseInt(r.days_in_advance), discountPercent: parseFloat(r.discount_percent) }));
+    const result = data.length > 0 ? data
+      : DEFAULT_EARLY_BIRD_TIERS.map(t => ({ daysInAdvance: t.daysAhead, discountPercent: t.discount }));
+    _earlyBirdCache = { data: result, fetchedAt: Date.now() };
+    return result;
+  } catch {
+    return DEFAULT_EARLY_BIRD_TIERS.map(t => ({ daysInAdvance: t.daysAhead, discountPercent: t.discount }));
+  }
+}
+
+async function getGroupDiscountRules(): Promise<GroupDiscountRule[]> {
+  if (_groupDiscountCache && Date.now() - _groupDiscountCache.fetchedAt < DISCOUNT_CACHE_TTL_MS) {
+    return _groupDiscountCache.data;
+  }
+  try {
+    const rows = await db.execute(sql`
+      SELECT min_pax, max_pax, discount_percent FROM group_discount_rules
+      WHERE is_active = true ORDER BY min_pax DESC
+    `);
+    const data = (rows.rows as Array<{ min_pax: string; max_pax: string | null; discount_percent: string }>)
+      .map(r => ({
+        minPax: parseInt(r.min_pax),
+        maxPax: r.max_pax !== null ? parseInt(r.max_pax) : null,
+        discountPercent: parseFloat(r.discount_percent),
+      }));
+    const result = data.length > 0 ? data
+      : DEFAULT_GROUP_DISCOUNT_TIERS.map(t => ({ minPax: t.minPax, maxPax: null, discountPercent: t.discount }));
+    _groupDiscountCache = { data: result, fetchedAt: Date.now() };
+    return result;
+  } catch {
+    return DEFAULT_GROUP_DISCOUNT_TIERS.map(t => ({ minPax: t.minPax, maxPax: null, discountPercent: t.discount }));
+  }
+}
+
+async function getLastMinuteRules(): Promise<LastMinuteRule[]> {
+  if (_lastMinuteCache && Date.now() - _lastMinuteCache.fetchedAt < DISCOUNT_CACHE_TTL_MS) {
+    return _lastMinuteCache.data;
+  }
+  try {
+    const rows = await db.execute(sql`
+      SELECT days_before_departure, discount_percent FROM last_minute_rules
+      WHERE is_active = true ORDER BY days_before_departure ASC
+    `);
+    const data = (rows.rows as Array<{ days_before_departure: string; discount_percent: string }>)
+      .map(r => ({ daysBeforeDeparture: parseInt(r.days_before_departure), discountPercent: parseFloat(r.discount_percent) }));
+    const result = data.length > 0 ? data
+      : DEFAULT_LAST_MINUTE_TIERS.map(t => ({ daysBeforeDeparture: t.daysAhead, discountPercent: t.discount }));
+    _lastMinuteCache = { data: result, fetchedAt: Date.now() };
+    return result;
+  } catch {
+    return DEFAULT_LAST_MINUTE_TIERS.map(t => ({ daysBeforeDeparture: t.daysAhead, discountPercent: t.discount }));
+  }
+}
+
+async function getLoyaltyTiers(): Promise<LoyaltyTierRule[]> {
+  if (_loyaltyTierCache && Date.now() - _loyaltyTierCache.fetchedAt < DISCOUNT_CACHE_TTL_MS) {
+    return _loyaltyTierCache.data;
+  }
+  try {
+    const rows = await db.execute(sql`
+      SELECT tier_name, min_points, discount_percent FROM loyalty_tiers
+      WHERE is_active = true ORDER BY min_points DESC
+    `);
+    const data = (rows.rows as Array<{ tier_name: string; min_points: string; discount_percent: string }>)
+      .map(r => ({ tierName: r.tier_name, minPoints: parseInt(r.min_points), discountPercent: parseFloat(r.discount_percent) }));
+    const result = data.length > 0 ? data
+      : Object.entries(DEFAULT_LOYALTY_DISCOUNTS).map(([tierName, discountPercent]) => ({ tierName, minPoints: 0, discountPercent }));
+    _loyaltyTierCache = { data: result, fetchedAt: Date.now() };
+    return result;
+  } catch {
+    return Object.entries(DEFAULT_LOYALTY_DISCOUNTS).map(([tierName, discountPercent]) => ({ tierName, minPoints: 0, discountPercent }));
   }
 }
