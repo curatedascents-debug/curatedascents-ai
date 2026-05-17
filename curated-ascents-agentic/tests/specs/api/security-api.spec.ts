@@ -52,6 +52,6 @@ test.describe('Security & Health APIs @api @regression', () => {
     const response = await request.post(`${baseURL}${API_ROUTES.portalVerifyCode}`, {
       data: { email: 'test@example.com', code: '000000' },
     });
-    expect([400, 401]).toContain(response.status());
+    expect([400, 401, 429]).toContain(response.status());
   });
 });

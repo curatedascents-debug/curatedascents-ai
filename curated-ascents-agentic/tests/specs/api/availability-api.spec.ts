@@ -1,22 +1,35 @@
 import { test, expect } from '@playwright/test';
-import { API_ROUTES } from '../../fixtures/test-data.fixture';
+import { API_ROUTES, TEST_ADMIN } from '../../fixtures/test-data.fixture';
+import { generateAdminToken } from '../../fixtures/auth.fixture';
 
 test.describe('Availability API @api @admin', () => {
+  const adminCookie = () => {
+    const token = generateAdminToken(
+      TEST_ADMIN.password,
+      process.env.ADMIN_SESSION_SECRET || 'curated-ascents-default-secret'
+    );
+    return `admin_session=${token}`;
+  };
+
   // --- Calendar ---
   test('GET calendar without params returns error', async ({ request, baseURL }) => {
-    const response = await request.get(`${baseURL}${API_ROUTES.adminAvailabilityCalendar}`);
+    const response = await request.get(`${baseURL}${API_ROUTES.adminAvailabilityCalendar}`, {
+      headers: { Cookie: adminCookie() },
+    });
     expect([400, 500]).toContain(response.status());
   });
 
   test('GET calendar with date range returns data', async ({ request, baseURL }) => {
     const response = await request.get(
-      `${baseURL}${API_ROUTES.adminAvailabilityCalendar}?startDate=2026-03-01&endDate=2026-03-31`
+      `${baseURL}${API_ROUTES.adminAvailabilityCalendar}?startDate=2026-03-01&endDate=2026-03-31`,
+      { headers: { Cookie: adminCookie() } }
     );
     expect(response.ok()).toBeTruthy();
   });
 
   test('POST calendar with missing fields returns error', async ({ request, baseURL }) => {
     const response = await request.post(`${baseURL}${API_ROUTES.adminAvailabilityCalendar}`, {
+      headers: { Cookie: adminCookie() },
       data: {},
     });
     expect([400, 500]).toContain(response.status());
@@ -24,25 +37,31 @@ test.describe('Availability API @api @admin', () => {
 
   // --- Availability Check ---
   test('GET check without params returns error', async ({ request, baseURL }) => {
-    const response = await request.get(`${baseURL}${API_ROUTES.adminAvailabilityCheck}`);
+    const response = await request.get(`${baseURL}${API_ROUTES.adminAvailabilityCheck}`, {
+      headers: { Cookie: adminCookie() },
+    });
     expect([400, 500]).toContain(response.status());
   });
 
   test('GET check with valid params', async ({ request, baseURL }) => {
     const response = await request.get(
-      `${baseURL}${API_ROUTES.adminAvailabilityCheck}?serviceType=hotel&serviceId=1&startDate=2026-04-01&endDate=2026-04-05`
+      `${baseURL}${API_ROUTES.adminAvailabilityCheck}?serviceType=hotel&serviceId=1&startDate=2026-04-01&endDate=2026-04-05`,
+      { headers: { Cookie: adminCookie() } }
     );
     expect([200, 500]).toContain(response.status());
   });
 
   // --- Blackouts ---
   test('GET blackouts returns data', async ({ request, baseURL }) => {
-    const response = await request.get(`${baseURL}${API_ROUTES.adminAvailabilityBlackouts}`);
+    const response = await request.get(`${baseURL}${API_ROUTES.adminAvailabilityBlackouts}`, {
+      headers: { Cookie: adminCookie() },
+    });
     expect(response.ok()).toBeTruthy();
   });
 
   test('POST blackouts with missing fields returns error', async ({ request, baseURL }) => {
     const response = await request.post(`${baseURL}${API_ROUTES.adminAvailabilityBlackouts}`, {
+      headers: { Cookie: adminCookie() },
       data: {},
     });
     expect([400, 500]).toContain(response.status());
@@ -50,6 +69,7 @@ test.describe('Availability API @api @admin', () => {
 
   test('POST blackouts with invalid date range returns error', async ({ request, baseURL }) => {
     const response = await request.post(`${baseURL}${API_ROUTES.adminAvailabilityBlackouts}`, {
+      headers: { Cookie: adminCookie() },
       data: { startDate: '2026-04-10', endDate: '2026-04-01', reason: 'Test' },
     });
     expect([400, 500]).toContain(response.status());
@@ -57,12 +77,15 @@ test.describe('Availability API @api @admin', () => {
 
   // --- Holds ---
   test('GET holds returns data', async ({ request, baseURL }) => {
-    const response = await request.get(`${baseURL}${API_ROUTES.adminAvailabilityHolds}`);
+    const response = await request.get(`${baseURL}${API_ROUTES.adminAvailabilityHolds}`, {
+      headers: { Cookie: adminCookie() },
+    });
     expect(response.ok()).toBeTruthy();
   });
 
   test('POST holds with missing fields returns error', async ({ request, baseURL }) => {
     const response = await request.post(`${baseURL}${API_ROUTES.adminAvailabilityHolds}`, {
+      headers: { Cookie: adminCookie() },
       data: {},
     });
     expect([400, 500]).toContain(response.status());
@@ -70,12 +93,15 @@ test.describe('Availability API @api @admin', () => {
 
   // --- Permits ---
   test('GET permits returns data', async ({ request, baseURL }) => {
-    const response = await request.get(`${baseURL}${API_ROUTES.adminAvailabilityPermits}`);
+    const response = await request.get(`${baseURL}${API_ROUTES.adminAvailabilityPermits}`, {
+      headers: { Cookie: adminCookie() },
+    });
     expect(response.ok()).toBeTruthy();
   });
 
   test('POST permits with missing fields returns error', async ({ request, baseURL }) => {
     const response = await request.post(`${baseURL}${API_ROUTES.adminAvailabilityPermits}`, {
+      headers: { Cookie: adminCookie() },
       data: {},
     });
     expect([400, 500]).toContain(response.status());

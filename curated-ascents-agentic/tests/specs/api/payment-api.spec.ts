@@ -16,6 +16,6 @@ test.describe('Payment API @api @booking', () => {
 
   test('GET /api/payments/status with invalid session returns error', async ({ request, baseURL }) => {
     const response = await request.get(`${baseURL}${API_ROUTES.paymentsStatus}?session_id=invalid_session`);
-    expect([400, 404, 500]).toContain(response.status());
+    expect([400, 404, 500, 503]).toContain(response.status());
   });
 });

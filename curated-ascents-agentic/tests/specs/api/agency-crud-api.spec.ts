@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { SignJWT } from 'jose';
-import { API_ROUTES, TEST_AGENCY_USER } from '../../fixtures/test-data.fixture';
+import { API_ROUTES, TEST_ADMIN, TEST_AGENCY_USER } from '../../fixtures/test-data.fixture';
+import { generateAdminToken } from '../../fixtures/auth.fixture';
 
 /** Generate agency JWT inline for API-level tests (no browser context needed) */
 async function generateAgencyJwt(): Promise<string> {
@@ -21,9 +22,19 @@ async function generateAgencyJwt(): Promise<string> {
 }
 
 test.describe('Agency CRUD API @api @agency', () => {
+  const adminCookie = () => {
+    const token = generateAdminToken(
+      TEST_ADMIN.password,
+      process.env.ADMIN_SESSION_SECRET || 'curated-ascents-default-secret'
+    );
+    return `admin_session=${token}`;
+  };
+
   // --- Admin-side agency management ---
   test('GET /api/admin/agencies returns data', async ({ request, baseURL }) => {
-    const response = await request.get(`${baseURL}${API_ROUTES.adminAgencies}`);
+    const response = await request.get(`${baseURL}${API_ROUTES.adminAgencies}`, {
+      headers: { Cookie: adminCookie() },
+    });
     expect(response.ok()).toBeTruthy();
     const data = await response.json();
     expect(data).toBeDefined();
@@ -31,6 +42,7 @@ test.describe('Agency CRUD API @api @agency', () => {
 
   test('POST /api/admin/agencies with empty body returns error', async ({ request, baseURL }) => {
     const response = await request.post(`${baseURL}${API_ROUTES.adminAgencies}`, {
+      headers: { Cookie: adminCookie() },
       data: {},
     });
     expect([400, 500]).toContain(response.status());
