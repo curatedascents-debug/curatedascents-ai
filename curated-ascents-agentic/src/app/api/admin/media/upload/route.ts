@@ -23,25 +23,32 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate file type
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-    if (!allowedTypes.includes(file.type)) {
+    const IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    const VIDEO_TYPES = ["video/mp4", "video/quicktime", "video/webm", "video/avi"];
+    const isImage = IMAGE_TYPES.includes(file.type);
+    const isVideo = VIDEO_TYPES.includes(file.type);
+
+    if (!isImage && !isVideo) {
       return NextResponse.json(
-        { error: "Invalid file type. Accepted: JPEG, PNG, WebP" },
+        { error: "Invalid file type. Accepted: JPEG, PNG, WebP, MP4, MOV, WebM, AVI" },
         { status: 400 }
       );
     }
 
-    // Validate file size (max 20MB)
-    const maxSize = 20 * 1024 * 1024;
+    // Per-type size limit: 500MB for video, 20MB for images
+    const maxSize = isVideo ? 500 * 1024 * 1024 : 20 * 1024 * 1024;
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: "File too large. Maximum size is 20MB." },
+        { error: `File too large. Maximum size is ${isVideo ? "500MB" : "20MB"}.` },
         { status: 400 }
       );
     }
 
     const country = (formData.get("country") as string)?.toLowerCase();
-    const category = (formData.get("category") as string)?.toLowerCase();
+    // For videos, default category to "video" if caller omits it
+    const category =
+      (formData.get("category") as string)?.toLowerCase() ||
+      (isVideo ? "video" : "");
 
     if (!country || !category) {
       return NextResponse.json(
@@ -68,6 +75,7 @@ export async function POST(req: NextRequest) {
     const record = await uploadMediaFile({
       file: buffer,
       filename: file.name,
+      mimeType: file.type,
       country,
       category,
       destination: (formData.get("destination") as string) || undefined,

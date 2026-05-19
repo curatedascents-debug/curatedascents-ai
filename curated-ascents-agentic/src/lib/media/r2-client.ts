@@ -64,6 +64,27 @@ export function generateKey(
 }
 
 /**
+ * Generate a storage key for video files, preserving the original extension.
+ * Format: {country}/{category}/{filename}-{uuid}.{ext}
+ */
+export function generateVideoKey(
+  country: string,
+  category: string,
+  filename: string
+): string {
+  const ext = filename.match(/\.([^.]+)$/)?.[1]?.toLowerCase() || "mp4";
+  const sanitized = filename
+    .replace(/\.[^.]+$/, "")
+    .replace(/[^a-zA-Z0-9_-]/g, "-")
+    .replace(/-+/g, "-")
+    .toLowerCase()
+    .slice(0, 60);
+
+  const uuid = crypto.randomUUID().slice(0, 8);
+  return `${country.toLowerCase()}/${category.toLowerCase()}/${sanitized}-${uuid}.${ext}`;
+}
+
+/**
  * Generate thumbnail key from the original key.
  */
 function thumbnailKey(key: string): string {
@@ -190,11 +211,11 @@ export async function deleteFromR2(key: string): Promise<void> {
 
 export interface UploadResult {
   cdnUrl: string;
-  thumbnailUrl: string;
+  thumbnailUrl: string | null;
   key: string;
   thumbnailKey: string;
-  width: number;
-  height: number;
+  width: number | null;
+  height: number | null;
   fileSize: number;
   mimeType: string;
 }
@@ -245,6 +266,38 @@ export async function uploadMedia(
     height: processed.height,
     fileSize: processed.originalSize,
     mimeType: "image/webp",
+  };
+}
+
+/**
+ * Video upload pipeline: stores the raw file as-is (no WebP conversion or thumbnail).
+ */
+export async function uploadVideoMedia(
+  file: Buffer,
+  country: string,
+  category: string,
+  filename: string,
+  mimeType: string
+): Promise<UploadResult> {
+  const key = generateVideoKey(country, category, filename);
+
+  let cdnUrl: string;
+  if (isR2Configured()) {
+    cdnUrl = await uploadToR2(file, key, mimeType);
+  } else {
+    console.log("[Media] R2 not configured — saving video to local public/uploads/media/");
+    cdnUrl = await uploadToLocal(file, key);
+  }
+
+  return {
+    cdnUrl,
+    thumbnailUrl: null,
+    key,
+    thumbnailKey: key,
+    width: null,
+    height: null,
+    fileSize: file.length,
+    mimeType,
   };
 }
 

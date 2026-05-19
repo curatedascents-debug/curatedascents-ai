@@ -12,6 +12,7 @@ import {
 import { eq, and, or, ilike, desc, asc, sql, count } from "drizzle-orm";
 import {
   uploadMedia as uploadPipeline,
+  uploadVideoMedia,
   deleteMedia as deleteFromStorage,
   keyFromCdnUrl,
 } from "./r2-client";
@@ -57,6 +58,7 @@ export interface MediaRecord {
 export interface MediaUploadParams {
   file: Buffer;
   filename: string;
+  mimeType?: string;
   country: string;
   category: string;
   destination?: string;
@@ -134,19 +136,36 @@ export interface MediaStats {
 
 // ─── Upload ──────────────────────────────────────────────────────────────────
 
+const VIDEO_MIME_TYPES = new Set([
+  "video/mp4",
+  "video/quicktime",
+  "video/webm",
+  "video/avi",
+]);
+
 /**
  * Upload a file to R2 and create a media library record.
+ * Videos skip WebP conversion and thumbnail generation.
  */
 export async function uploadMediaFile(
   params: MediaUploadParams
 ): Promise<MediaRecord> {
-  // Upload to R2 or local filesystem fallback (process → WebP → thumbnail → upload)
-  const r2Result = await uploadPipeline(
-    params.file,
-    params.country,
-    params.category,
-    params.filename
-  );
+  const isVideo = params.mimeType ? VIDEO_MIME_TYPES.has(params.mimeType) : false;
+
+  const r2Result = isVideo
+    ? await uploadVideoMedia(
+        params.file,
+        params.country,
+        params.category,
+        params.filename,
+        params.mimeType!
+      )
+    : await uploadPipeline(
+        params.file,
+        params.country,
+        params.category,
+        params.filename
+      );
 
   // Create DB record
   const [record] = await db

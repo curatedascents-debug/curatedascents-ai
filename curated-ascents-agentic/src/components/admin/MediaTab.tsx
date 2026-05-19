@@ -85,8 +85,14 @@ interface Collection {
 const COUNTRIES = ["nepal", "india", "tibet", "bhutan"];
 const CATEGORIES = [
   "landscape", "hotel", "trek", "culture", "food", "wildlife",
-  "temple", "adventure", "wellness", "people", "aerial", "luxury", "heritage",
+  "temple", "adventure", "wellness", "people", "aerial", "luxury", "heritage", "video",
 ];
+
+const VIDEO_MIME_TYPES = new Set(["video/mp4", "video/quicktime", "video/webm", "video/avi"]);
+
+function isVideo(item: MediaItem) {
+  return item.mimeType ? VIDEO_MIME_TYPES.has(item.mimeType) : false;
+}
 const SEASONS = ["spring", "summer", "monsoon", "autumn", "winter", "all"];
 
 type SubTab = "library" | "collections" | "stats";
@@ -405,7 +411,7 @@ function LibraryView() {
       {/* Summary line */}
       <div className="flex items-center justify-between mb-3">
         <p className="text-sm text-slate-400">
-          {total} image{total !== 1 ? "s" : ""} found
+          {total} item{total !== 1 ? "s" : ""} found
           {items.length > 0 && (
             <button onClick={selectAll} className="ml-3 text-emerald-400 hover:underline text-sm">
               {selected.size === items.length ? "Deselect all" : "Select all"}
@@ -420,7 +426,7 @@ function LibraryView() {
       ) : items.length === 0 ? (
         <div className="text-center py-12 text-slate-400">
           <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <p>No media found. Upload your first image!</p>
+          <p>No media found. Upload your first image or video!</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -438,12 +444,21 @@ function LibraryView() {
                 className="aspect-square bg-slate-800 relative"
                 onClick={() => setPreviewItem(item)}
               >
-                <img
-                  src={item.thumbnailUrl || item.cdnUrl}
-                  alt={item.altText || item.title || item.filename}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
+                {isVideo(item) ? (
+                  <video
+                    src={item.cdnUrl}
+                    className="w-full h-full object-cover"
+                    preload="metadata"
+                    muted
+                  />
+                ) : (
+                  <img
+                    src={item.thumbnailUrl || item.cdnUrl}
+                    alt={item.altText || item.title || item.filename}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                )}
 
                 {/* Select checkbox */}
                 <button
@@ -588,7 +603,10 @@ function UploadModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
 
   const handleFiles = (fileList: FileList) => {
     const valid = Array.from(fileList).filter((f) =>
-      ["image/jpeg", "image/png", "image/webp"].includes(f.type)
+      [
+        "image/jpeg", "image/jpg", "image/png", "image/webp",
+        "video/mp4", "video/quicktime", "video/webm", "video/avi",
+      ].includes(f.type)
     );
     setFiles(valid);
     setError("");
@@ -631,7 +649,7 @@ function UploadModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
           } catch {
             const text = await res.text();
             if (res.status === 413) {
-              errorMsg = "File too large. Maximum upload size is 20MB.";
+              errorMsg = "File too large. Maximum size is 20MB for images, 500MB for videos.";
             } else {
               errorMsg = text || `Upload failed (${res.status})`;
             }
@@ -651,7 +669,7 @@ function UploadModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
       <div className="bg-slate-900 rounded-lg border border-slate-700 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b border-slate-700">
-          <h3 className="text-lg font-semibold">Upload Images</h3>
+          <h3 className="text-lg font-semibold">Upload Media</h3>
           <button onClick={onClose} className="p-1 hover:bg-slate-700 rounded">
             <X className="w-5 h-5" />
           </button>
@@ -672,13 +690,13 @@ function UploadModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
           >
             <Upload className="w-8 h-8 mx-auto mb-2 text-slate-400" />
             <p className="text-sm text-slate-400">
-              Drop images here or click to browse
+              Drop images or videos here or click to browse
             </p>
-            <p className="text-xs text-slate-500 mt-1">JPEG, PNG, WebP — max 20MB each</p>
+            <p className="text-xs text-slate-500 mt-1">JPEG, PNG, WebP — max 20MB · MP4, MOV, WebM, AVI — max 500MB</p>
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp"
+              accept="image/jpeg,image/jpg,image/png,image/webp,video/mp4,video/quicktime,video/webm,video/avi"
               multiple
               onChange={(e) => e.target.files && handleFiles(e.target.files)}
               className="hidden"
@@ -802,7 +820,7 @@ function UploadModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
               disabled={files.length === 0 || uploading}
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded text-sm disabled:opacity-50"
             >
-              {uploading ? "Uploading..." : `Upload ${files.length || ""} Image${files.length > 1 ? "s" : ""}`}
+              {uploading ? "Uploading..." : `Upload ${files.length || ""} File${files.length > 1 ? "s" : ""}`}
             </button>
           </div>
         </div>
@@ -894,7 +912,7 @@ function EditModal({
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
       <div className="bg-slate-900 rounded-lg border border-slate-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b border-slate-700">
-          <h3 className="text-lg font-semibold">Edit Image</h3>
+          <h3 className="text-lg font-semibold">Edit Media</h3>
           <button onClick={onClose} className="p-1 hover:bg-slate-700 rounded">
             <X className="w-5 h-5" />
           </button>
@@ -903,11 +921,20 @@ function EditModal({
         <div className="p-4 space-y-4">
           {/* Preview */}
           <div className="flex gap-4">
-            <img
-              src={item.thumbnailUrl || item.cdnUrl}
-              alt={item.altText || item.filename}
-              className="w-32 h-32 object-cover rounded"
-            />
+            {isVideo(item) ? (
+              <video
+                src={item.cdnUrl}
+                className="w-32 h-32 object-cover rounded"
+                preload="metadata"
+                muted
+              />
+            ) : (
+              <img
+                src={item.thumbnailUrl || item.cdnUrl}
+                alt={item.altText || item.filename}
+                className="w-32 h-32 object-cover rounded"
+              />
+            )}
             <div className="flex-1 text-sm text-slate-400 space-y-1">
               <p><span className="text-slate-500">Filename:</span> {item.filename}</p>
               <p><span className="text-slate-500">Size:</span> {item.width}x{item.height}</p>
@@ -1082,11 +1109,19 @@ function PreviewModal({
         </div>
 
         <div className="p-4">
-          <img
-            src={item.cdnUrl}
-            alt={item.altText || item.title || item.filename}
-            className="w-full max-h-[60vh] object-contain rounded mb-4"
-          />
+          {isVideo(item) ? (
+            <video
+              src={item.cdnUrl}
+              controls
+              className="w-full max-h-[60vh] rounded mb-4"
+            />
+          ) : (
+            <img
+              src={item.cdnUrl}
+              alt={item.altText || item.title || item.filename}
+              className="w-full max-h-[60vh] object-contain rounded mb-4"
+            />
+          )}
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
             <div>
