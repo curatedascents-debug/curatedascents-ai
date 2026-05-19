@@ -94,39 +94,44 @@ export async function GET(req: NextRequest) {
       ON CONFLICT (key) DO NOTHING
     `);
 
-    // Seed earlyBirdRules
+    // Seed earlyBirdRules (only if table is empty)
     await db.execute(sql`
       INSERT INTO early_bird_rules (days_in_advance, discount_percent, is_active, label)
-      VALUES
-        (60, 10.00, false, 'Book 60+ days ahead'),
-        (90, 15.00, false, 'Book 90+ days ahead')
-      ON CONFLICT DO NOTHING
+      SELECT * FROM (VALUES
+        (60, 10.00::numeric, false, 'Book 60+ days ahead'),
+        (90, 15.00::numeric, false, 'Book 90+ days ahead')
+      ) AS v(days_in_advance, discount_percent, is_active, label)
+      WHERE NOT EXISTS (SELECT 1 FROM early_bird_rules LIMIT 1)
     `);
 
-    // Seed groupDiscountRules
+    // Seed groupDiscountRules (only if table is empty)
     await db.execute(sql`
       INSERT INTO group_discount_rules (min_pax, max_pax, discount_percent, is_active, label)
-      VALUES
-        (8, 15, 5.00, false, 'Small group (8–15 pax)'),
-        (16, NULL, 10.00, false, 'Large group (16+ pax)')
-      ON CONFLICT DO NOTHING
+      SELECT * FROM (VALUES
+        (8, 15::integer, 5.00::numeric, false, 'Small group (8–15 pax)'),
+        (16, NULL::integer, 10.00::numeric, false, 'Large group (16+ pax)')
+      ) AS v(min_pax, max_pax, discount_percent, is_active, label)
+      WHERE NOT EXISTS (SELECT 1 FROM group_discount_rules LIMIT 1)
     `);
 
-    // Seed lastMinuteRules
+    // Seed lastMinuteRules (only if table is empty)
     await db.execute(sql`
       INSERT INTO last_minute_rules (days_before_departure, discount_percent, is_active, label)
-      VALUES (14, 5.00, false, 'Last minute (14 days before)')
-      ON CONFLICT DO NOTHING
+      SELECT * FROM (VALUES
+        (14, 5.00::numeric, false, 'Last minute (14 days before)')
+      ) AS v(days_before_departure, discount_percent, is_active, label)
+      WHERE NOT EXISTS (SELECT 1 FROM last_minute_rules LIMIT 1)
     `);
 
-    // Seed loyaltyTiers
+    // Seed loyaltyTiers (only if table is empty)
     await db.execute(sql`
       INSERT INTO loyalty_tiers (tier_name, min_points, discount_percent, is_active)
-      VALUES
-        ('Silver', 500, 5.00, false),
-        ('Gold', 1500, 8.00, false),
-        ('Platinum', 3000, 12.00, false)
-      ON CONFLICT DO NOTHING
+      SELECT * FROM (VALUES
+        ('Silver', 500, 5.00::numeric, false),
+        ('Gold', 1500, 8.00::numeric, false),
+        ('Platinum', 3000, 12.00::numeric, false)
+      ) AS v(tier_name, min_points, discount_percent, is_active)
+      WHERE NOT EXISTS (SELECT 1 FROM loyalty_tiers LIMIT 1)
     `);
 
     // Remove duplicate service_type_margins rows (keep most-recently-updated per key)
