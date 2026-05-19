@@ -1001,7 +1001,10 @@ export async function saveQuote(params: {
 
     const quote = quoteResult[0];
 
-    // Build per-item margin keys and audit data
+    // Build per-item margin keys and audit data.
+    // For package items, use a country-specific key when the destination is known
+    // so each country's margin is independently configurable in service_type_margins.
+    const dest = (params.destination || '').toLowerCase();
     const marginKeys = params.items.map(item => {
       const st = (item.serviceType || 'miscellaneous').toLowerCase();
       if (st === 'hotel') return 'hotel_room_only';
@@ -1011,7 +1014,12 @@ export async function saveQuote(params: {
       if (st === 'helicopter_sharing' || st === 'helicopter') return 'helicopter';
       if (st === 'permit') return 'trekking_permit';
       if (st === 'transportation') return 'ground_transport';
-      if (st === 'package') return 'miscellaneous';
+      if (st === 'package') {
+        if (dest.includes('bhutan')) return 'bhutan_package';
+        if (dest.includes('tibet')) return 'tibet_package';
+        if (dest.includes('india')) return 'india_package';
+        return 'miscellaneous';
+      }
       return 'miscellaneous';
     });
 

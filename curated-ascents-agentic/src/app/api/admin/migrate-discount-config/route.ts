@@ -129,24 +129,37 @@ export async function GET(req: NextRequest) {
       ON CONFLICT DO NOTHING
     `);
 
-    // Seed serviceTypeMargins
+    // Remove duplicate service_type_margins rows (keep most-recently-updated per key)
+    await db.execute(sql`
+      DELETE FROM service_type_margins
+      WHERE id NOT IN (
+        SELECT DISTINCT ON (service_type_key) id
+        FROM service_type_margins
+        ORDER BY service_type_key, updated_at DESC NULLS LAST
+      )
+    `);
+
+    // Seed serviceTypeMargins (Nepal service-type keys + country-level keys for Bhutan/Tibet/India)
     await db.execute(sql`
       INSERT INTO service_type_margins (service_type_key, display_name, b2c_margin_percent, agent_margin_percent)
       VALUES
-        ('trekking_permit',    'Trekking Permits & TIMS',           35, 20),
-        ('guide_service',      'Guide Services',                    40, 25),
-        ('porter_service',     'Porter Services',                   40, 25),
-        ('hotel_room_only',    'Hotel (Room Only, EP)',              50, 30),
-        ('hotel_with_meals',   'Hotel (with Meals, CP/MAP/AP)',      45, 28),
-        ('domestic_flight',    'Domestic Flights',                  12,  8),
-        ('international_flight','International Flights',             8,  5),
-        ('ground_transport',   'Ground Transportation',             40, 25),
-        ('helicopter',         'Helicopter Services',               30, 18),
-        ('cultural_tour',      'Cultural Tours & Sightseeing',      45, 28),
-        ('adventure_activity', 'Adventure Activities',              40, 25),
-        ('equipment_rental',   'Equipment Rental',                  35, 20),
-        ('visa_assistance',    'Visa & Documentation Assistance',   25, 15),
-        ('miscellaneous',      'Miscellaneous & Other Services',    40, 25)
+        ('trekking_permit',     'Trekking Permits & TIMS',           35, 20),
+        ('guide_service',       'Guide Services',                    40, 25),
+        ('porter_service',      'Porter Services',                   40, 25),
+        ('hotel_room_only',     'Hotel (Room Only, EP)',              50, 30),
+        ('hotel_with_meals',    'Hotel (with Meals, CP/MAP/AP)',      45, 28),
+        ('domestic_flight',     'Domestic Flights',                  12,  8),
+        ('international_flight','International Flights',              8,  5),
+        ('ground_transport',    'Ground Transportation',             40, 25),
+        ('helicopter',          'Helicopter Services',               30, 18),
+        ('cultural_tour',       'Cultural Tours & Sightseeing',      45, 28),
+        ('adventure_activity',  'Adventure Activities',              40, 25),
+        ('equipment_rental',    'Equipment Rental',                  35, 20),
+        ('visa_assistance',     'Visa & Documentation Assistance',   25, 15),
+        ('miscellaneous',       'Miscellaneous & Other Services',    40, 25),
+        ('bhutan_package',      'Bhutan Packages & Programs',        50, 30),
+        ('tibet_package',       'Tibet Packages & Programs',         50, 30),
+        ('india_package',       'India Packages & Programs',         50, 30)
       ON CONFLICT (service_type_key) DO NOTHING
     `);
 
