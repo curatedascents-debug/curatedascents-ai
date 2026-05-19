@@ -6,6 +6,7 @@ import HotelModal from "@/components/HotelModal";
 interface Hotel {
   id: number;
   name: string;
+  supplierId?: number | null;
   [key: string]: any;
 }
 
@@ -112,7 +113,16 @@ export default function HotelsTab({ suppliers, destinations }: HotelsTabProps) {
                 className="border-t border-slate-700 hover:bg-slate-700 cursor-pointer transition-colors"
                 onClick={() => setSelectedHotel(hotel)}
               >
-                <td className="p-4 font-medium">{hotel.name}</td>
+                <td className="p-4 font-medium">
+                  <span className="inline-flex items-center gap-2">
+                    {hotel.name}
+                    {hotel.supplierId == null && (
+                      <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-amber-900/60 text-amber-300 border border-amber-700/50">
+                        No supplier
+                      </span>
+                    )}
+                  </span>
+                </td>
                 <td className="p-4 text-yellow-400">
                   {hotel.starRating ? `${hotel.starRating} Star` : "-"}
                 </td>
