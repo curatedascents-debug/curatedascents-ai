@@ -41,7 +41,7 @@ const DESTINATION_GUIDES = [
       { tip: "Photography may be restricted in dzongs", explanation: "Ask before photographing" },
     ],
     healthAndSafety: "Medical facilities limited outside Thimphu. Comprehensive travel insurance mandatory.",
-    emergencyInfo: { police: "113", ambulance: "110", hospitals: ["Jigme Dorji Wangchuck Hospital (Thimphu)"] },
+    emergencyInfo: { police: "113", ambulance: "110", helpline: "+975-1-321-321", tourismBoard: "+975-2-323251 (Bhutan Tourism Council)", hospitals: ["Jigme Dorji Wangchuck Hospital (Thimphu)"] },
   },
   {
     country: "Tibet",
@@ -59,7 +59,7 @@ const DESTINATION_GUIDES = [
       { tip: "Be politically sensitive", explanation: "Avoid sensitive political topics" },
     ],
     healthAndSafety: "Altitude is serious — Lhasa is 3,650m. Acclimatize 2-3 days before strenuous activity.",
-    emergencyInfo: { police: "110", ambulance: "120", hospitals: ["Tibet People's Hospital (Lhasa)"] },
+    emergencyInfo: { police: "110", ambulance: "120", tourismBoard: "+86-891-6834315 (Tibet Tourism Bureau)", hospitals: ["Tibet People's Hospital (Lhasa)"] },
   },
   {
     country: "India",
@@ -78,7 +78,7 @@ const DESTINATION_GUIDES = [
       { tip: "Remove shoes at religious sites", explanation: "Footwear considered impure" },
     ],
     healthAndSafety: "Drink only bottled water. Travel insurance essential. Vaccinations for Hepatitis A and Typhoid recommended.",
-    emergencyInfo: { police: "100", ambulance: "102 / 108", hospitals: ["Max Super Speciality Hospital (Delhi)", "Apollo Hospitals"] },
+    emergencyInfo: { police: "100", ambulance: "108", helpline: "1800-111-363 (Tourist Police, toll-free)", tourismBoard: "1800-11-1363 (India Tourism helpline, toll-free)", hospitals: ["Max Super Speciality Hospital (Delhi)", "Apollo Hospitals"] },
   },
 ];
 

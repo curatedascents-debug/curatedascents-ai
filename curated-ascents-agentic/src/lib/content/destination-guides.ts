@@ -63,6 +63,8 @@ export interface DestinationGuide {
     police?: string;
     ambulance?: string;
     embassy?: string;
+    helpline?: string;
+    tourismBoard?: string;
     hospitals?: string[];
   };
   coverImage?: string;
@@ -178,6 +180,8 @@ const DESTINATION_DATA: Record<string, Partial<DestinationGuide>> = {
     emergencyInfo: {
       police: "113",
       ambulance: "110",
+      helpline: "+975-1-321-321",
+      tourismBoard: "+975-2-323251 (Bhutan Tourism Council)",
       hospitals: ["Jigme Dorji Wangchuck National Referral Hospital (Thimphu)"],
     },
   },
@@ -231,6 +235,7 @@ const DESTINATION_DATA: Record<string, Partial<DestinationGuide>> = {
     emergencyInfo: {
       police: "110",
       ambulance: "120",
+      tourismBoard: "+86-891-6834315 (Tibet Tourism Bureau)",
       hospitals: ["Tibet Autonomous Region People's Hospital (Lhasa)"],
     },
   },
@@ -286,7 +291,9 @@ const DESTINATION_DATA: Record<string, Partial<DestinationGuide>> = {
     moneyMatters: `The Indian Rupee (INR) is the local currency. ATMs are widely available. Credit cards accepted at hotels, restaurants, and shops in tourist areas. Tipping is customary — 10% at restaurants, INR 200–500 per day for drivers and guides. Bargaining is expected at markets. Many luxury hotels quote in USD and accept international payment.`,
     emergencyInfo: {
       police: "100",
-      ambulance: "102 / 108",
+      ambulance: "108",
+      helpline: "1800-111-363 (Tourist Police, toll-free)",
+      tourismBoard: "1800-11-1363 (India Tourism helpline, toll-free)",
       embassy: "Contact your country's embassy in New Delhi",
       hospitals: ["Max Super Speciality Hospital (New Delhi)", "Apollo Hospitals (multiple cities)", "Fortis Memorial Research Institute (Gurugram)"],
     },
