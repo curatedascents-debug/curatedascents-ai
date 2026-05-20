@@ -39,6 +39,8 @@ interface DestinationData {
     police?: string;
     ambulance?: string;
     embassy?: string;
+    helpline?: string;
+    tourismBoard?: string;
     hospitals?: string[];
   };
 }
@@ -119,7 +121,7 @@ const destinationData: Record<string, DestinationData> = {
     },
     healthAndSafety: "Altitude can affect visitors, especially on treks. Medical facilities are limited outside Thimphu. Comprehensive travel insurance with evacuation coverage is mandatory.",
     moneyMatters: "Bhutanese Ngultrum (BTN) is at par with Indian Rupee; both are accepted. The Sustainable Development Fee (SDF) of $200/day for tourists covers most costs. ATMs available in main towns.",
-    emergencyInfo: { police: "113", ambulance: "110", hospitals: ["Jigme Dorji Wangchuck National Referral Hospital (Thimphu)"] },
+    emergencyInfo: { police: "113", ambulance: "110", helpline: "+975-1-321-321", tourismBoard: "+975-2-323251 (Bhutan Tourism Council)", hospitals: ["Jigme Dorji Wangchuck National Referral Hospital (Thimphu)"] },
   },
   tibet: {
     slug: "tibet",
@@ -157,7 +159,7 @@ const destinationData: Record<string, DestinationData> = {
     },
     healthAndSafety: "Altitude is a serious concern — Lhasa is at 3,650m. Spend at least 2-3 days acclimatizing before any strenuous activity. Drink lots of water and ascend gradually. Medical facilities are limited.",
     moneyMatters: "Chinese Yuan (CNY/RMB) is the currency. ATMs available in Lhasa; carry cash for remote areas. All tour costs must be pre-arranged through your tour operator.",
-    emergencyInfo: { police: "110", ambulance: "120", hospitals: ["Tibet Autonomous Region People's Hospital (Lhasa)"] },
+    emergencyInfo: { police: "110", ambulance: "120", tourismBoard: "+86-891-6834315 (Tibet Tourism Bureau)", hospitals: ["Tibet Autonomous Region People's Hospital (Lhasa)"] },
   },
   india: {
     slug: "india",
@@ -197,7 +199,7 @@ const destinationData: Record<string, DestinationData> = {
     },
     healthAndSafety: "Drink only bottled or purified water. Travel insurance with medical evacuation is essential. Altitude sickness is a concern above 3,000m in Ladakh. Vaccinations for Hepatitis A, Typhoid, and Tetanus are recommended.",
     moneyMatters: "The Indian Rupee (INR) is the local currency. ATMs are widely available. Credit cards accepted at hotels and shops in tourist areas. Tipping is customary — 10% at restaurants, INR 200-500 per day for drivers and guides.",
-    emergencyInfo: { police: "100", ambulance: "102 / 108", embassy: "Contact your country's embassy in New Delhi", hospitals: ["Max Super Speciality Hospital (New Delhi)", "Apollo Hospitals (multiple cities)", "Fortis Memorial Research Institute (Gurugram)"] },
+    emergencyInfo: { police: "100", ambulance: "108", helpline: "1800-111-363 (Tourist Police, toll-free)", tourismBoard: "1800-11-1363 (India Tourism helpline, toll-free)", embassy: "Contact your country's embassy in New Delhi", hospitals: ["Max Super Speciality Hospital (New Delhi)", "Apollo Hospitals (multiple cities)", "Fortis Memorial Research Institute (Gurugram)"] },
   },
 };
 
@@ -472,6 +474,18 @@ export default async function DestinationDetailPage({ params }: PageProps) {
                 <div>
                   <dt className="text-red-800/60 mb-1">Ambulance</dt>
                   <dd className="text-red-900 font-medium">{dest.emergencyInfo.ambulance}</dd>
+                </div>
+              )}
+              {dest.emergencyInfo.helpline && (
+                <div>
+                  <dt className="text-red-800/60 mb-1">Tourist Helpline</dt>
+                  <dd className="text-red-900 font-medium">{dest.emergencyInfo.helpline}</dd>
+                </div>
+              )}
+              {dest.emergencyInfo.tourismBoard && (
+                <div>
+                  <dt className="text-red-800/60 mb-1">Tourism Board</dt>
+                  <dd className="text-red-900 font-medium">{dest.emergencyInfo.tourismBoard}</dd>
                 </div>
               )}
               {dest.emergencyInfo.embassy && (
