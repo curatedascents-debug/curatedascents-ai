@@ -66,10 +66,10 @@ export default function ContactPage() {
             For urgent booking changes or emergencies during your trip, please call our 24/7 emergency line.
           </p>
           <a
-            href="tel:+9779800000000"
+            href="tel:+97714247041"
             className="text-emerald-400 hover:text-emerald-300 transition-colors text-sm"
           >
-            +977 980 000 0000 (Emergency)
+            +977-1-4247041 (Tourist Police, Kathmandu)
           </a>
         </div>
       </div>
